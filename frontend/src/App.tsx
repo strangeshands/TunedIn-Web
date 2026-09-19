@@ -148,8 +148,51 @@ export default function App() {
     };
 
     const startBaseline = () => {
+        setRecordBank(generateRecordBank(100));
+
+        setRecordIndex(0);
+        setForm(empty);
+        setErrors([]);
+        setAccepted(0);
+
+        firstKey.current = null;
+        hasSubmittedCurrentRecord.current = false;
+
         setSeconds(0);
         setBaselineStarted(performance.now());
+    };
+
+    const submitBaseline = (e: FormEvent) => {
+        e.preventDefault();
+
+        const bad: string[] = [];
+
+        if (form.recordCode !== current.recordCode) {
+            bad.push("Record Code");
+        }
+
+        if (form.batchCode !== current.batchCode) {
+            bad.push("Batch Code");
+        }
+
+        if (form.quantity !== current.quantity) {
+            bad.push("Quantity");
+        }
+
+        if (bad.length) {
+            setErrors(bad);
+            return;
+        }
+
+        // Practice only.
+        setAccepted((old) => old + 1);
+        setRecordIndex((old) => old + 1);
+
+        setForm(empty);
+        setErrors([]);
+
+        firstKey.current = null;
+        hasSubmittedCurrentRecord.current = false;
     };
 
     const continueFromAudioCheck = () => {
@@ -370,33 +413,184 @@ export default function App() {
 
     if (stage === "baseline") {
         const baselineRunning = baselineStarted !== null;
+
         const baselineRemaining = Math.max(0, BASELINE_SECONDS - seconds);
 
-        return (
-            <SimpleStage
-                eyebrow="SILENT BASELINE"
-                title="Silent baseline"
-                description="Complete the baseline period without background music. This stage precedes the audio-comfort check and the three experimental blocks."
-                participantId={participantId}
-            >
-                <div className="timer-card">
-                    <span>
-                        {baselineRunning ? "Time remaining" : "Duration"}
-                    </span>
-                    <strong>
-                        {fmt(
-                            baselineRunning
-                                ? baselineRemaining
-                                : BASELINE_SECONDS,
-                        )}
-                    </strong>
-                </div>
-                {!baselineRunning && (
+        if (!baselineRunning) {
+            return (
+                <SimpleStage
+                    eyebrow="SILENT BASELINE"
+                    title="Practice encoding task"
+                    description="Complete a short practice encoding task without background music before the experimental blocks begin."
+                    participantId={participantId}
+                >
+                    <div className="instructions">
+                        <b>Practice instructions</b>
+
+                        <ul>
+                            <li>
+                                Copy the values from the source record into the
+                                matching fields.
+                            </li>
+
+                            <li>
+                                Press <kbd>Tab</kbd> to move between fields.
+                            </li>
+
+                            <li>
+                                Press <kbd>Enter</kbd> to submit.
+                            </li>
+
+                            <li>
+                                Incorrect records must be corrected before
+                                moving to the next record.
+                            </li>
+
+                            <li>
+                                No background music will play during this
+                                practice period.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="timer-card">
+                        <span>Practice duration</span>
+
+                        <strong>{fmt(BASELINE_SECONDS)}</strong>
+                    </div>
+
+                    {TEST_MODE && (
+                        <div className="test-banner">
+                            TEST MODE — practice ends after{" "}
+                            {TEST_BASELINE_SECONDS} seconds. Production duration
+                            is 2 minutes.
+                        </div>
+                    )}
+
                     <button className="primary large" onClick={startBaseline}>
-                        Start silent baseline <span>→</span>
+                        Start practice <span>→</span>
                     </button>
-                )}
-            </SimpleStage>
+                </SimpleStage>
+            );
+        }
+
+        return (
+            <main className="task">
+                <header>
+                    <div>
+                        <div className="brand">TUNED IN</div>
+
+                        <small className="participant-tag">
+                            Participant {participantId}
+                        </small>
+                    </div>
+
+                    <div className="meta">
+                        <span className="pill">Practice</span>
+
+                        <span className="pill">No music</span>
+
+                        <span>{fmt(baselineRemaining)} remaining</span>
+                    </div>
+                </header>
+
+                <div className="progress">
+                    <i
+                        style={{
+                            width: `${Math.min(
+                                100,
+                                (seconds / BASELINE_SECONDS) * 100,
+                            )}%`,
+                        }}
+                    />
+                </div>
+
+                <section className="content">
+                    <div className="heading">
+                        <div>
+                            <div className="eyebrow">PRACTICE ENCODING</div>
+
+                            <h2>Enter the source record</h2>
+                        </div>
+
+                        <b>{accepted} practice records</b>
+                    </div>
+
+                    <div className="grid">
+                        <section className="panel">
+                            <div className="panel-label">SOURCE RECORD</div>
+
+                            <div className="source">
+                                {[
+                                    ["Record Code", current.recordCode],
+                                    ["Batch Code", current.batchCode],
+                                    ["Quantity", current.quantity],
+                                ].map(([label, value]) => (
+                                    <div className="source-row" key={label}>
+                                        <span>{label}</span>
+                                        <strong>{value}</strong>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <p className="note">
+                                ● Practice only · No background music
+                            </p>
+                        </section>
+
+                        <form className="panel" onSubmit={submitBaseline}>
+                            <div className="panel-label">ENTRY FIELDS</div>
+
+                            <Field
+                                label="Record Code"
+                                value={form.recordCode}
+                                error={errors.includes("Record Code")}
+                                autoFocus
+                                onChange={(value) =>
+                                    update("recordCode", value)
+                                }
+                            />
+
+                            <Field
+                                label="Batch Code"
+                                value={form.batchCode}
+                                error={errors.includes("Batch Code")}
+                                onChange={(value) => update("batchCode", value)}
+                            />
+
+                            <Field
+                                label="Quantity"
+                                value={form.quantity}
+                                error={errors.includes("Quantity")}
+                                inputMode="numeric"
+                                onChange={(value) => update("quantity", value)}
+                            />
+
+                            {errors.length > 0 && (
+                                <div className="error">
+                                    <b>
+                                        Check the highlighted field
+                                        {errors.length > 1 ? "s" : ""}.
+                                    </b>
+
+                                    <span>
+                                        Correct the values and submit again.
+                                    </span>
+                                </div>
+                            )}
+
+                            <button className="primary submit" type="submit">
+                                Submit Record <span>↵</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div className="foot">
+                        Practice task · No music · Results are not included in
+                        experimental blocks
+                    </div>
+                </section>
+            </main>
         );
     }
 
