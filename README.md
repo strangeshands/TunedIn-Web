@@ -1,3 +1,7 @@
+# DO NOT RUN BACKEND FIRST
+
+--
+
 # Tuned In — Frontend Prototype
 
 React + TypeScript + Vite prototype aligned with Chapter 6's planned frontend architecture and initial digital encoding flow.
@@ -7,15 +11,9 @@ React + TypeScript + Vite prototype aligned with Chapter 6's planned frontend ar
 Requires Node.js 20+.
 
 ```bash
+cd frontend
 npm install
 npm run dev
-```
-
-For a production build:
-
-```bash
-npm run build
-npm run preview
 ```
 
 ## Included
