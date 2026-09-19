@@ -33,6 +33,7 @@ export default function App() {
         [started, setStarted] = useState<number | null>(null);
     const firstKey = useRef<number | null>(null);
     const current = RECORDS[i % RECORDS.length];
+    
     useEffect(() => {
         if (screen !== "task" || started === null) return;
         const id = setInterval(
@@ -41,6 +42,7 @@ export default function App() {
         );
         return () => clearInterval(id);
     }, [screen, started]);
+
     const start = () => {
         setScreen("task");
         setI(0);
@@ -50,12 +52,14 @@ export default function App() {
         setSeconds(0);
         setStarted(performance.now());
     };
+
     const update = (k: keyof typeof form, v: string) => {
         if (firstKey.current === null && v)
             firstKey.current = performance.now();
         setForm((x) => ({ ...x, [k]: v.toUpperCase() }));
         if (errors.length) setErrors([]);
     };
+
     const submit = (e: FormEvent) => {
         e.preventDefault();
         const bad: string[] = [];
@@ -73,6 +77,7 @@ export default function App() {
         if (n >= 12) setScreen("complete");
         else setI((x) => x + 1);
     };
+    
     if (screen === "landing")
         return (
             <main className="app">
