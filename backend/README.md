@@ -1,40 +1,61 @@
-# Tuned In — Python prototype backend
+# Tuned In Backend
 
-This version uses no SQL/database. It keeps sessions and task events in a normal
-Python dictionary and computes the measures from those raw events.
+Current backend implementation aligned with the Chapter 6 technology stack:
+
+- **TypeScript** — backend implementation language
+- **Node.js + Express** — local application service / HTTP API
+- **JSON Lines (`.jsonl`)** — append-friendly raw task-event export
+- **CSV** — processed block-level measure export
+- **SQLite** — intentionally pending; current prototype keeps live session state in memory
 
 ## Run
 
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app:app --reload --port 3001
+npm install
+npm run dev
 ```
 
-Check:
+Backend URL:
 
-- `http://localhost:3001/api/health`
-- `http://localhost:3001/docs`
+```text
+http://127.0.0.1:3001
+```
 
-Your existing frontend `api.ts` can stay unchanged if it points to
-`http://localhost:3001`.
+Health check:
 
-## Measures
+```text
+http://127.0.0.1:3001/api/health
+```
 
-The backend computes:
+Participant results:
 
-- validated record throughput
+```text
+http://127.0.0.1:3001/api/participants/P001
+```
+
+## Prototype storage behavior
+
+While the server is running, session/block/event data is held in memory. Restarting the backend clears that live state. This is the only deliberate mismatch with the final Chapter 6 stack; SQLite can be added later behind the same API.
+
+Raw events are additionally appended to:
+
+```text
+exports/<participant>_<session>_events.jsonl
+```
+
+Processed measures are written to:
+
+```text
+exports/<participant>_<session>_measures.csv
+```
+
+## Measures currently computed
+
+- validated-record throughput
 - median initiation latency (IL)
 - median first-pass entry duration (FPED)
 - first-pass record error rate (FPRER)
-- first-pass accuracy
+- first-pass record accuracy
 - median time to successful validation (TTSV)
 - correction cycles
 - correction cycles per validated record
-
-## Important
-
-This is deliberately temporary. All data disappears when the Python process
-stops or reloads. Add persistent storage later.

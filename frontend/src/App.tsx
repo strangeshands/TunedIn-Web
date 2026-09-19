@@ -229,7 +229,7 @@ export default function App() {
             console.error("Could not create session:", error);
 
             alert(
-                "Could not connect to the backend. Make sure the Python server is running on port 3001.",
+                "Could not connect to the backend. Make sure the Node.js backend is running on port 3001.",
             );
         }
     };
