@@ -5,9 +5,17 @@ import {
     type ParticipantSessionResult,
 } from "./resultExport";
 import { generateRecordBank, type GeneratedRecord } from "./recordGenerator";
+import {
+    createSession,
+    startApiBlock,
+    sendTaskEvent,
+    finishApiBlock,
+    type BlockMeasures,
+} from "./api";
 
 type Condition = "No music" | "Static music" | "Adaptive music";
 type OrderId = "A" | "B" | "C";
+
 type Stage =
     | "participant"
     | "baseline"
@@ -33,13 +41,9 @@ const CONDITION_ORDERS: Record<OrderId, Condition[]> = {
     C: ["Adaptive music", "No music", "Static music"],
 };
 
-// Production protocol durations.
 const REAL_BASELINE_SECONDS = 2 * 60;
 const REAL_BLOCK_SECONDS = 8 * 60;
 
-// TEMPORARY TEST MODE:
-// Keep this true while developing so you do not have to wait 2/8 minutes.
-// Set to false before actual study sessions.
 const TEST_MODE = true;
 const TEST_BASELINE_SECONDS = 8;
 const TEST_BLOCK_SECONDS = 15;
@@ -47,27 +51,47 @@ const TEST_BLOCK_SECONDS = 15;
 const BASELINE_SECONDS = TEST_MODE
     ? TEST_BASELINE_SECONDS
     : REAL_BASELINE_SECONDS;
+
 const BLOCK_SECONDS = TEST_MODE ? TEST_BLOCK_SECONDS : REAL_BLOCK_SECONDS;
 
-const empty = { recordCode: "", batchCode: "", quantity: "" };
+const empty = {
+    recordCode: "",
+    batchCode: "",
+    quantity: "",
+};
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
+
     const [participantId, setParticipantId] = useState(
         () => localStorage.getItem("tunedIn.participantId") ?? "",
     );
+
     const [orderId, setOrderId] = useState<OrderId>("A");
+
+    const [sessionId, setSessionId] = useState<string | null>(null);
+
     const [blockIndex, setBlockIndex] = useState(0);
     const [recordIndex, setRecordIndex] = useState(0);
+
     const [form, setForm] = useState(empty);
     const [errors, setErrors] = useState<string[]>([]);
+
     const [accepted, setAccepted] = useState(0);
+
     const [seconds, setSeconds] = useState(0);
     const [started, setStarted] = useState<number | null>(null);
+
     const [baselineStarted, setBaselineStarted] = useState<number | null>(null);
+
     const [blockResults, setBlockResults] = useState<BlockResult[]>([]);
+
+    const [backendResults, setBackendResults] = useState<BlockMeasures[]>([]);
+
     const [firstPassAccepted, setFirstPassAccepted] = useState(0);
+
     const [firstPassRejected, setFirstPassRejected] = useState(0);
+
     const [correctionCycles, setCorrectionCycles] = useState(0);
 
     const [recordBank, setRecordBank] = useState<GeneratedRecord[]>(() =>
@@ -75,11 +99,15 @@ export default function App() {
     );
 
     const firstKey = useRef<number | null>(null);
+
     const completionGuard = useRef(false);
+
     const hasSubmittedCurrentRecord = useRef(false);
 
     const conditionOrder = CONDITION_ORDERS[orderId];
+
     const condition = conditionOrder[blockIndex] ?? conditionOrder[0];
+
     const current = recordBank[recordIndex % recordBank.length];
 
     const remaining = useMemo(
@@ -87,19 +115,40 @@ export default function App() {
         [seconds],
     );
 
-    // Silent baseline timer.
+    /*
+     * --------------------------------------------------
+     * PRACTICE / SILENT BASELINE TIMER
+     * --------------------------------------------------
+     */
+
     useEffect(() => {
-        if (stage !== "baseline" || baselineStarted === null) return;
+        if (stage !== "baseline" || baselineStarted === null) {
+            return;
+        }
 
         const id = window.setInterval(() => {
             const elapsed = Math.floor(
                 (performance.now() - baselineStarted) / 1000,
             );
+
             setSeconds(elapsed);
 
             if (elapsed >= BASELINE_SECONDS) {
                 window.clearInterval(id);
+
                 setSeconds(BASELINE_SECONDS);
+
+                setForm(empty);
+                setErrors([]);
+                setAccepted(0);
+                setRecordIndex(0);
+
+                firstKey.current = null;
+
+                hasSubmittedCurrentRecord.current = false;
+
+                setBaselineStarted(null);
+
                 setStage("audio-check");
             }
         }, 250);
@@ -107,18 +156,28 @@ export default function App() {
         return () => window.clearInterval(id);
     }, [stage, baselineStarted]);
 
-    // Eight-minute block timer. In TEST_MODE this ends after 15 seconds.
+    /*
+     * --------------------------------------------------
+     * EXPERIMENTAL BLOCK TIMER
+     * --------------------------------------------------
+     */
+
     useEffect(() => {
-        if (stage !== "task" || started === null) return;
+        if (stage !== "task" || started === null) {
+            return;
+        }
 
         const id = window.setInterval(() => {
             const elapsed = Math.floor((performance.now() - started) / 1000);
+
             setSeconds(elapsed);
 
             if (elapsed >= BLOCK_SECONDS && !completionGuard.current) {
                 completionGuard.current = true;
+
                 window.clearInterval(id);
-                finishBlock(BLOCK_SECONDS);
+
+                void finishBlock(BLOCK_SECONDS);
             }
         }, 250);
 
@@ -134,18 +193,52 @@ export default function App() {
         correctionCycles,
     ]);
 
-    const saveParticipant = (e: FormEvent) => {
+    /*
+     * --------------------------------------------------
+     * CREATE PARTICIPANT SESSION
+     * --------------------------------------------------
+     */
+
+    const saveParticipant = async (e: FormEvent) => {
         e.preventDefault();
+
         const cleanId = participantId.trim();
+
         if (!cleanId) return;
 
-        localStorage.setItem("tunedIn.participantId", cleanId);
-        localStorage.setItem("tunedIn.orderId", orderId);
-        setParticipantId(cleanId);
-        setSeconds(0);
-        setBaselineStarted(null);
-        setStage("baseline");
+        try {
+            const response = await createSession({
+                participantId: cleanId,
+                orderId,
+                conditionOrder,
+            });
+
+            setSessionId(response.sessionId);
+
+            localStorage.setItem("tunedIn.participantId", cleanId);
+
+            localStorage.setItem("tunedIn.orderId", orderId);
+
+            setParticipantId(cleanId);
+
+            setSeconds(0);
+            setBaselineStarted(null);
+
+            setStage("baseline");
+        } catch (error) {
+            console.error("Could not create session:", error);
+
+            alert(
+                "Could not connect to the backend. Make sure the Python server is running on port 3001.",
+            );
+        }
     };
+
+    /*
+     * --------------------------------------------------
+     * PRACTICE BASELINE
+     * --------------------------------------------------
+     */
 
     const startBaseline = () => {
         setRecordBank(generateRecordBank(100));
@@ -156,9 +249,11 @@ export default function App() {
         setAccepted(0);
 
         firstKey.current = null;
+
         hasSubmittedCurrentRecord.current = false;
 
         setSeconds(0);
+
         setBaselineStarted(performance.now());
     };
 
@@ -184,59 +279,206 @@ export default function App() {
             return;
         }
 
-        // Practice only.
         setAccepted((old) => old + 1);
+
         setRecordIndex((old) => old + 1);
 
         setForm(empty);
         setErrors([]);
 
         firstKey.current = null;
+
         hasSubmittedCurrentRecord.current = false;
     };
+
+    /*
+     * --------------------------------------------------
+     * AUDIO CHECK
+     * --------------------------------------------------
+     */
 
     const continueFromAudioCheck = () => {
         setBlockIndex(0);
         setStage("block-intro");
     };
 
-    const startBlock = () => {
-        completionGuard.current = false;
-        firstKey.current = null;
-        setRecordBank(generateRecordBank(100));
-        setRecordIndex(0);
-        setForm(empty);
-        setErrors([]);
-        setAccepted(0);
-        setFirstPassAccepted(0);
-        setFirstPassRejected(0);
-        setCorrectionCycles(0);
-        hasSubmittedCurrentRecord.current = false;
-        setSeconds(0);
-        setStarted(performance.now());
-        setStage("task");
+    /*
+     * --------------------------------------------------
+     * START EXPERIMENT BLOCK
+     * --------------------------------------------------
+     */
+
+    const startBlock = async () => {
+        if (!sessionId) {
+            alert("No backend session exists.");
+
+            return;
+        }
+
+        const newBank = generateRecordBank(100);
+
+        try {
+            await startApiBlock(sessionId, blockIndex + 1, condition);
+
+            setRecordBank(newBank);
+
+            completionGuard.current = false;
+
+            firstKey.current = null;
+
+            setRecordIndex(0);
+            setForm(empty);
+            setErrors([]);
+
+            setAccepted(0);
+
+            setFirstPassAccepted(0);
+            setFirstPassRejected(0);
+
+            setCorrectionCycles(0);
+
+            hasSubmittedCurrentRecord.current = false;
+
+            setSeconds(0);
+
+            const startTime = performance.now();
+
+            setStarted(startTime);
+
+            setStage("task");
+
+            /*
+             * First record becomes visible.
+             */
+            await sendTaskEvent(sessionId, {
+                blockNumber: blockIndex + 1,
+
+                recordId: newBank[0].id,
+
+                eventType: "record_presented",
+
+                clientTimeMs: performance.now(),
+            });
+        } catch (error) {
+            console.error("Could not start block:", error);
+
+            alert("Could not start the backend block.");
+        }
     };
+
+    /*
+     * --------------------------------------------------
+     * FIRST KEYPRESS
+     * --------------------------------------------------
+     */
 
     const update = (key: keyof typeof form, value: string) => {
         if (firstKey.current === null && value) {
-            firstKey.current = performance.now();
+            const time = performance.now();
+
+            firstKey.current = time;
+
+            /*
+             * Only experimental task events
+             * go to backend.
+             *
+             * Practice baseline is excluded.
+             */
+            if (stage === "task" && sessionId) {
+                void sendTaskEvent(sessionId, {
+                    blockNumber: blockIndex + 1,
+
+                    recordId: current.id,
+
+                    eventType: "first_key",
+
+                    clientTimeMs: time,
+                });
+            }
         }
 
-        setForm((old) => ({ ...old, [key]: value.toUpperCase() }));
-        if (errors.length) setErrors([]);
+        setForm((old) => ({
+            ...old,
+            [key]: value.toUpperCase(),
+        }));
+
+        if (errors.length) {
+            setErrors([]);
+        }
     };
 
-    const submit = (e: FormEvent) => {
+    /*
+     * --------------------------------------------------
+     * EXPERIMENTAL RECORD SUBMISSION
+     * --------------------------------------------------
+     */
+
+    const submit = async (e: FormEvent) => {
         e.preventDefault();
 
+        if (!sessionId) return;
+
+        const submissionTime = performance.now();
+
         const isFirstPass = !hasSubmittedCurrentRecord.current;
+
         hasSubmittedCurrentRecord.current = true;
 
         const bad: string[] = [];
-        if (form.recordCode !== current.recordCode) bad.push("Record Code");
-        if (form.batchCode !== current.batchCode) bad.push("Batch Code");
-        if (form.quantity !== current.quantity) bad.push("Quantity");
 
+        if (form.recordCode !== current.recordCode) {
+            bad.push("Record Code");
+        }
+
+        if (form.batchCode !== current.batchCode) {
+            bad.push("Batch Code");
+        }
+
+        if (form.quantity !== current.quantity) {
+            bad.push("Quantity");
+        }
+
+        const acceptedSubmission = bad.length === 0;
+
+        /*
+         * Full-record submission event.
+         */
+        try {
+            await sendTaskEvent(sessionId, {
+                blockNumber: blockIndex + 1,
+
+                recordId: current.id,
+
+                eventType: "record_submitted",
+
+                clientTimeMs: submissionTime,
+            });
+
+            /*
+             * Validation result event.
+             */
+            await sendTaskEvent(sessionId, {
+                blockNumber: blockIndex + 1,
+
+                recordId: current.id,
+
+                eventType: "validation_result",
+
+                clientTimeMs: performance.now(),
+
+                payload: {
+                    accepted: acceptedSubmission,
+
+                    incorrectFields: bad,
+                },
+            });
+        } catch (error) {
+            console.error("Could not send task event:", error);
+        }
+
+        /*
+         * Incorrect submission.
+         */
         if (bad.length) {
             if (isFirstPass) {
                 setFirstPassRejected((old) => old + 1);
@@ -245,49 +487,136 @@ export default function App() {
             }
 
             setErrors(bad);
+
             return;
         }
 
+        /*
+         * Correct submission.
+         */
         if (isFirstPass) {
             setFirstPassAccepted((old) => old + 1);
         } else {
             setCorrectionCycles((old) => old + 1);
         }
 
+        const nextIndex = recordIndex + 1;
+
         setAccepted((old) => old + 1);
-        setRecordIndex((old) => old + 1);
+
+        setRecordIndex(nextIndex);
+
         hasSubmittedCurrentRecord.current = false;
+
         setForm(empty);
+
         setErrors([]);
+
         firstKey.current = null;
+
+        /*
+         * Log next record presentation.
+         */
+        const nextRecord = recordBank[nextIndex % recordBank.length];
+
+        try {
+            await sendTaskEvent(sessionId, {
+                blockNumber: blockIndex + 1,
+
+                recordId: nextRecord.id,
+
+                eventType: "record_presented",
+
+                clientTimeMs: performance.now(),
+            });
+        } catch (error) {
+            console.error("Could not log next record:", error);
+        }
     };
 
-    const finishBlock = (elapsedSeconds: number) => {
+    /*
+     * --------------------------------------------------
+     * FINISH BLOCK
+     * --------------------------------------------------
+     */
+
+    const finishBlock = async (elapsedSeconds: number) => {
+        if (!sessionId) return;
+
+        /*
+         * Local result.
+         *
+         * Keeping this for your existing
+         * frontend result/export logic.
+         */
         const result: BlockResult = {
             block: blockIndex + 1,
+
             condition,
+
             accepted,
+
             elapsedSeconds,
+
             firstPassAccepted,
+
             firstPassRejected,
+
             correctionCycles,
         };
 
+        /*
+         * Ask Python to calculate
+         * the real measures.
+         */
+        try {
+            const response = await finishApiBlock(
+                sessionId,
+                blockIndex + 1,
+                elapsedSeconds,
+            );
+
+            if (response.measures) {
+                setBackendResults((old) => [
+                    ...old.filter(
+                        (item) => item.block !== response.measures.block,
+                    ),
+
+                    response.measures,
+                ]);
+            }
+        } catch (error) {
+            console.error("Could not finish backend block:", error);
+        }
+
+        /*
+         * Existing local result.
+         */
         setBlockResults((old) => {
             const next = [
                 ...old.filter((x) => x.block !== result.block),
+
                 result,
             ];
+
             localStorage.setItem(
                 `tunedIn.session.${participantId}`,
+
                 JSON.stringify({
                     participantId,
+
                     orderId,
+
                     conditionOrder,
+
+                    sessionId,
+
                     blocks: next,
+
                     updatedAt: new Date().toISOString(),
                 }),
             );
+
             return next;
         });
 
@@ -296,62 +625,115 @@ export default function App() {
         setStage("block-results");
     };
 
+    /*
+     * --------------------------------------------------
+     * NEXT BLOCK
+     * --------------------------------------------------
+     */
+
     const continueAfterBlockResults = () => {
         if (blockIndex >= conditionOrder.length - 1) {
             setStage("complete");
+
             return;
         }
 
         setBlockIndex((old) => old + 1);
+
         setSeconds(0);
+
         setStage("block-intro");
     };
 
+    /*
+     * --------------------------------------------------
+     * LOCAL EXPORT
+     * --------------------------------------------------
+     */
+
     const getParticipantSession = (): ParticipantSessionResult => ({
         participantId,
+
         orderId,
+
         conditionOrder,
+
         blocks: blockResults,
+
         updatedAt: new Date().toISOString(),
     });
 
+    /*
+     * --------------------------------------------------
+     * RESET SESSION
+     * --------------------------------------------------
+     */
+
     const restartSession = () => {
         setStage("participant");
+
+        setSessionId(null);
+
         setBlockIndex(0);
         setRecordIndex(0);
+
         setForm(empty);
+
         setErrors([]);
+
         setAccepted(0);
+
         setFirstPassAccepted(0);
+
         setFirstPassRejected(0);
+
         setCorrectionCycles(0);
+
+        setBackendResults([]);
+
         hasSubmittedCurrentRecord.current = false;
+
+        firstKey.current = null;
+
+        completionGuard.current = false;
+
         setSeconds(0);
+
         setStarted(null);
+
         setBaselineStarted(null);
+
         setBlockResults([]);
     };
+
+    /*
+     * --------------------------------------------------
+     * PARTICIPANT SETUP
+     * --------------------------------------------------
+     */
 
     if (stage === "participant") {
         return (
             <main className="app">
                 <div className="brand">TUNED IN</div>
+
                 <section className="landing card">
                     <div className="eyebrow">SESSION SETUP</div>
+
                     <h1>
                         Participant setup.
                         <br />
                         <span>Start the protocol.</span>
                     </h1>
+
                     <p className="lead">
-                        Enter the participant ID before beginning. The ID and
-                        temporary session summary are stored locally in this
-                        browser.
+                        Enter the participant ID before beginning.
                     </p>
 
                     <form onSubmit={saveParticipant}>
                         <label className="field">
                             <span>Participant ID</span>
+
                             <input
                                 autoFocus
                                 value={participantId}
@@ -365,6 +747,7 @@ export default function App() {
 
                         <label className="field">
                             <span>Counterbalanced condition order</span>
+
                             <select
                                 value={orderId}
                                 onChange={(e) =>
@@ -374,9 +757,11 @@ export default function App() {
                                 <option value="A">
                                     Order A — No → Static → Adaptive
                                 </option>
+
                                 <option value="B">
                                     Order B — Static → Adaptive → No
                                 </option>
+
                                 <option value="C">
                                     Order C — Adaptive → No → Static
                                 </option>
@@ -385,19 +770,22 @@ export default function App() {
 
                         <div className="instructions">
                             <b>Prototype sequence</b>
+
                             <ol>
-                                <li>Silent baseline</li>
+                                <li>Silent baseline practice</li>
+
                                 <li>Audio-comfort check</li>
+
                                 <li>Three timed encoding blocks</li>
                             </ol>
                         </div>
 
                         {TEST_MODE && (
                             <div className="test-banner">
-                                TEST MODE — baseline ends after{" "}
-                                {TEST_BASELINE_SECONDS}s and each block ends
-                                after {TEST_BLOCK_SECONDS}s. Production blocks
-                                are 8 minutes.
+                                TEST MODE — practice ends after{" "}
+                                {TEST_BASELINE_SECONDS}s and each experimental
+                                block ends after {TEST_BLOCK_SECONDS}
+                                s.
                             </div>
                         )}
 
@@ -406,10 +794,17 @@ export default function App() {
                         </button>
                     </form>
                 </section>
+
                 <footer>Local prototype · Fictional records only</footer>
             </main>
         );
     }
+
+    /*
+     * --------------------------------------------------
+     * PRACTICE BASELINE
+     * --------------------------------------------------
+     */
 
     if (stage === "baseline") {
         const baselineRunning = baselineStarted !== null;
@@ -434,22 +829,16 @@ export default function App() {
                             </li>
 
                             <li>
-                                Press <kbd>Tab</kbd> to move between fields.
+                                Press <kbd>Tab</kbd> between fields.
                             </li>
 
                             <li>
                                 Press <kbd>Enter</kbd> to submit.
                             </li>
 
-                            <li>
-                                Incorrect records must be corrected before
-                                moving to the next record.
-                            </li>
+                            <li>Incorrect records must be corrected.</li>
 
-                            <li>
-                                No background music will play during this
-                                practice period.
-                            </li>
+                            <li>No background music plays during practice.</li>
                         </ul>
                     </div>
 
@@ -462,8 +851,7 @@ export default function App() {
                     {TEST_MODE && (
                         <div className="test-banner">
                             TEST MODE — practice ends after{" "}
-                            {TEST_BASELINE_SECONDS} seconds. Production duration
-                            is 2 minutes.
+                            {TEST_BASELINE_SECONDS} seconds.
                         </div>
                     )}
 
@@ -523,11 +911,14 @@ export default function App() {
                             <div className="source">
                                 {[
                                     ["Record Code", current.recordCode],
+
                                     ["Batch Code", current.batchCode],
+
                                     ["Quantity", current.quantity],
                                 ].map(([label, value]) => (
                                     <div className="source-row" key={label}>
                                         <span>{label}</span>
+
                                         <strong>{value}</strong>
                                     </div>
                                 ))}
@@ -594,6 +985,12 @@ export default function App() {
         );
     }
 
+    /*
+     * --------------------------------------------------
+     * AUDIO CHECK
+     * --------------------------------------------------
+     */
+
     if (stage === "audio-check") {
         return (
             <SimpleStage
@@ -604,15 +1001,19 @@ export default function App() {
             >
                 <div className="instructions">
                     <b>Researcher / participant check</b>
+
                     <ul>
                         <li>Confirm that audio is audible and comfortable.</li>
+
                         <li>
                             Confirm there is no clipping, distortion, or device
                             issue.
                         </li>
+
                         <li>Do not change the volume once the blocks begin.</li>
                     </ul>
                 </div>
+
                 <button
                     className="primary large"
                     onClick={continueFromAudioCheck}
@@ -623,92 +1024,181 @@ export default function App() {
         );
     }
 
+    /*
+     * --------------------------------------------------
+     * BLOCK INTRO
+     * --------------------------------------------------
+     */
+
     if (stage === "block-intro") {
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} OF 3`}
                 title={condition}
-                description={`This encoding block runs for 8 minutes in the study. Continue entering records until the timer ends.`}
+                description="Continue entering records until the timer ends."
                 participantId={participantId}
             >
                 <div className="summary single-summary">
                     <div>
                         <span>Assigned condition</span>
+
                         <b>{condition}</b>
                     </div>
+
                     <div>
                         <span>Study duration</span>
+
                         <b>08:00</b>
                     </div>
+
                     <div>
-                        <span>Prototype duration</span>
+                        <span>Current duration</span>
+
                         <b>{fmt(BLOCK_SECONDS)}</b>
                     </div>
                 </div>
-                <button className="primary large" onClick={startBlock}>
+
+                <button
+                    className="primary large"
+                    onClick={() => void startBlock()}
+                >
                     Start Block {blockIndex + 1} <span>→</span>
                 </button>
             </SimpleStage>
         );
     }
 
+    /*
+     * --------------------------------------------------
+     * BLOCK RESULTS
+     * --------------------------------------------------
+     */
+
     if (stage === "block-results") {
-        const result = blockResults.find(
+        const localResult = blockResults.find(
             (item) => item.block === blockIndex + 1,
         );
 
-        if (!result) return null;
+        const backendResult = backendResults.find(
+            (item) => item.block === blockIndex + 1,
+        );
 
-        const firstPassTotal =
-            result.firstPassAccepted + result.firstPassRejected;
-        const firstPassAccuracy =
-            firstPassTotal === 0
-                ? 0
-                : (result.firstPassAccepted / firstPassTotal) * 100;
-        const minutes = result.elapsedSeconds / 60;
-        const throughput = minutes === 0 ? 0 : result.accepted / minutes;
+        if (!localResult) {
+            return null;
+        }
 
         return (
             <SimpleStage
-                eyebrow={`BLOCK ${result.block} COMPLETE`}
+                eyebrow={`BLOCK ${localResult.block} COMPLETE`}
                 title="Block results"
-                description="Review the recorded task summary before continuing to the post-block form and rest period."
+                description="Processed task measures for the completed block."
                 participantId={participantId}
             >
                 <div className="block-results-grid">
                     <div className="result-card">
                         <span>Condition</span>
-                        <strong>{result.condition}</strong>
+
+                        <strong>{localResult.condition}</strong>
                     </div>
+
                     <div className="result-card">
                         <span>Validated records</span>
-                        <strong>{result.accepted}</strong>
+
+                        <strong>
+                            {backendResult?.validatedRecords ??
+                                localResult.accepted}
+                        </strong>
                     </div>
-                    <div className="result-card">
-                        <span>Elapsed time</span>
-                        <strong>{fmt(result.elapsedSeconds)}</strong>
-                    </div>
+
                     <div className="result-card">
                         <span>Throughput</span>
-                        <strong>{throughput.toFixed(2)}</strong>
+
+                        <strong>
+                            {backendResult
+                                ? backendResult.validatedRecordThroughput.toFixed(
+                                      2,
+                                  )
+                                : "—"}
+                        </strong>
+
                         <small>records / minute</small>
                     </div>
+
+                    <div className="result-card">
+                        <span>Median IL</span>
+
+                        <strong>
+                            {backendResult?.medianInitiationLatencyMs !== null
+                                ? `${Math.round(
+                                      backendResult?.medianInitiationLatencyMs ??
+                                          0,
+                                  )} ms`
+                                : "—"}
+                        </strong>
+                    </div>
+
+                    <div className="result-card">
+                        <span>Median FPED</span>
+
+                        <strong>
+                            {backendResult?.medianFirstPassEntryDurationMs !==
+                            null
+                                ? `${Math.round(
+                                      backendResult?.medianFirstPassEntryDurationMs ??
+                                          0,
+                                  )} ms`
+                                : "—"}
+                        </strong>
+                    </div>
+
+                    <div className="result-card">
+                        <span>First-pass error</span>
+
+                        <strong>
+                            {backendResult?.firstPassRecordErrorRate !== null
+                                ? `${(
+                                      (backendResult?.firstPassRecordErrorRate ??
+                                          0) * 100
+                                  ).toFixed(1)}%`
+                                : "—"}
+                        </strong>
+                    </div>
+
                     <div className="result-card">
                         <span>First-pass accuracy</span>
-                        <strong>{firstPassAccuracy.toFixed(1)}%</strong>
+
+                        <strong>
+                            {backendResult?.firstPassRecordAccuracy !== null
+                                ? `${(
+                                      (backendResult?.firstPassRecordAccuracy ??
+                                          0) * 100
+                                  ).toFixed(1)}%`
+                                : "—"}
+                        </strong>
                     </div>
+
+                    <div className="result-card">
+                        <span>Median TTSV</span>
+
+                        <strong>
+                            {backendResult?.medianTimeToSuccessfulValidationMs !==
+                            null
+                                ? `${Math.round(
+                                      backendResult?.medianTimeToSuccessfulValidationMs ??
+                                          0,
+                                  )} ms`
+                                : "—"}
+                        </strong>
+                    </div>
+
                     <div className="result-card">
                         <span>Correction cycles</span>
-                        <strong>{result.correctionCycles}</strong>
-                    </div>
-                </div>
 
-                <div className="instructions">
-                    <b>Post-block step</b>
-                    <p>
-                        Complete the post-block form and allow the scheduled
-                        rest period before continuing.
-                    </p>
+                        <strong>
+                            {backendResult?.correctionCycles ??
+                                localResult.correctionCycles}
+                        </strong>
+                    </div>
                 </div>
 
                 <button
@@ -718,73 +1208,84 @@ export default function App() {
                     {blockIndex >= conditionOrder.length - 1
                         ? "Finish participant"
                         : `Continue to Block ${blockIndex + 2}`}
+
                     <span>→</span>
                 </button>
             </SimpleStage>
         );
     }
 
+    /*
+     * --------------------------------------------------
+     * COMPLETE
+     * --------------------------------------------------
+     */
+
     if (stage === "complete") {
         return (
             <main className="app">
                 <div className="brand">TUNED IN</div>
+
                 <section className="complete card">
                     <div className="check">✓</div>
+
                     <div className="eyebrow">THREE BLOCKS COMPLETE</div>
+
                     <h1>Encoding session finished.</h1>
+
                     <p className="lead">
                         Participant {participantId} has completed all three
-                        experimental conditions. The next protocol steps are the
-                        final post-block form, interview, and debriefing.
+                        conditions.
                     </p>
 
                     <div className="participant-results">
-                        {blockResults.map((result) => {
-                            const firstPassTotal =
-                                result.firstPassAccepted +
-                                result.firstPassRejected;
-                            const accuracy =
-                                firstPassTotal === 0
-                                    ? 0
-                                    : (result.firstPassAccepted /
-                                          firstPassTotal) *
-                                      100;
-                            const throughput =
-                                result.elapsedSeconds === 0
-                                    ? 0
-                                    : result.accepted /
-                                      (result.elapsedSeconds / 60);
+                        {backendResults.map((result) => (
+                            <div
+                                className="participant-block"
+                                key={result.block}
+                            >
+                                <div className="participant-block-heading">
+                                    <strong>Block {result.block}</strong>
 
-                            return (
-                                <div
-                                    className="participant-block"
-                                    key={result.block}
-                                >
-                                    <div className="participant-block-heading">
-                                        <strong>Block {result.block}</strong>
-                                        <span>{result.condition}</span>
-                                    </div>
-                                    <div className="participant-block-stats">
-                                        <span>
-                                            Validated
-                                            <b>{result.accepted}</b>
-                                        </span>
-                                        <span>
-                                            Throughput
-                                            <b>{throughput.toFixed(2)}/min</b>
-                                        </span>
-                                        <span>
-                                            First-pass accuracy
-                                            <b>{accuracy.toFixed(1)}%</b>
-                                        </span>
-                                        <span>
-                                            Corrections
-                                            <b>{result.correctionCycles}</b>
-                                        </span>
-                                    </div>
+                                    <span>{result.condition}</span>
                                 </div>
-                            );
-                        })}
+
+                                <div className="participant-block-stats">
+                                    <span>
+                                        Validated
+                                        <b>{result.validatedRecords}</b>
+                                    </span>
+
+                                    <span>
+                                        Throughput
+                                        <b>
+                                            {result.validatedRecordThroughput.toFixed(
+                                                2,
+                                            )}
+                                            /min
+                                        </b>
+                                    </span>
+
+                                    <span>
+                                        First-pass accuracy
+                                        <b>
+                                            {result.firstPassRecordAccuracy !==
+                                            null
+                                                ? `${(
+                                                      result.firstPassRecordAccuracy *
+                                                      100
+                                                  ).toFixed(1)}%`
+                                                : "—"}
+                                        </b>
+                                    </span>
+
+                                    <span>
+                                        Corrections
+                                        <b>{result.correctionCycles}</b>
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <div className="download-actions">
@@ -796,6 +1297,7 @@ export default function App() {
                         >
                             Download CSV
                         </button>
+
                         <button
                             className="secondary"
                             onClick={() =>
@@ -805,6 +1307,19 @@ export default function App() {
                             Download JSON
                         </button>
                     </div>
+
+                    {sessionId && (
+                        <div className="instructions">
+                            <b>Backend API</b>
+
+                            <p>Participant results can also be viewed from:</p>
+
+                            <code>
+                                http://127.0.0.1:3001/api/participants/
+                                {participantId}
+                            </code>
+                        </div>
+                    )}
 
                     <button
                         className="primary new-participant"
@@ -817,18 +1332,28 @@ export default function App() {
         );
     }
 
+    /*
+     * --------------------------------------------------
+     * EXPERIMENTAL TASK
+     * --------------------------------------------------
+     */
+
     return (
         <main className="task">
             <header>
                 <div>
                     <div className="brand">TUNED IN</div>
+
                     <small className="participant-tag">
                         Participant {participantId}
                     </small>
                 </div>
+
                 <div className="meta">
                     <span className="pill">Block {blockIndex + 1} / 3</span>
+
                     <span className="pill">{condition}</span>
+
                     <span>{fmt(remaining)} remaining</span>
                 </div>
             </header>
@@ -836,7 +1361,10 @@ export default function App() {
             <div className="progress">
                 <i
                     style={{
-                        width: `${Math.min(100, (seconds / BLOCK_SECONDS) * 100)}%`,
+                        width: `${Math.min(
+                            100,
+                            (seconds / BLOCK_SECONDS) * 100,
+                        )}%`,
                     }}
                 />
             </div>
@@ -845,26 +1373,33 @@ export default function App() {
                 <div className="heading">
                     <div>
                         <div className="eyebrow">DIGITAL ENCODING</div>
+
                         <h2>Enter the source record</h2>
                     </div>
+
                     <b>{accepted} validated</b>
                 </div>
 
                 <div className="grid">
                     <section className="panel">
                         <div className="panel-label">SOURCE RECORD</div>
+
                         <div className="source">
                             {[
                                 ["Record Code", current.recordCode],
+
                                 ["Batch Code", current.batchCode],
+
                                 ["Quantity", current.quantity],
                             ].map(([label, value]) => (
                                 <div className="source-row" key={label}>
                                     <span>{label}</span>
+
                                     <strong>{value}</strong>
                                 </div>
                             ))}
                         </div>
+
                         <p className="note">
                             ● Keep this record visible while entering the
                             values.
@@ -873,6 +1408,7 @@ export default function App() {
 
                     <form className="panel" onSubmit={submit}>
                         <div className="panel-label">ENTRY FIELDS</div>
+
                         <Field
                             label="Record Code"
                             value={form.recordCode}
@@ -880,12 +1416,14 @@ export default function App() {
                             autoFocus
                             onChange={(value) => update("recordCode", value)}
                         />
+
                         <Field
                             label="Batch Code"
                             value={form.batchCode}
                             error={errors.includes("Batch Code")}
                             onChange={(value) => update("batchCode", value)}
                         />
+
                         <Field
                             label="Quantity"
                             value={form.quantity}
@@ -900,6 +1438,7 @@ export default function App() {
                                     Check the highlighted field
                                     {errors.length > 1 ? "s" : ""}.
                                 </b>
+
                                 <span>
                                     The record was not accepted. Correct the
                                     values and submit again.
@@ -932,15 +1471,21 @@ function SimpleStage(props: {
     return (
         <main className="app">
             <div className="brand">TUNED IN</div>
+
             <section className="landing card">
                 <div className="eyebrow">{props.eyebrow}</div>
+
                 <h1 className="stage-title">{props.title}</h1>
+
                 <p className="lead">{props.description}</p>
+
                 <div className="participant-line">
                     Participant {props.participantId}
                 </div>
+
                 {props.children}
             </section>
+
             <footer>Local prototype · Fictional records only</footer>
         </main>
     );
@@ -957,6 +1502,7 @@ function Field(props: {
     return (
         <label className={props.error ? "field bad" : "field"}>
             <span>{props.label}</span>
+
             <input
                 autoFocus={props.autoFocus}
                 value={props.value}
@@ -966,6 +1512,7 @@ function Field(props: {
                 aria-invalid={props.error}
                 onChange={(e) => props.onChange(e.target.value)}
             />
+
             {props.error && <small>Does not match the source value.</small>}
         </label>
     );
@@ -973,6 +1520,7 @@ function Field(props: {
 
 function fmt(totalSeconds: number) {
     const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+
     return `${String(Math.floor(safeSeconds / 60)).padStart(2, "0")}:${String(
         safeSeconds % 60,
     ).padStart(2, "0")}`;

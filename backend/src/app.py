@@ -291,3 +291,34 @@ def debug_events(session_id: str):
         "participantId": session["participantId"],
         "events": session["events"],
     }
+
+@app.get("/api/participants/{participant_id}")
+def get_participant_results(participant_id: str):
+    matching_sessions = [
+        session
+        for session in SESSIONS.values()
+        if session["participantId"] == participant_id
+    ]
+
+    if not matching_sessions:
+        raise HTTPException(
+            status_code=404,
+            detail="Participant not found."
+        )
+
+    # If the same participant ID somehow has multiple sessions,
+    # return the newest one.
+    session = max(
+        matching_sessions,
+        key=lambda s: s["createdAt"]
+    )
+
+    return {
+        "id": session["id"],
+        "participantId": session["participantId"],
+        "orderId": session["orderId"],
+        "conditionOrder": session["conditionOrder"],
+        "createdAt": session["createdAt"],
+        "updatedAt": session["updatedAt"],
+        "measures": calculate_session_measures(session),
+    }
