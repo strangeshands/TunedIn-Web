@@ -1,10 +1,13 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+
 import {
     downloadParticipantCsv,
     downloadParticipantJson,
     type ParticipantSessionResult,
 } from "./resultExport";
+
 import { generateRecordBank, type GeneratedRecord } from "./recordGenerator";
+
 import {
     createSession,
     startApiBlock,
@@ -13,7 +16,16 @@ import {
     type BlockMeasures,
 } from "./api";
 
+import {
+    getMusicManifest,
+    type MusicManifest,
+    type MusicTrack,
+} from "./musicApi";
+
+import { playTrack, stopTrack } from "./audioPlayer";
+
 type Condition = "No music" | "Static music" | "Adaptive music";
+
 type OrderId = "A" | "B" | "C";
 
 type Stage =
@@ -37,14 +49,18 @@ type BlockResult = {
 
 const CONDITION_ORDERS: Record<OrderId, Condition[]> = {
     A: ["No music", "Static music", "Adaptive music"],
+
     B: ["Static music", "Adaptive music", "No music"],
+
     C: ["Adaptive music", "No music", "Static music"],
 };
 
 const REAL_BASELINE_SECONDS = 2 * 60;
+
 const REAL_BLOCK_SECONDS = 8 * 60;
 
 const TEST_MODE = true;
+
 const TEST_BASELINE_SECONDS = 8;
 const TEST_BLOCK_SECONDS = 15;
 
@@ -60,6 +76,14 @@ const empty = {
     quantity: "",
 };
 
+function randomTrack(tracks: MusicTrack[]) {
+    if (tracks.length === 0) {
+        return null;
+    }
+
+    return tracks[Math.floor(Math.random() * tracks.length)];
+}
+
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
 
@@ -72,14 +96,17 @@ export default function App() {
     const [sessionId, setSessionId] = useState<string | null>(null);
 
     const [blockIndex, setBlockIndex] = useState(0);
+
     const [recordIndex, setRecordIndex] = useState(0);
 
     const [form, setForm] = useState(empty);
+
     const [errors, setErrors] = useState<string[]>([]);
 
     const [accepted, setAccepted] = useState(0);
 
     const [seconds, setSeconds] = useState(0);
+
     const [started, setStarted] = useState<number | null>(null);
 
     const [baselineStarted, setBaselineStarted] = useState<number | null>(null);
@@ -98,6 +125,14 @@ export default function App() {
         generateRecordBank(100),
     );
 
+    const [musicManifest, setMusicManifest] = useState<MusicManifest | null>(
+        null,
+    );
+
+    const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+
+    const [musicError, setMusicError] = useState<string | null>(null);
+
     const firstKey = useRef<number | null>(null);
 
     const completionGuard = useRef(false);
@@ -114,6 +149,32 @@ export default function App() {
         () => Math.max(0, BLOCK_SECONDS - seconds),
         [seconds],
     );
+
+    /*
+     * --------------------------------------------------
+     * LOAD MUSIC MANIFEST
+     * --------------------------------------------------
+     */
+
+    useEffect(() => {
+        void getMusicManifest()
+            .then((manifest) => {
+                setMusicManifest(manifest);
+
+                setMusicError(null);
+
+                console.log("Music manifest loaded:", manifest);
+            })
+            .catch((error) => {
+                console.error("Could not load music manifest:", error);
+
+                setMusicError("Could not load the music library.");
+            });
+
+        return () => {
+            stopTrack();
+        };
+    }, []);
 
     /*
      * --------------------------------------------------
@@ -139,8 +200,11 @@ export default function App() {
                 setSeconds(BASELINE_SECONDS);
 
                 setForm(empty);
+
                 setErrors([]);
+
                 setAccepted(0);
+
                 setRecordIndex(0);
 
                 firstKey.current = null;
@@ -204,12 +268,16 @@ export default function App() {
 
         const cleanId = participantId.trim();
 
-        if (!cleanId) return;
+        if (!cleanId) {
+            return;
+        }
 
         try {
             const response = await createSession({
                 participantId: cleanId,
+
                 orderId,
+
                 conditionOrder,
             });
 
@@ -222,6 +290,7 @@ export default function App() {
             setParticipantId(cleanId);
 
             setSeconds(0);
+
             setBaselineStarted(null);
 
             setStage("baseline");
@@ -241,11 +310,18 @@ export default function App() {
      */
 
     const startBaseline = () => {
+        stopTrack();
+
+        setCurrentTrack(null);
+
         setRecordBank(generateRecordBank(100));
 
         setRecordIndex(0);
+
         setForm(empty);
+
         setErrors([]);
+
         setAccepted(0);
 
         firstKey.current = null;
@@ -284,6 +360,7 @@ export default function App() {
         setRecordIndex((old) => old + 1);
 
         setForm(empty);
+
         setErrors([]);
 
         firstKey.current = null;
@@ -297,8 +374,51 @@ export default function App() {
      * --------------------------------------------------
      */
 
+    const playComfortAudio = async () => {
+        if (!musicManifest) {
+            alert(
+                "Music has not loaded yet. Make sure the backend is running and /api/music is available.",
+            );
+
+            return;
+        }
+
+        const track = randomTrack(musicManifest.Baseline);
+
+        if (!track) {
+            alert("No Baseline tracks were found.");
+
+            return;
+        }
+
+        try {
+            await playTrack(track);
+
+            setCurrentTrack(track);
+
+            setMusicError(null);
+        } catch (error) {
+            console.error("Could not play comfort-check audio:", error);
+
+            setMusicError("The browser could not play the audio.");
+
+            alert("The browser could not play the audio.");
+        }
+    };
+
+    const stopComfortAudio = () => {
+        stopTrack();
+
+        setCurrentTrack(null);
+    };
+
     const continueFromAudioCheck = () => {
+        stopTrack();
+
+        setCurrentTrack(null);
+
         setBlockIndex(0);
+
         setStage("block-intro");
     };
 
@@ -317,6 +437,70 @@ export default function App() {
 
         const newBank = generateRecordBank(100);
 
+        /*
+         * Start playback directly from
+         * the participant's Start Block
+         * button interaction.
+         *
+         * This is intentionally done
+         * before waiting for the API
+         * request because browsers may
+         * block delayed autoplay.
+         */
+
+        if (condition === "No music") {
+            stopTrack();
+
+            setCurrentTrack(null);
+        } else {
+            if (!musicManifest) {
+                alert(
+                    "The music library has not loaded yet. Make sure the backend is running.",
+                );
+
+                return;
+            }
+
+            /*
+             * Static music currently uses
+             * a randomly selected track
+             * from the Baseline bank.
+             *
+             * Adaptive music also starts
+             * from Baseline.
+             *
+             * Later, the adaptive engine
+             * will switch between:
+             *
+             * Reduced
+             * Baseline
+             * Elevated
+             */
+            const selectedTrack = randomTrack(musicManifest.Baseline);
+
+            if (!selectedTrack) {
+                alert("No Baseline tracks were found.");
+
+                return;
+            }
+
+            try {
+                await playTrack(selectedTrack);
+
+                setCurrentTrack(selectedTrack);
+
+                setMusicError(null);
+            } catch (error) {
+                console.error("Could not start block music:", error);
+
+                setMusicError("Could not start music playback.");
+
+                alert("Audio could not be started.");
+
+                return;
+            }
+        }
+
         try {
             await startApiBlock(sessionId, blockIndex + 1, condition);
 
@@ -327,12 +511,15 @@ export default function App() {
             firstKey.current = null;
 
             setRecordIndex(0);
+
             setForm(empty);
+
             setErrors([]);
 
             setAccepted(0);
 
             setFirstPassAccepted(0);
+
             setFirstPassRejected(0);
 
             setCorrectionCycles(0);
@@ -347,9 +534,6 @@ export default function App() {
 
             setStage("task");
 
-            /*
-             * First record becomes visible.
-             */
             await sendTaskEvent(sessionId, {
                 blockNumber: blockIndex + 1,
 
@@ -360,6 +544,10 @@ export default function App() {
                 clientTimeMs: performance.now(),
             });
         } catch (error) {
+            stopTrack();
+
+            setCurrentTrack(null);
+
             console.error("Could not start block:", error);
 
             alert("Could not start the backend block.");
@@ -379,10 +567,9 @@ export default function App() {
             firstKey.current = time;
 
             /*
-             * Only experimental task events
-             * go to backend.
-             *
-             * Practice baseline is excluded.
+             * Practice events are not
+             * included in the experimental
+             * task-event stream.
              */
             if (stage === "task" && sessionId) {
                 void sendTaskEvent(sessionId, {
@@ -399,6 +586,7 @@ export default function App() {
 
         setForm((old) => ({
             ...old,
+
             [key]: value.toUpperCase(),
         }));
 
@@ -416,7 +604,9 @@ export default function App() {
     const submit = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (!sessionId) return;
+        if (!sessionId) {
+            return;
+        }
 
         const submissionTime = performance.now();
 
@@ -440,9 +630,6 @@ export default function App() {
 
         const acceptedSubmission = bad.length === 0;
 
-        /*
-         * Full-record submission event.
-         */
         try {
             await sendTaskEvent(sessionId, {
                 blockNumber: blockIndex + 1,
@@ -454,9 +641,6 @@ export default function App() {
                 clientTimeMs: submissionTime,
             });
 
-            /*
-             * Validation result event.
-             */
             await sendTaskEvent(sessionId, {
                 blockNumber: blockIndex + 1,
 
@@ -476,9 +660,6 @@ export default function App() {
             console.error("Could not send task event:", error);
         }
 
-        /*
-         * Incorrect submission.
-         */
         if (bad.length) {
             if (isFirstPass) {
                 setFirstPassRejected((old) => old + 1);
@@ -491,9 +672,6 @@ export default function App() {
             return;
         }
 
-        /*
-         * Correct submission.
-         */
         if (isFirstPass) {
             setFirstPassAccepted((old) => old + 1);
         } else {
@@ -514,9 +692,6 @@ export default function App() {
 
         firstKey.current = null;
 
-        /*
-         * Log next record presentation.
-         */
         const nextRecord = recordBank[nextIndex % recordBank.length];
 
         try {
@@ -541,14 +716,19 @@ export default function App() {
      */
 
     const finishBlock = async (elapsedSeconds: number) => {
-        if (!sessionId) return;
-
         /*
-         * Local result.
-         *
-         * Keeping this for your existing
-         * frontend result/export logic.
+         * Music must stop immediately
+         * when the experimental block
+         * ends.
          */
+        stopTrack();
+
+        setCurrentTrack(null);
+
+        if (!sessionId) {
+            return;
+        }
+
         const result: BlockResult = {
             block: blockIndex + 1,
 
@@ -566,8 +746,9 @@ export default function App() {
         };
 
         /*
-         * Ask Python to calculate
-         * the real measures.
+         * Ask the Node/Express backend
+         * to calculate the task
+         * measures.
          */
         try {
             const response = await finishApiBlock(
@@ -589,9 +770,6 @@ export default function App() {
             console.error("Could not finish backend block:", error);
         }
 
-        /*
-         * Existing local result.
-         */
         setBlockResults((old) => {
             const next = [
                 ...old.filter((x) => x.block !== result.block),
@@ -632,6 +810,10 @@ export default function App() {
      */
 
     const continueAfterBlockResults = () => {
+        stopTrack();
+
+        setCurrentTrack(null);
+
         if (blockIndex >= conditionOrder.length - 1) {
             setStage("complete");
 
@@ -670,11 +852,16 @@ export default function App() {
      */
 
     const restartSession = () => {
+        stopTrack();
+
+        setCurrentTrack(null);
+
         setStage("participant");
 
         setSessionId(null);
 
         setBlockIndex(0);
+
         setRecordIndex(0);
 
         setForm(empty);
@@ -704,6 +891,8 @@ export default function App() {
         setBaselineStarted(null);
 
         setBlockResults([]);
+
+        setMusicError(null);
     };
 
     /*
@@ -780,6 +969,14 @@ export default function App() {
                             </ol>
                         </div>
 
+                        {musicError && (
+                            <div className="error">
+                                <b>Music library warning</b>
+
+                                <span>{musicError}</span>
+                            </div>
+                        )}
+
                         {TEST_MODE && (
                             <div className="test-banner">
                                 TEST MODE — practice ends after{" "}
@@ -809,7 +1006,11 @@ export default function App() {
     if (stage === "baseline") {
         const baselineRunning = baselineStarted !== null;
 
-        const baselineRemaining = Math.max(0, BASELINE_SECONDS - seconds);
+        const baselineRemaining = Math.max(
+            0,
+
+            BASELINE_SECONDS - seconds,
+        );
 
         if (!baselineRunning) {
             return (
@@ -887,6 +1088,7 @@ export default function App() {
                         style={{
                             width: `${Math.min(
                                 100,
+
                                 (seconds / BASELINE_SECONDS) * 100,
                             )}%`,
                         }}
@@ -1014,6 +1216,44 @@ export default function App() {
                     </ul>
                 </div>
 
+                {!musicManifest && (
+                    <div className="test-banner">Loading music library...</div>
+                )}
+
+                {musicError && (
+                    <div className="error">
+                        <b>Audio library unavailable</b>
+
+                        <span>{musicError}</span>
+                    </div>
+                )}
+
+                <div className="download-actions">
+                    <button
+                        className="secondary"
+                        type="button"
+                        disabled={!musicManifest}
+                        onClick={() => void playComfortAudio()}
+                    >
+                        ▶ Play test audio
+                    </button>
+
+                    <button
+                        className="secondary"
+                        type="button"
+                        onClick={stopComfortAudio}
+                    >
+                        ■ Stop audio
+                    </button>
+                </div>
+
+                {currentTrack && (
+                    <p className="note">
+                        Test audio is playing. Adjust the device volume until
+                        the playback is comfortable.
+                    </p>
+                )}
+
                 <button
                     className="primary large"
                     onClick={continueFromAudioCheck}
@@ -1058,8 +1298,15 @@ export default function App() {
                     </div>
                 </div>
 
+                {condition !== "No music" && !musicManifest && (
+                    <div className="test-banner">
+                        Waiting for music library...
+                    </div>
+                )}
+
                 <button
                     className="primary large"
+                    disabled={condition !== "No music" && !musicManifest}
                     onClick={() => void startBlock()}
                 >
                     Start Block {blockIndex + 1} <span>→</span>
@@ -1363,6 +1610,7 @@ export default function App() {
                     style={{
                         width: `${Math.min(
                             100,
+
                             (seconds / BLOCK_SECONDS) * 100,
                         )}%`,
                     }}
@@ -1406,7 +1654,11 @@ export default function App() {
                         </p>
                     </section>
 
-                    <form className="panel" onSubmit={submit}>
+                    <form
+                        key={`task-${recordIndex}`}
+                        className="panel"
+                        onSubmit={submit}
+                    >
                         <div className="panel-label">ENTRY FIELDS</div>
 
                         <Field
@@ -1446,7 +1698,7 @@ export default function App() {
                             </div>
                         )}
 
-                        <button className="primary submit">
+                        <button className="primary submit" type="submit">
                             Submit Record <span>↵</span>
                         </button>
                     </form>
@@ -1519,7 +1771,11 @@ function Field(props: {
 }
 
 function fmt(totalSeconds: number) {
-    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const safeSeconds = Math.max(
+        0,
+
+        Math.floor(totalSeconds),
+    );
 
     return `${String(Math.floor(safeSeconds / 60)).padStart(2, "0")}:${String(
         safeSeconds % 60,

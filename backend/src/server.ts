@@ -16,11 +16,21 @@ import type {
   TaskEvent,
 } from "./types.js";
 
+import path from "node:path";
+import fs from "node:fs";
+
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
 
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "2mb" }));
+
+const MUSIC_ROOT = path.resolve(process.cwd(), "../music");
+
+app.use(
+    "/music",
+    express.static(MUSIC_ROOT),
+);
 
 const CONDITIONS: Condition[] = ["No music", "Static music", "Adaptive music"];
 const EVENT_TYPES: EventType[] = [
@@ -55,6 +65,42 @@ function getSessionOr404(sessionId: string, res: express.Response) {
   return session;
 }
 
+type MusicState =
+    | "Reduced"
+    | "Baseline"
+    | "Elevated";
+
+function getTracksForState(
+    state: MusicState,
+) {
+    const folder = path.join(
+        MUSIC_ROOT,
+        state,
+    );
+
+    if (!fs.existsSync(folder)) {
+        return [];
+    }
+
+    return fs
+        .readdirSync(folder)
+        .filter((file) =>
+            file.toLowerCase().endsWith(".wav"),
+        )
+        .map((file) => ({
+            id: `${state}:${file}`,
+            state,
+            fileName: file,
+
+            url:
+                `/music/${encodeURIComponent(
+                    state,
+                )}/${encodeURIComponent(
+                    file,
+                )}`,
+        }));
+}
+
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
@@ -62,6 +108,19 @@ app.get("/api/health", (_req, res) => {
     storage: "in-memory prototype (SQLite pending)",
     sessionsInMemory: sessions.size,
   });
+});
+
+app.get("/api/music", (_req, res) => {
+    res.json({
+        Reduced:
+            getTracksForState("Reduced"),
+
+        Baseline:
+            getTracksForState("Baseline"),
+
+        Elevated:
+            getTracksForState("Elevated"),
+    });
 });
 
 app.post("/api/sessions", (req, res) => {

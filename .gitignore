@@ -1,1 +1,7 @@
 node_modules
+
+/music/elevated
+/music/baseline
+/music/reduced
+
+.DS_Store
