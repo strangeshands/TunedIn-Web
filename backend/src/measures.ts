@@ -1,131 +1,47 @@
-import type { BlockMeasures, Session } from "./types.js";
+import type { BlockMeasures, Session, TaskEvent } from "../../shared/types.js";
 
-type RecordState = {
-  presentedAt?: number;
-  firstKeyAt?: number;
-  firstSubmissionAt?: number;
-  firstPassAccepted?: boolean;
-  validatedAt?: number;
-  submissionCount: number;
-};
+type RecordTimeline = { presented?: number; firstKey?: number; firstSubmission?: number; firstRejected?: boolean; validated?: number; submissions: number };
 
-function median(values: number[]): number | null {
-  if (values.length === 0) return null;
+function median(values: number[]) {
+  if (!values.length) return null;
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 1
-    ? sorted[middle]
-    : (sorted[middle - 1] + sorted[middle]) / 2;
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
-export function calculateBlockMeasures(
-  session: Session,
-  blockNumber: number,
-): BlockMeasures | null {
-  const block = session.blocks.get(blockNumber);
-  if (!block) return null;
-
-  const records = new Map<string, RecordState>();
-  const events = session.events
-    .filter((event) => event.blockNumber === blockNumber)
-    .sort((a, b) => a.clientTimeMs - b.clientTimeMs);
-
+// Every task measure is calculated on the backend from saved raw events.
+export function calculateBlockMeasures(session: Session, blockNumber: number): BlockMeasures {
+  const block = session.blocks.find(item => item.number === blockNumber)!;
+  const records = new Map<string, RecordTimeline>();
+  const events = session.events.filter(event => event.blockNumber === blockNumber).sort((a, b) => a.clientTimeMs - b.clientTimeMs);
   for (const event of events) {
-    const record = records.get(event.recordId) ?? { submissionCount: 0 };
-
-    if (event.eventType === "record_presented" && record.presentedAt === undefined) {
-      record.presentedAt = event.clientTimeMs;
-    }
-
-    if (event.eventType === "first_key" && record.firstKeyAt === undefined) {
-      record.firstKeyAt = event.clientTimeMs;
-    }
-
-    if (event.eventType === "record_submitted") {
-      record.submissionCount += 1;
-      if (record.firstSubmissionAt === undefined) {
-        record.firstSubmissionAt = event.clientTimeMs;
-      }
-    }
-
+    const timeline = records.get(event.recordId) ?? { submissions: 0 };
+    if (event.eventType === "record_presented") timeline.presented ??= event.clientTimeMs;
+    if (event.eventType === "first_key") timeline.firstKey ??= event.clientTimeMs;
+    if (event.eventType === "record_submitted") { timeline.submissions += 1; timeline.firstSubmission ??= event.clientTimeMs; }
     if (event.eventType === "validation_result") {
       const accepted = event.payload?.accepted === true;
-
-      if (record.firstPassAccepted === undefined) {
-        record.firstPassAccepted = accepted;
-      }
-
-      if (accepted && record.validatedAt === undefined) {
-        record.validatedAt = event.clientTimeMs;
-      }
+      if (timeline.firstRejected === undefined) timeline.firstRejected = !accepted;
+      if (accepted) timeline.validated ??= event.clientTimeMs;
     }
-
-    records.set(event.recordId, record);
+    records.set(event.recordId, timeline);
   }
-
-  const values = [...records.values()];
-  const validated = values.filter((record) => record.validatedAt !== undefined);
-  const firstPassKnown = values.filter(
-    (record) => record.firstPassAccepted !== undefined,
-  );
-
-  const initiationLatencies = values
-    .filter(
-      (record) =>
-        record.presentedAt !== undefined && record.firstKeyAt !== undefined,
-    )
-    .map((record) => record.firstKeyAt! - record.presentedAt!);
-
-  const firstPassEntryDurations = values
-    .filter(
-      (record) =>
-        record.firstKeyAt !== undefined &&
-        record.firstSubmissionAt !== undefined,
-    )
-    .map((record) => record.firstSubmissionAt! - record.firstKeyAt!);
-
-  const validationTimes = validated
-    .filter((record) => record.presentedAt !== undefined)
-    .map((record) => record.validatedAt! - record.presentedAt!);
-
-  const firstPassErrors = firstPassKnown.filter(
-    (record) => record.firstPassAccepted === false,
-  ).length;
-
-  const correctionCycles = validated.reduce(
-    (sum, record) => sum + Math.max(0, record.submissionCount - 1),
-    0,
-  );
-
+  const all = [...records.values()];
+  const submitted = all.filter(record => record.firstSubmission !== undefined && record.firstRejected !== undefined);
+  const valid = all.filter(record => record.validated !== undefined);
+  const il = submitted.flatMap(record => record.presented !== undefined && record.firstKey !== undefined ? [record.firstKey - record.presented] : []);
+  const fped = submitted.flatMap(record => record.firstKey !== undefined && record.firstSubmission !== undefined ? [record.firstSubmission - record.firstKey] : []);
+  const ttsv = valid.flatMap(record => record.presented !== undefined ? [record.validated! - record.presented] : []);
+  const rejected = submitted.filter(record => record.firstRejected).length;
   const durationSeconds = block.durationSeconds ?? 0;
-  const durationMinutes = durationSeconds / 60;
-
+  const correctionCycles = all.reduce((total, record) => total + Math.max(0, record.submissions - 1), 0);
   return {
-    block: block.block,
-    condition: block.condition,
-    durationSeconds,
-    recordsPresented: values.length,
-    validatedRecords: validated.length,
-    validatedRecordThroughput:
-      durationMinutes > 0 ? validated.length / durationMinutes : 0,
-    medianInitiationLatencyMs: median(initiationLatencies),
-    medianFirstPassEntryDurationMs: median(firstPassEntryDurations),
-    firstPassRecordErrorRate:
-      firstPassKnown.length > 0 ? firstPassErrors / firstPassKnown.length : null,
-    firstPassRecordAccuracy:
-      firstPassKnown.length > 0
-        ? (firstPassKnown.length - firstPassErrors) / firstPassKnown.length
-        : null,
-    medianTimeToSuccessfulValidationMs: median(validationTimes),
-    correctionCycles,
-    correctionCyclesPerValidatedRecord:
-      validated.length > 0 ? correctionCycles / validated.length : null,
+    block: blockNumber, condition: block.condition, durationSeconds, recordsPresented: all.length,
+    validatedRecords: valid.length, validatedRecordThroughput: durationSeconds ? valid.length / (durationSeconds / 60) : 0,
+    medianInitiationLatencyMs: median(il), medianFirstPassEntryDurationMs: median(fped),
+    firstPassRecordErrorRate: submitted.length ? rejected / submitted.length : null,
+    firstPassRecordAccuracy: submitted.length ? (submitted.length - rejected) / submitted.length : null,
+    medianTimeToSuccessfulValidationMs: median(ttsv), correctionCycles,
+    correctionCyclesPerValidatedRecord: valid.length ? correctionCycles / valid.length : null,
   };
-}
-
-export function calculateSessionMeasures(session: Session): BlockMeasures[] {
-  return [...session.blocks.keys()]
-    .sort((a, b) => a - b)
-    .map((blockNumber) => calculateBlockMeasures(session, blockNumber))
-    .filter((result): result is BlockMeasures => result !== null);
 }

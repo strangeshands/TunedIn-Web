@@ -1,434 +1,122 @@
 # Tuned In
 
-**Tuned In** is a local experimental application for studying task-responsive background music and self-reported flow during a digital encoding task.
+This is a simple local browser application for the Chapter Six fictional digital encoding task.
 
-The project currently contains:
-
-- a React + TypeScript frontend for the participant task
-- a Node.js + Express backend for session and task-event processing
-- JSON Lines (`.jsonl`) raw-event exports
-- CSV processed-measure exports
-- temporary in-memory backend storage while SQLite integration is still pending
-
----
-
-## Project Structure
+It keeps the App.tsx flow you supplied:
 
 ```text
-TunedIn-Web/
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   └── ...
-│
-├── backend/
-│   ├── src/
-│   ├── exports/
-│   ├── package.json
-│   └── ...
-│
-└── README.md
+Participant setup
+    → Silent baseline practice
+    → Audio-comfort check
+    → Block 1 → results
+    → Block 2 → results
+    → Block 3 → results
+    → Session complete
 ```
 
----
+The visible record has three fields: **Record Code**, **Batch Code**, and **Quantity**. The participant uses Tab between fields and Enter to submit. Incorrect fields are highlighted and must be corrected before the next record.
 
-# Requirements
+## What this version does
 
-Before running the project, make sure you have:
+- Keeps the participant setup, condition-order selector, practice task, audio-comfort screen, timed blocks, block results, and final download flow.
+- Keeps the Chapter Six measures: initiation latency (IL), first-pass entry duration (FPED), first-pass record error rate (FPRER), time to successful validation (TTSV), throughput, and correction cycles.
+- Generates source records, compares answers, calculates measures, writes JSON Lines and CSV files, and saves session data **in the backend**.
+- Organizes browser helper code under `frontend/src/script/`.
+- Includes a SQLite design and a clear `TODO(SQLite)` annotation, but does **not** install or use SQLite yet.
 
-```text
-Node.js 18+ recommended
-npm
-Git
-```
+## What is deliberately not included yet
 
-Check your versions:
+The audio-comfort stage is present as a manual checklist. It does not play music. The `No music`, `Static music`, and `Adaptive music` labels remain in the counterbalanced order because they belong to the study design, but this simple version does not load music, crossfade tracks, or run adaptive playback.
+
+The backend still creates `decisions.csv`, `transitions.csv`, and `tracks.csv` with headers. They are empty until music playback is implemented; this avoids pretending that a music exposure occurred.
+
+## Run it
+
+Install Node.js 18 or newer. In the `TunedIn-Web` folder:
 
 ```bash
-node --version
-npm --version
-git --version
-```
-
-# Running the Project
-
-The application requires both the frontend and backend to be running.
-
-## Option 1 — Run Both With One Command
-
-If the root project has the combined development script configured, run this from:
-
-```text
-TunedIn-Web/
-```
-
-```bash
-npm install
+npm run install:all
 npm run dev
 ```
 
-This should start both:
+Open [http://localhost:5173](http://localhost:5173). Keep both processes running while using the app.
+
+To create a production browser build:
+
+```bash
+npm run build
+npm run start --prefix backend
+```
+
+Then open [http://localhost:3001](http://localhost:3001).
+
+## Make changes
+
+| To change… | Edit this file |
+| --- | --- |
+| Practice length or experimental block length | `config/study.json` |
+| Counterbalanced A/B/C order | `frontend/src/App.tsx` and `backend/src/server.ts` together |
+| How fictional records look | `backend/src/records.ts` |
+| Answer validation | `backend/src/records.ts` |
+| IL, FPED, FPRER, TTSV, throughput or correction formulas | `backend/src/measures.ts` |
+| What an API request does | `backend/src/server.ts` |
+| CSV/JSONL output fields | `backend/src/exports.ts` and `docs/DATA-DICTIONARY.md` |
+| App flow and wording | `frontend/src/App.tsx` |
+| Browser-to-backend requests | `frontend/src/script/api.ts` |
+| Browser event sending | `frontend/src/script/eventQueue.ts` |
+| Visual design | `frontend/src/styles.css` |
+| Pending SQLite migration | `backend/src/store.ts`, `docs/sqlite-schema.sql`, and `docs/SQLITE-NEXT.md` |
+
+Restart the backend after changing `config/study.json`. Give `version` and `taskVersion` a new value before collecting study data with changed settings/materials.
+
+## Folder guide
 
 ```text
-Frontend: http://localhost:5173
-Backend:  http://127.0.0.1:3001
+frontend/src/App.tsx          Screen flow and visible participant interface
+frontend/src/script/          Browser helper scripts only
+  api.ts                      Calls the backend
+  eventQueue.ts               Sends raw interaction events
+  format.ts                   Formats the timer for display
+backend/src/server.ts         API routes and session lifecycle
+backend/src/records.ts        Server-side fictional records and answer checking
+backend/src/measures.ts       Server-side calculations
+backend/src/exports.ts        Server-side CSV/JSONL creation
+backend/src/store.ts          JSON storage now; SQLite annotation for later
+backend/data/                 Created automatically; saved participant data
+config/study.json             Research settings for new sessions
+shared/types.ts               Shared TypeScript data shapes
+docs/DATA-DICTIONARY.md       Meaning of every saved CSV field
+docs/sqlite-schema.sql        Pending SQLite tables and fields
+docs/SQLITE-NEXT.md           SQLite implementation notes
+music/reduced/                Reserved for later music files
+music/baseline/               Reserved for later music files
+music/elevated/               Reserved for later music files
 ```
 
-Keep the terminal open while testing.
+## Saved files
 
----
-
-# Check That the Backend Is Working
-
-Before starting a participant session, open:
+At each block completion the backend creates:
 
 ```text
-http://127.0.0.1:3001/api/health
+backend/data/exports/<session-id>/
 ```
 
-You should receive a response similar to:
+| File | What it contains |
+| --- | --- |
+| `blocks.csv` | One row per block and its summary measures |
+| `records.csv` | One row per record, timestamps, IL, FPED, FPRER indicator, TTSV and corrections |
+| `events.jsonl` | Raw presentation, first-key, submission and validation events |
+| `session.json` | Full saved session plus backend-calculated block measures |
+| `decisions.csv` | Header-only until adaptation is implemented |
+| `transitions.csv` | Header-only until crossfades are implemented |
+| `tracks.csv` | Header-only until a final track manifest is implemented |
 
-```json
-{
-  "ok": true,
-  "backend": "Node.js + Express + TypeScript",
-  "storage": "in-memory prototype (SQLite pending)",
-  "sessionsInMemory": 0
-}
-```
+See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for a field-by-field explanation. `quantity` is stored as text so leading zeros are retained. Times are browser monotonic milliseconds; rates are fractions from 0 to 1.
 
-If this page does not load, the backend is not running.
+## SQLite later
 
----
+The current app saves JSON session files so it can be used without a database dependency. SQLite is the next storage step, not an active component. Its required tables cover sessions, blocks, raw events, record measures, block measures, tracks, adaptation decisions, and transitions. Read [docs/SQLITE-NEXT.md](docs/SQLITE-NEXT.md) before adding it.
 
-# Testing the Experiment
+## Important study note
 
-The application currently runs in **TEST MODE** during development.
-
-Instead of waiting for the full study durations:
-
-```text
-Practice / silent baseline: 8 seconds
-Experimental block:         15 seconds
-```
-
-The intended study durations are:
-
-```text
-Practice / silent baseline: 2 minutes
-Experimental block:         8 minutes each
-```
-
-Test mode is controlled in the frontend source code:
-
-```ts
-const TEST_MODE = true;
-```
-
-Do **not** change this to `false` unless you specifically want to test the full-duration study.
-
----
-
-# Test Flow
-
-When the frontend opens, follow the experiment in this order:
-
-```text
-Participant Setup
-      ↓
-Practice Encoding Task
-No Music
-      ↓
-Audio Comfort Check
-      ↓
-Block 1
-      ↓
-Block Results
-      ↓
-Block 2
-      ↓
-Block Results
-      ↓
-Block 3
-      ↓
-Block Results
-      ↓
-Participant Summary
-```
-
-Enter a participant ID such as:
-
-```text
-P001
-```
-
-Then select one of the available counterbalanced orders.
-
-The three experimental conditions are:
-
-```text
-No music
-Static music
-Adaptive music
-```
-
-The actual audio/adaptation behavior is still under development.
-
----
-
-# Digital Encoding Task
-
-Each record contains:
-
-```text
-Record Code
-Batch Code
-Quantity
-```
-
-The values are randomly generated for each task block.
-
-Example:
-
-```text
-Record Code: K7M-418
-Batch Code:  QX-16
-Quantity:    064
-```
-
-Copy the source values exactly into the corresponding fields.
-
-Keyboard controls:
-
-```text
-Tab     → move to the next field
-Enter   → submit the current record
-```
-
-Incorrect submissions remain on the same record until they are corrected.
-
----
-
-# Data Collected
-
-During each experimental block, the frontend sends task events to the backend.
-
-The current event types are:
-
-```text
-record_presented
-first_key
-record_submitted
-validation_result
-```
-
-These events allow the backend to derive task-performance measures without directly treating them as measures of flow.
-
-The backend currently processes:
-
-```text
-Validated record count
-Validated-record throughput
-Median Initiation Latency (IL)
-Median First-Pass Entry Duration (FPED)
-First-Pass Record Error Rate (FPRER)
-First-Pass Record Accuracy
-Median Time to Successful Validation (TTSV)
-Correction Cycles
-Correction Cycles per Validated Record
-```
-
----
-
-# Viewing Participant Results
-
-After a participant has completed a block, their processed results can also be viewed directly through the backend API.
-
-For participant `P001`:
-
-```text
-http://127.0.0.1:3001/api/participants/P001
-```
-
-Example:
-
-```json
-{
-  "participantId": "P001",
-  "orderId": "A",
-  "conditionOrder": [
-    "No music",
-    "Static music",
-    "Adaptive music"
-  ],
-  "measures": [
-    {
-      "block": 1,
-      "condition": "No music",
-      "validatedRecords": 5,
-      "validatedRecordThroughput": 20,
-      "medianInitiationLatencyMs": 850,
-      "medianFirstPassEntryDurationMs": 3200,
-      "firstPassRecordErrorRate": 0.2
-    }
-  ]
-}
-```
-
-You can also access a session directly if you know its session ID:
-
-```text
-http://127.0.0.1:3001/api/sessions/<session-id>
-```
-
----
-
-# Exported Data
-
-The backend writes study data into:
-
-```text
-backend/exports/
-```
-
-Raw task events are saved as:
-
-```text
-<participant>_<session-id>_events.jsonl
-```
-
-Example:
-
-```text
-P001_97205d65-9037-4deb-bd22-c33ba3ce0b99_events.jsonl
-```
-
-Processed measures are saved as:
-
-```text
-<participant>_<session-id>_measures.csv
-```
-
-Example:
-
-```text
-P001_97205d65-9037-4deb-bd22-c33ba3ce0b99_measures.csv
-```
-
-The CSV output can later be opened in tools such as:
-
-```text
-Excel
-Google Sheets
-Jamovi
-R
-```
-
----
-
-# Important: Current Storage Limitation
-
-The backend currently keeps active session information **in memory**.
-
-This means:
-
-```text
-Stopping/restarting the backend
-        ↓
-clears the sessions available through the API
-```
-
-The JSONL and CSV files already written to `backend/exports/` remain on disk.
-
-SQLite persistence is planned but has **not yet been integrated**.
-
-Do not rely on the current in-memory storage for actual study deployment.
-
----
-
-# Current Technology Stack
-
-```text
-Frontend
-React
-TypeScript
-HTML5
-CSS
-Vite
-
-Backend
-TypeScript
-Node.js
-Express
-
-Raw event format
-JSON Lines (JSONL)
-
-Processed data format
-CSV
-
-Planned local database
-SQLite
-
-Browser
-Chromium-based browser
-
-Version control
-Git + GitHub
-```
-
-This structure follows the technology stack described in the thesis while SQLite persistence and the audio/adaptation components are still under development.
-
----
-
-# Current Development Status
-
-Implemented:
-
-```text
-✓ Participant ID and session setup
-✓ Counterbalanced condition order
-✓ Random fictional record generation
-✓ Two-minute practice encoding stage
-✓ Test-mode shortened timing
-✓ Three timed experimental blocks
-✓ Exact record validation
-✓ Raw task-event logging
-✓ Frontend-to-backend API communication
-✓ IL calculation
-✓ FPED calculation
-✓ FPRER calculation
-✓ First-pass accuracy
-✓ TTSV calculation
-✓ Correction-cycle calculation
-✓ Validated-record throughput
-✓ Per-block results
-✓ Participant result API
-✓ JSONL raw-event export
-✓ CSV processed-measure export
-```
-
-Still under development:
-
-```text
-○ SQLite persistence
-○ Static music playback
-○ Adaptive music playback
-○ Audio comfort-check playback
-○ Classified music-bank integration
-○ Rolling 60-second task window
-○ Adaptive-state decision rules
-○ Track transitions and crossfading
-○ Playback-event logging
-○ Final researcher controls
-```
-
----
-
-# Research Prototype Notice
-
-This application is an active research prototype.
-
-Only fictional encoding records are currently used. The task-performance measures are behavioral interaction measures and should not be interpreted as direct measurements of participant flow or arousal.
-
-The final experiment configuration may change following pilot testing.
+This app uses fictional data only. Current silent runs must not be described as delivering static or adaptive music conditions. Pilot the final timings, minimum record count, music manifest, playback volume, track selection and crossfade behavior before a main study.
