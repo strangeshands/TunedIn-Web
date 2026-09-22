@@ -3,5 +3,13 @@
   "taskVersion": "fictional-records-1",
   "practiceSeconds": 120,
   "blockSeconds": 480,
-  "audioIntegration": "deferred"
+  "audioIntegration": "rule-engine",
+  "adaptiveRules": {
+    "rollingWindowSeconds": 60,
+    "evaluationIntervalSeconds": 30,
+    "minimumRecordCount": 5,
+    "slowerThanBaselinePercent": 0.15,
+    "fasterThanBaselinePercent": 0.15,
+    "errorRateIncrease": 0.1
+  }
 }

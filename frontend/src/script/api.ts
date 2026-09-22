@@ -1,6 +1,8 @@
 import type {
     BlockMeasures,
     Condition,
+    MusicCatalogue,
+    MusicDecision,
     OrderId,
     SourceRecord,
     TaskEvent,
@@ -30,6 +32,21 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
     }
 
     return response.json() as Promise<T>;
+}
+
+export function getMusicCatalogue() {
+    return request<MusicCatalogue>("/api/music/catalogue");
+}
+
+export function evaluateAdaptiveMusic(
+    sessionId: string,
+    blockNumber: number,
+    windowEndMs: number,
+) {
+    return request<{ decision: MusicDecision }>(
+        `/api/sessions/${sessionId}/blocks/${blockNumber}/music/evaluate`,
+        { windowEndMs },
+    );
 }
 
 /**

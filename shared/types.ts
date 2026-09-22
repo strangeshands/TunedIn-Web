@@ -8,6 +8,36 @@ export type Stage =
     | "task"
     | "block-results"
     | "complete";
+export type MusicClass = "baseline" | "reduced" | "elevated";
+
+/** One audio file that the backend has found in the project's music folder. */
+export type MusicTrack = {
+    id: string;
+    musicClass: MusicClass;
+    relativeFilePath: string;
+};
+
+/** Empty arrays are valid: the study must still run without music files. */
+export type MusicCatalogue = Record<MusicClass, MusicTrack[]>;
+export type AdaptiveState = MusicClass | "silent";
+
+export type MusicDecision = {
+    id: string;
+    blockNumber: number;
+    windowStartMs: number;
+    windowEndMs: number;
+    recordCount: number;
+    medianInitiationLatencyMs: number | null;
+    medianFirstPassEntryDurationMs: number | null;
+    firstPassRecordErrorRate: number | null;
+    baselineInitiationLatencyMs: number | null;
+    baselineFirstPassEntryDurationMs: number | null;
+    previousState: AdaptiveState;
+    selectedState: AdaptiveState;
+    previousTrackId: string | null;
+    selectedTrackId: string | null;
+    reason: string;
+};
 
 export type RecordValues = {
     recordCode: string;
@@ -54,10 +84,12 @@ export type Session = {
     updatedAt: string;
     configVersion: string;
     taskVersion: string;
-    audioIntegration: "deferred";
+    audioIntegration: "rule-engine";
     comfortCheckCompletedAt: string | null;
     blocks: Block[];
     events: TaskEvent[];
+    musicTracks: MusicTrack[];
+    musicDecisions: MusicDecision[];
 };
 export type Block = {
     number: number;

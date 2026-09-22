@@ -9,18 +9,23 @@ import {
 import type {
     BlockMeasures,
     Condition,
+    MusicCatalogue,
+    MusicTrack,
     OrderId,
     SourceRecord,
 } from "../../shared/types";
 import {
     confirmComfortCheck,
     createSession,
+    evaluateAdaptiveMusic,
     exportUrl,
     finishApiBlock,
+    getMusicCatalogue,
     sendTaskEvent,
     startApiBlock,
     submitRecord,
 } from "./script/api";
+import { AudioController } from "./script/audio";
 import { EventQueue } from "./script/eventQueue";
 import { fmt } from "./script/format";
 
@@ -39,7 +44,6 @@ const orders: Record<OrderId, Condition[]> = {
     B: ["Static music", "Adaptive music", "No music"],
     C: ["Adaptive music", "No music", "Static music"],
 };
-
 /**
  *  2 minutes = 120
  *  8 minutes = 480
@@ -64,9 +68,16 @@ export default function App() {
     const [started, setStarted] = useState<number | null>(null);
     const [results, setResults] = useState<BlockMeasures[]>([]);
     const [message, setMessage] = useState("");
+    const [musicCatalogue, setMusicCatalogue] = useState<MusicCatalogue>({
+        baseline: [],
+        reduced: [],
+        elevated: [],
+    });
+    const [audioMessage, setAudioMessage] = useState("");
     const firstKey = useRef(false);
     const completing = useRef(false);
     const queue = useRef<EventQueue | null>(null);
+    const audio = useRef(new AudioController());
     const order = orders[orderId];
     const condition = order[blockIndex];
     const duration = stage === "baseline" ? PRACTICE_SECONDS : BLOCK_SECONDS;
@@ -89,6 +100,24 @@ export default function App() {
         return () => window.clearInterval(timer);
     }, [stage, started, duration]);
 
+    // Stop audio if the app is closed or React removes this screen.
+    useEffect(() => () => audio.current.stop(), []);
+
+    // Adaptive blocks ask the backend for a new decision every 30 seconds.
+    useEffect(() => {
+        if (
+            stage !== "task" ||
+            condition !== "Adaptive music" ||
+            !sessionId ||
+            started === null
+        )
+            return;
+        const interval = window.setInterval(() => {
+            void applyAdaptiveDecision(sessionId, blockIndex + 1);
+        }, 30_000);
+        return () => window.clearInterval(interval);
+    }, [stage, condition, sessionId, started, blockIndex, musicCatalogue]);
+
     /**
      *  Calls createSession
      */
@@ -103,8 +132,8 @@ export default function App() {
                 conditionOrder: order,
             });
             setSessionId(response.sessionId);
-            console.log(response.sessionId);
             queue.current = new EventQueue(response.sessionId);
+            void loadMusicCatalogue();
             localStorage.setItem("tunedIn.participantId", clean);
             setParticipantId(clean);
             setStage("baseline");
@@ -113,6 +142,76 @@ export default function App() {
         }
     }
 
+    async function loadMusicCatalogue() {
+        try {
+            setMusicCatalogue(await getMusicCatalogue());
+        } catch {
+            // A catalogue failure must never prevent the participant task from running.
+            setMusicCatalogue({ baseline: [], reduced: [], elevated: [] });
+            setAudioMessage(
+                "Music is unavailable. This session will continue silently.",
+            );
+        }
+    }
+
+    function trackById(trackId: string | null): MusicTrack | null {
+        if (!trackId) return null;
+        return (
+            Object.values(musicCatalogue)
+                .flat()
+                .find((track) => track.id === trackId) ?? null
+        );
+    }
+
+    async function playTrack(track: MusicTrack | null) {
+        const result = await audio.current.play(track);
+        if (result.status === "playing") setAudioMessage("");
+        else
+            setAudioMessage(
+                result.status === "silent"
+                    ? result.reason
+                    : `Audio could not play. The task will continue silently.`,
+            );
+    }
+
+    async function startMusic(nextCondition: Condition) {
+        if (nextCondition === "No music") {
+            audio.current.stop();
+            setAudioMessage("");
+            return;
+        }
+        const initialTrack =
+            nextCondition === "Static music"
+                ? (musicCatalogue.baseline[0] ?? null)
+                : (musicCatalogue.baseline[0] ??
+                  musicCatalogue.reduced[0] ??
+                  musicCatalogue.elevated[0] ??
+                  null);
+        await playTrack(initialTrack);
+    }
+
+    async function applyAdaptiveDecision(
+        activeSessionId: string,
+        number: number,
+    ) {
+        try {
+            const { decision } = await evaluateAdaptiveMusic(
+                activeSessionId,
+                number,
+                performance.now(),
+            );
+            await playTrack(trackById(decision.selectedTrackId));
+        } catch {
+            // A rule-engine request must never interrupt data entry or the timer.
+            setAudioMessage(
+                "Music update was unavailable. The task will continue safely.",
+            );
+        }
+    }
+
+    /**
+     *  Starts the block and then starts the condition's safe music behaviour.
+     */
     async function beginBlock(number: number, nextCondition: Condition) {
         if (!sessionId) return;
         try {
@@ -129,6 +228,7 @@ export default function App() {
             completing.current = false;
             setStarted(performance.now());
             setStage(number === 0 ? "baseline" : "task");
+            if (number > 0) await startMusic(nextCondition);
             await queue.current!.send({
                 blockNumber: number,
                 recordId: response.record.id,
@@ -169,7 +269,6 @@ export default function App() {
         event.preventDefault();
         if (!sessionId || !record) return;
         try {
-            console.log(event);
             const number = stage === "baseline" ? 0 : blockIndex + 1;
             const response = await submitRecord(
                 sessionId,
@@ -198,6 +297,7 @@ export default function App() {
     async function finishBlock(elapsedSeconds: number) {
         if (!sessionId) return;
         try {
+            audio.current.stop();
             const number = stage === "baseline" ? 0 : blockIndex + 1;
             const response = await finishApiBlock(
                 sessionId,
@@ -226,6 +326,7 @@ export default function App() {
     async function continueFromAudioCheck() {
         if (!sessionId) return;
         try {
+            audio.current.stop();
             await confirmComfortCheck(sessionId);
             setStage("block-intro");
         } catch (error) {
@@ -240,6 +341,7 @@ export default function App() {
         }
     }
     function restart() {
+        audio.current.stop();
         setStage("participant");
         setSessionId(null);
         setBlockIndex(0);
@@ -247,6 +349,7 @@ export default function App() {
         setForm(empty);
         setResults([]);
         setMessage("");
+        setAudioMessage("");
     }
     const result = results.find((item) => item.block === blockIndex + 1);
 
@@ -305,6 +408,56 @@ export default function App() {
         );
 
     /**
+     *  Third Stage: audio check.
+     *      * Checks if the audio is heard, and volume is comfortable.
+     */
+    if (stage === "audio-check")
+        return (
+            <SimpleStage
+                eyebrow="AUDIO-COMFORT CHECK"
+                title="Check the playback level"
+                description="Confirm that headphones are comfortable before the timed blocks."
+                participantId={participantId}
+            >
+                <div className="instructions">
+                    <b>Researcher / participant check</b>
+                    <ul>
+                        <li>Confirm the headphones fit comfortably.</li>
+                        <li>
+                            If test audio is provided separately, adjust the
+                            device to a comfortable level.
+                        </li>
+                        <li>
+                            Do not change that device level during the blocks.
+                        </li>
+                    </ul>
+                </div>
+                <div className="test-banner">
+                    {musicCatalogue.baseline.length
+                        ? "Use the test button to check the first baseline track."
+                        : "No test track was found. The session can still continue silently."}
+                </div>
+                {musicCatalogue.baseline.length > 0 && (
+                    <button
+                        className="secondary"
+                        onClick={() =>
+                            void playTrack(musicCatalogue.baseline[0])
+                        }
+                    >
+                        Play test audio
+                    </button>
+                )}
+                {audioMessage && <p className="error">{audioMessage}</p>}
+                <button
+                    className="primary large"
+                    onClick={() => void continueFromAudioCheck()}
+                >
+                    Audio level is comfortable <span>→</span>
+                </button>
+            </SimpleStage>
+        );
+
+    /**
      *  Second Stage: Practice
      *      * Begins practice typing.
      */
@@ -335,44 +488,6 @@ export default function App() {
                 </div>
                 <button className="primary large" onClick={startPractice}>
                     Start practice <span>→</span>
-                </button>
-            </SimpleStage>
-        );
-
-    /**
-     *  Third Stage: audio check.
-     *      * Checks if the audio is heard, and volume is comfortable.
-     */
-    if (stage === "audio-check")
-        return (
-            <SimpleStage
-                eyebrow="AUDIO-COMFORT CHECK"
-                title="Check the playback level"
-                description="Confirm that headphones are comfortable before the timed blocks."
-                participantId={participantId}
-            >
-                <div className="instructions">
-                    <b>Researcher / participant check</b>
-                    <ul>
-                        <li>Confirm the headphones fit comfortably.</li>
-                        <li>
-                            If test audio is provided separately, adjust the
-                            device to a comfortable level.
-                        </li>
-                        <li>
-                            Do not change that device level during the blocks.
-                        </li>
-                    </ul>
-                </div>
-                <div className="test-banner">
-                    Audio playback is not integrated yet. This screen records
-                    only that the manual comfort check was completed.
-                </div>
-                <button
-                    className="primary large"
-                    onClick={() => void continueFromAudioCheck()}
-                >
-                    Audio level is comfortable <span>→</span>
                 </button>
             </SimpleStage>
         );
@@ -595,6 +710,9 @@ export default function App() {
                         </form>
                     </div>
                 )}
+                {audioMessage && !isPractice && (
+                    <p className="error">{audioMessage}</p>
+                )}
             </section>
         </main>
     );
@@ -645,6 +763,7 @@ function SimpleStage(props: {
                 )}
                 {props.children}
             </section>
+            <footer>Local prototype · Fictional records only</footer>
         </main>
     );
 }

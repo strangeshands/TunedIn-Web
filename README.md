@@ -11,7 +11,7 @@ Participant setup
     → Block 1 → results
     → Block 2 → results
     → Block 3 → results
-    → Session complete
+    → Session completea
 ```
 
 The visible record has three fields: **Record Code**, **Batch Code**, and **Quantity**. The participant uses Tab between fields and Enter to submit. Incorrect fields are highlighted and must be corrected before the next record.
@@ -24,9 +24,21 @@ The visible record has three fields: **Record Code**, **Batch Code**, and **Quan
 - Organizes browser helper code under `frontend/src/script/`.
 - Includes a SQLite design and a clear `TODO(SQLite)` annotation, but does **not** install or use SQLite yet.
 
-## What is deliberately not included yet
+## Music integration progress
 
-The audio-comfort stage is present as a manual checklist. It does not play music. The `No music`, `Static music`, and `Adaptive music` labels remain in the counterbalanced order because they belong to the study design, but this simple version does not load music, crossfade tracks, or run adaptive playback.
+Step 1 is complete: the backend now discovers usable music files from these folders:
+
+```text
+music/baseline/
+music/reduced/
+music/elevated/
+```
+
+Supported files are `.mp3`, `.wav`, `.m4a`, `.ogg`, and `.aac`. Put individual files directly into the appropriate folder. The backend ignores unsupported files, and missing or empty folders are valid: the experiment will continue silently.
+
+You can view the discovered catalogue at [http://localhost:3001/api/music/catalogue](http://localhost:3001/api/music/catalogue) while the backend is running. It returns three empty arrays when no music is present.
+
+Playback, track selection, crossfades, and the adaptive rule engine are the next steps. The audio-comfort stage remains a manual checklist until playback is added.
 
 The backend still creates `decisions.csv`, `transitions.csv`, and `tracks.csv` with headers. They are empty until music playback is implemented; this avoids pretending that a music exposure occurred.
 
@@ -82,6 +94,7 @@ backend/src/records.ts        Server-side fictional records and answer checking
 backend/src/measures.ts       Server-side calculations
 backend/src/exports.ts        Server-side CSV/JSONL creation
 backend/src/store.ts          JSON storage now; SQLite annotation for later
+backend/src/music.ts          Finds usable music files and safely handles empty folders
 backend/data/                 Created automatically; saved participant data
 config/study.json             Research settings for new sessions
 shared/types.ts               Shared TypeScript data shapes

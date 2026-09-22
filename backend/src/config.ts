@@ -9,5 +9,13 @@ export const config = JSON.parse(
     taskVersion: string;
     practiceSeconds: number;
     blockSeconds: number;
-    audioIntegration: "deferred";
+    audioIntegration: "rule-engine";
+    adaptiveRules: {
+        rollingWindowSeconds: number;
+        evaluationIntervalSeconds: number;
+        minimumRecordCount: number;
+        slowerThanBaselinePercent: number;
+        fasterThanBaselinePercent: number;
+        errorRateIncrease: number;
+    };
 };

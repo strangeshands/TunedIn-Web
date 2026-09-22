@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { randomUUID } from "node:crypto";
+import { join } from "node:path";
 import type {
     Block,
     Condition,
@@ -8,15 +9,19 @@ import type {
     Session,
     TaskEvent,
 } from "../../shared/types.js";
-import { config } from "./config.js";
+import { config, root } from "./config.js";
 import { exportFiles, writeExports } from "./exports.js";
 import { calculateBlockMeasures } from "./measures.js";
+import { hasAnyMusic, loadMusicCatalogue } from "./music.js";
 import { generateRecord, wrongFields } from "./records.js";
+import { evaluateAdaptiveRule } from "./rule.js";
 import { saveSession, sessions } from "./store.js";
 
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "2mb" }));
+// A missing or empty music directory is safe: Express simply has no files to serve.
+app.use("/music", express.static(join(root, "music")));
 
 const orders: Record<OrderId, Condition[]> = {
     A: ["No music", "Static music", "Adaptive music"],
@@ -38,23 +43,28 @@ const getSession = (id: string) => {
 const appendEvent = (session: Session, event: Omit<TaskEvent, "sequence">) =>
     session.events.push({ ...event, sequence: session.events.length + 1 });
 
-app.get("/api/health", (_request, response) =>
+app.get("/api/health", (_request, response) => {
+    const catalogue = loadMusicCatalogue();
     response.json({
         ok: true,
         storage: "JSON files now; SQLite pending",
         audioIntegration: config.audioIntegration,
-    }),
+        musicAvailable: hasAnyMusic(catalogue),
+    });
+});
+
+/** Lets the frontend see which tracks can be used, without exposing file-system paths. */
+app.get("/api/music/catalogue", (_request, response) =>
+    response.json(loadMusicCatalogue()),
 );
 
-/**
- *  Creates a new session.
- */
 app.post("/api/sessions", (request, response) => {
     const participantId = String(request.body?.participantId ?? "").trim();
     const orderId = request.body?.orderId as OrderId;
     if (!participantId || !Object.hasOwn(orders, orderId))
         throw new Error("Participant ID and order are required.");
     const now = new Date().toISOString();
+    const musicCatalogue = loadMusicCatalogue();
     const session: Session = {
         id: randomUUID(),
         participantId,
@@ -64,10 +74,12 @@ app.post("/api/sessions", (request, response) => {
         updatedAt: now,
         configVersion: config.version,
         taskVersion: config.taskVersion,
-        audioIntegration: "deferred",
+        audioIntegration: "rule-engine",
         comfortCheckCompletedAt: null,
         blocks: [],
         events: [],
+        musicTracks: Object.values(musicCatalogue).flat(),
+        musicDecisions: [],
     };
     saveSession(session);
     response.status(201).json({ sessionId: session.id });
@@ -192,6 +204,38 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
     saveSession(session);
     response.json({ ok: true });
 });
+
+/**
+ * Evaluates the adaptive rule for the current performance window. The response
+ * describes the desired state and track; frontend playback is added later.
+ */
+app.post(
+    "/api/sessions/:sessionId/blocks/:blockNumber/music/evaluate",
+    (request, response) => {
+        const session = getSession(request.params.sessionId);
+        const blockNumber = Number(request.params.blockNumber);
+        const block = session.blocks.find(
+            (item) => item.number === blockNumber && item.endedAt === null,
+        );
+        const windowEndMs = Number(request.body?.windowEndMs);
+        if (
+            !block ||
+            block.condition !== "Adaptive music" ||
+            !Number.isFinite(windowEndMs) ||
+            windowEndMs < 0
+        )
+            throw new Error("Invalid adaptive-music evaluation.");
+        const decision = evaluateAdaptiveRule(
+            session,
+            blockNumber,
+            windowEndMs,
+            loadMusicCatalogue(),
+        );
+        session.musicDecisions.push(decision);
+        saveSession(session);
+        response.json({ decision });
+    },
+);
 
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/finish",
