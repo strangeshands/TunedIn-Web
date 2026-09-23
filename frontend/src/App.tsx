@@ -5,6 +5,7 @@ import {
     useState,
     type FormEvent,
     type ReactNode,
+    type RefObject,
 } from "react";
 import type {
     BlockMeasures,
@@ -50,8 +51,8 @@ const orders: Record<OrderId, Condition[]> = {
  *
  *  Change duration here.
  */
-const PRACTICE_SECONDS = 8;
-const BLOCK_SECONDS = 12;
+const PRACTICE_SECONDS = 20;
+const BLOCK_SECONDS = 60;
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -75,6 +76,7 @@ export default function App() {
     });
     const [audioMessage, setAudioMessage] = useState("");
     const firstKey = useRef(false);
+    const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const completing = useRef(false);
     const queue = useRef<EventQueue | null>(null);
     const audio = useRef(new AudioController());
@@ -282,6 +284,7 @@ export default function App() {
                 setRecord(response.nextRecord);
                 setForm(empty);
                 firstKey.current = false;
+                requestAnimationFrame(() => recordCodeInput.current?.focus());
                 await queue.current!.send({
                     blockNumber: number,
                     recordId: response.nextRecord.id,
@@ -676,6 +679,7 @@ export default function App() {
                                 value={form.recordCode}
                                 error={errors.includes("recordCode")}
                                 autoFocus
+                                inputRef={recordCodeInput}
                                 onChange={(value) =>
                                     update("recordCode", value)
                                 }
@@ -773,12 +777,14 @@ function Field(props: {
     error?: boolean;
     autoFocus?: boolean;
     inputMode?: "numeric";
+    inputRef?: RefObject<HTMLInputElement | null>;
     onChange: (value: string) => void;
 }) {
     return (
         <label className={props.error ? "field bad" : "field"}>
             <span>{props.label}</span>
             <input
+                ref={props.inputRef}
                 autoFocus={props.autoFocus}
                 value={props.value}
                 inputMode={props.inputMode}
