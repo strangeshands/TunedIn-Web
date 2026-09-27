@@ -115,7 +115,8 @@ export function evaluateAdaptiveRule(
         windowStartMs,
         windowEndMs,
     );
-    const baseline = calculateBlockMeasures(session, 0);
+    // Block 1 is the silent calibration reference.
+    const baseline = calculateBlockMeasures(session, 1);
     const previous = session.musicDecisions.at(-1);
     const previousState: AdaptiveState = previous?.selectedState ?? "baseline";
     const previousTrackId = previous?.selectedTrackId ?? null;

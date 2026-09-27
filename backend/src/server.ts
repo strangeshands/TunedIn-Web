@@ -95,14 +95,14 @@ app.post(
             !Number.isInteger(number) ||
             number !== expected ||
             number < 0 ||
-            number > 3
+            number > 4
         )
             throw new Error("Blocks must be started in order.");
-        if (number > 0 && session.comfortCheckCompletedAt === null)
+        if (number > 1 && session.comfortCheckCompletedAt === null)
             throw new Error(
                 "Complete the manual comfort check before Block 1.",
             );
-        const condition = number === 0 ? "No music" : request.body?.condition;
+        const condition = number <= 1 ? "No music" : request.body?.condition;
         if (!conditions.includes(condition))
             throw new Error("Invalid condition.");
         const block: Block = {
@@ -196,10 +196,10 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
     const session = getSession(request.params.sessionId);
     if (
         !session.blocks.find(
-            (block) => block.number === 0 && block.endedAt !== null,
+            (block) => block.number === 1 && block.endedAt !== null,
         )
     )
-        throw new Error("Finish practice before the comfort check.");
+        throw new Error("Finish silent baseline calibration before the comfort check.");
     session.comfortCheckCompletedAt = new Date().toISOString();
     saveSession(session);
     response.json({ ok: true });

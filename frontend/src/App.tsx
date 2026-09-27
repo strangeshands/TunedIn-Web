@@ -32,7 +32,10 @@ import { fmt } from "./script/format";
 
 type Stage =
     | "participant"
+    | "practice"
+    | "baseline-intro"
     | "baseline"
+    | "calibration-results"
     | "audio-check"
     | "block-intro"
     | "task"
@@ -45,14 +48,13 @@ const orders: Record<OrderId, Condition[]> = {
     B: ["Static music", "Adaptive music", "No music"],
     C: ["Adaptive music", "No music", "Static music"],
 };
+
 /**
- *  2 minutes = 120
- *  8 minutes = 480
- *
  *  Change duration here.
  */
-const PRACTICE_SECONDS = 20;
-const BLOCK_SECONDS = 60;
+const PRACTICE_SECONDS = 10;
+const BASELINE_SECONDS = 20;
+const BLOCK_SECONDS = 60*2;
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -68,6 +70,7 @@ export default function App() {
     const [seconds, setSeconds] = useState(0);
     const [started, setStarted] = useState<number | null>(null);
     const [results, setResults] = useState<BlockMeasures[]>([]);
+    const [calibration, setCalibration] = useState<BlockMeasures | null>(null);
     const [message, setMessage] = useState("");
     const [musicCatalogue, setMusicCatalogue] = useState<MusicCatalogue>({
         baseline: [],
@@ -82,14 +85,14 @@ export default function App() {
     const audio = useRef(new AudioController());
     const order = orders[orderId];
     const condition = order[blockIndex];
-    const duration = stage === "baseline" ? PRACTICE_SECONDS : BLOCK_SECONDS;
+    const duration = stage === "practice" ? PRACTICE_SECONDS : stage === "baseline" ? BASELINE_SECONDS : BLOCK_SECONDS;
     const remaining = useMemo(
         () => Math.max(0, duration - seconds),
         [duration, seconds],
     );
 
     useEffect(() => {
-        if ((stage !== "baseline" && stage !== "task") || started === null)
+        if ((stage !== "practice" && stage !== "baseline" && stage !== "task") || started === null)
             return;
         const timer = window.setInterval(() => {
             const elapsed = Math.floor((performance.now() - started) / 1000);
@@ -115,7 +118,7 @@ export default function App() {
         )
             return;
         const interval = window.setInterval(() => {
-            void applyAdaptiveDecision(sessionId, blockIndex + 1);
+            void applyAdaptiveDecision(sessionId, blockIndex + 2);
         }, 30_000);
         return () => window.clearInterval(interval);
     }, [stage, condition, sessionId, started, blockIndex, musicCatalogue]);
@@ -138,7 +141,7 @@ export default function App() {
             void loadMusicCatalogue();
             localStorage.setItem("tunedIn.participantId", clean);
             setParticipantId(clean);
-            setStage("baseline");
+            setStage("practice");
         } catch (error) {
             setMessage(String(error));
         }
@@ -229,7 +232,7 @@ export default function App() {
             firstKey.current = false;
             completing.current = false;
             setStarted(performance.now());
-            setStage(number === 0 ? "baseline" : "task");
+            setStage(number === 0 ? "practice" : number === 1 ? "baseline" : "task");
             if (number > 0) await startMusic(nextCondition);
             await queue.current!.send({
                 blockNumber: number,
@@ -245,8 +248,11 @@ export default function App() {
     function startPractice() {
         void beginBlock(0, "No music");
     }
+    function startBaselineCalibration() {
+        void beginBlock(1, "No music");
+    }
     function startBlock() {
-        void beginBlock(blockIndex + 1, condition);
+        void beginBlock(blockIndex + 2, condition);
     }
 
     function update(key: keyof FormValues, value: string) {
@@ -254,7 +260,7 @@ export default function App() {
         if (!firstKey.current && value.length > form[key].length) {
             firstKey.current = true;
             void queue.current?.send({
-                blockNumber: stage === "baseline" ? 0 : blockIndex + 1,
+                blockNumber: stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2,
                 recordId: record.id,
                 eventType: "first_key",
                 clientTimeMs: performance.now(),
@@ -271,7 +277,7 @@ export default function App() {
         event.preventDefault();
         if (!sessionId || !record) return;
         try {
-            const number = stage === "baseline" ? 0 : blockIndex + 1;
+            const number = stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2;
             const response = await submitRecord(
                 sessionId,
                 number,
@@ -301,7 +307,7 @@ export default function App() {
         if (!sessionId) return;
         try {
             audio.current.stop();
-            const number = stage === "baseline" ? 0 : blockIndex + 1;
+            const number = stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2;
             const response = await finishApiBlock(
                 sessionId,
                 number,
@@ -309,7 +315,13 @@ export default function App() {
             );
             if (number === 0) {
                 setStarted(null);
-                setStage("audio-check");
+                setStage("baseline-intro");
+                return;
+            }
+            if (number === 1) {
+                setCalibration(response.measures);
+                setStarted(null);
+                setStage("calibration-results");
                 return;
             }
             setResults((old) => [
@@ -351,10 +363,11 @@ export default function App() {
         setRecord(null);
         setForm(empty);
         setResults([]);
+        setCalibration(null);
         setMessage("");
         setAudioMessage("");
     }
-    const result = results.find((item) => item.block === blockIndex + 1);
+    const result = results.find((item) => item.block === blockIndex + 2);
 
     /**
      *  First Stage: Participant
@@ -376,7 +389,7 @@ export default function App() {
                         onChange={setParticipantId}
                     />
                     <label className="field">
-                        <span>Counterbalanced condition order</span>
+                        <span>Counterbalanced Condition Order</span>
                         <select
                             value={orderId}
                             onChange={(event) =>
@@ -384,20 +397,21 @@ export default function App() {
                             }
                         >
                             <option value="A">
-                                Order A — No → Static → Adaptive
+                                Order A: No → Static → Adaptive
                             </option>
                             <option value="B">
-                                Order B — Static → Adaptive → No
+                                Order B: Static → Adaptive → No
                             </option>
                             <option value="C">
-                                Order C — Adaptive → No → Static
+                                Order C: Adaptive → No → Static
                             </option>
                         </select>
                     </label>
                     <div className="instructions">
-                        <b>Prototype sequence</b>
+                        <b>Experiment Sequence</b>
                         <ol>
-                            <li>Silent baseline practice</li>
+                            <li>Practice task</li>
+                            <li>Silent baseline calibration</li>
                             <li>Audio-comfort check</li>
                             <li>Three timed encoding blocks</li>
                         </ol>
@@ -426,10 +440,6 @@ export default function App() {
                     <b>Researcher / participant check</b>
                     <ul>
                         <li>Confirm the headphones fit comfortably.</li>
-                        <li>
-                            If test audio is provided separately, adjust the
-                            device to a comfortable level.
-                        </li>
                         <li>
                             Do not change that device level during the blocks.
                         </li>
@@ -464,12 +474,12 @@ export default function App() {
      *  Second Stage: Practice
      *      * Begins practice typing.
      */
-    if (stage === "baseline" && started === null)
+    if (stage === "practice" && started === null)
         return (
             <SimpleStage
-                eyebrow="SILENT BASELINE"
+                eyebrow="PRACTICE"
                 title="Practice encoding task"
-                description="Complete a short silent practice task before the experimental blocks begin."
+                description="Learn the task mechanics. The researcher may clarify instructions during this stage."
                 participantId={participantId}
             >
                 <div className="instructions">
@@ -492,6 +502,37 @@ export default function App() {
                 <button className="primary large" onClick={startPractice}>
                     Start practice <span>→</span>
                 </button>
+            </SimpleStage>
+        );
+
+    if (stage === "baseline-intro")
+        return (
+            <SimpleStage
+                eyebrow="SILENT BASELINE"
+                title="Baseline calibration"
+                description="Complete the same task without music. These results become your personal adaptive-music reference."
+                participantId={participantId}
+            >
+                <div className="timer-card"><span>Calibration duration</span><strong>{fmt(BASELINE_SECONDS)}</strong></div>
+                <button className="primary large" onClick={startBaselineCalibration}>Start silent calibration <span>→</span></button>
+            </SimpleStage>
+        );
+
+    if (stage === "calibration-results" && calibration)
+        return (
+            <SimpleStage
+                eyebrow="SILENT BASELINE COMPLETE"
+                title="Calibration results"
+                description="These personal reference values will be used only by the Adaptive Music rule engine."
+                participantId={participantId}
+            >
+                <div className="block-results-grid">
+                    <Result label="Median initiation latency" value={calibration.medianInitiationLatencyMs === null ? "—" : `${Math.round(calibration.medianInitiationLatencyMs)} ms`} />
+                    <Result label="Median first-pass entry duration" value={calibration.medianFirstPassEntryDurationMs === null ? "—" : `${Math.round(calibration.medianFirstPassEntryDurationMs)} ms`} />
+                    <Result label="First-pass error rate" value={calibration.firstPassRecordErrorRate === null ? "—" : `${(calibration.firstPassRecordErrorRate * 100).toFixed(1)}%`} />
+                    <Result label="Validated records" value={String(calibration.validatedRecords)} />
+                </div>
+                <button className="primary large" onClick={() => setStage("audio-check")}>Continue to audio check <span>→</span></button>
             </SimpleStage>
         );
 
@@ -534,7 +575,7 @@ export default function App() {
     if (stage === "block-results" && result)
         return (
             <SimpleStage
-                eyebrow={`BLOCK ${result.block} COMPLETE`}
+                eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
                 title="Block results"
                 description="Processed task measures for the completed block."
                 participantId={participantId}
@@ -626,7 +667,7 @@ export default function App() {
     /**
      *  Actual block.
      */
-    const isPractice = stage === "baseline";
+    const isPractice = stage === "practice" || stage === "baseline";
     return (
         <main className="task">
             <header>
@@ -638,9 +679,11 @@ export default function App() {
                 </div>
                 <div className="meta">
                     <span className="pill">
-                        {isPractice
-                            ? "Practice"
-                            : `Block ${blockIndex + 1} / 3`}
+                        {stage === "baseline"
+                            ? "Calibration"
+                            : isPractice
+                              ? "Practice"
+                              : `Block ${blockIndex + 1} / 3`}
                     </span>
                     <span className="pill">
                         {isPractice ? "No music" : condition}
@@ -659,9 +702,11 @@ export default function App() {
                 <div className="heading">
                     <div>
                         <div className="eyebrow">
-                            {isPractice
-                                ? "PRACTICE ENCODING"
-                                : "DIGITAL ENCODING"}
+                            {stage === "baseline"
+                                ? "SILENT CALIBRATION"
+                                : isPractice
+                                  ? "PRACTICE ENCODING"
+                                  : "DIGITAL ENCODING"}
                         </div>
                         <h2>Enter the source record</h2>
                     </div>
@@ -767,7 +812,7 @@ function SimpleStage(props: {
                 )}
                 {props.children}
             </section>
-            <footer>Local prototype · Fictional records only</footer>
+            <footer>Version 1: First Iteration of Formative User Feedback</footer>
         </main>
     );
 }

@@ -2,7 +2,10 @@ export type Condition = "No music" | "Static music" | "Adaptive music";
 export type OrderId = "A" | "B" | "C";
 export type Stage =
     | "participant"
+    | "practice"
+    | "baseline-intro"
     | "baseline"
+    | "calibration-results"
     | "audio-check"
     | "block-intro"
     | "task"
