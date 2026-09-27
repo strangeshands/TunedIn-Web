@@ -6,7 +6,8 @@ It keeps the App.tsx flow you supplied:
 
 ```text
 Participant setup
-    → Silent baseline practice
+    → Practice
+    → Silent baseline calibration
     → Audio-comfort check
     → Block 1 → results
     → Block 2 → results

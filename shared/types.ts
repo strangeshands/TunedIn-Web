@@ -42,6 +42,20 @@ export type MusicDecision = {
     reason: string;
 };
 
+/** Playback outcome reported by the browser after an adaptive decision. */
+export type MusicTransition = {
+    id: string;
+    decisionId: string;
+    blockNumber: number;
+    previousTrackId: string | null;
+    selectedTrackId: string | null;
+    startedMs: number;
+    completedMs: number;
+    configuredCrossfadeMs: number;
+    outcome: "playing" | "silent" | "failed";
+    error: string | null;
+};
+
 export type RecordValues = {
     recordCode: string;
     batchCode: string;
@@ -93,6 +107,7 @@ export type Session = {
     events: TaskEvent[];
     musicTracks: MusicTrack[];
     musicDecisions: MusicDecision[];
+    musicTransitions: MusicTransition[];
 };
 export type Block = {
     number: number;

@@ -3,6 +3,7 @@ import type {
     Condition,
     MusicCatalogue,
     MusicDecision,
+    MusicTransition,
     OrderId,
     SourceRecord,
     TaskEvent,
@@ -46,6 +47,20 @@ export function evaluateAdaptiveMusic(
     return request<{ decision: MusicDecision }>(
         `/api/sessions/${sessionId}/blocks/${blockNumber}/music/evaluate`,
         { windowEndMs },
+    );
+}
+
+export function recordMusicTransition(
+    sessionId: string,
+    blockNumber: number,
+    data: Pick<
+        MusicTransition,
+        "decisionId" | "startedMs" | "completedMs" | "outcome" | "error"
+    >,
+) {
+    return request<{ saved: true }>(
+        `/api/sessions/${sessionId}/blocks/${blockNumber}/music/transitions`,
+        data,
     );
 }
 

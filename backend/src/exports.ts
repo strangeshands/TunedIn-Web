@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Session } from "../../shared/types.js";
+import { config } from "./config.js";
 import { calculateBlockMeasures } from "./measures.js";
 import { dataDir } from "./store.js";
 
@@ -130,8 +131,6 @@ export function exportFiles(session: Session) {
                 }),
             )
             .join("\n") + "\n";
-    // These empty, header-only files reserve the Chapter Six fields for the later
-    // music integration. No playback or adaptation row is invented in this version.
     const decisionsCsv = csv(
         [
             "participant_id",
@@ -151,7 +150,15 @@ export function exportFiles(session: Session) {
             "selected_track_id",
             "reason",
         ],
-        [],
+        session.musicDecisions.map((item) => [
+            session.participantId, session.id, item.blockNumber,
+            item.windowStartMs, item.windowEndMs, item.recordCount,
+            item.medianInitiationLatencyMs, item.medianFirstPassEntryDurationMs,
+            item.firstPassRecordErrorRate, item.baselineInitiationLatencyMs,
+            item.baselineFirstPassEntryDurationMs, item.previousState,
+            item.selectedState, item.previousTrackId, item.selectedTrackId,
+            item.reason,
+        ]),
     );
     const transitionsCsv = csv(
         [
@@ -167,7 +174,12 @@ export function exportFiles(session: Session) {
             "outcome",
             "error",
         ],
-        [],
+        (session.musicTransitions ?? []).map((item) => [
+            session.participantId, session.id, item.blockNumber,
+            item.decisionId, item.previousTrackId, item.selectedTrackId,
+            item.startedMs, item.completedMs, item.configuredCrossfadeMs,
+            item.outcome, item.error,
+        ]),
     );
     const tracksCsv = csv(
         [
@@ -181,7 +193,10 @@ export function exportFiles(session: Session) {
             "loudness_checked",
             "file_sha256",
         ],
-        [],
+        session.musicTracks.map((track) => [
+            session.participantId, session.id, track.id, track.musicClass,
+            track.relativeFilePath, "folder", config.version, "pending", "pending",
+        ]),
     );
     return {
         "blocks.csv": blockCsv,

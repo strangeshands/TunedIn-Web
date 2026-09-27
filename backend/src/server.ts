@@ -80,6 +80,7 @@ app.post("/api/sessions", (request, response) => {
         events: [],
         musicTracks: Object.values(musicCatalogue).flat(),
         musicDecisions: [],
+        musicTransitions: [],
     };
     saveSession(session);
     response.status(201).json({ sessionId: session.id });
@@ -234,6 +235,44 @@ app.post(
         session.musicDecisions.push(decision);
         saveSession(session);
         response.json({ decision });
+    },
+);
+
+/** Saves the actual browser playback outcome for one adaptive decision. */
+app.post(
+    "/api/sessions/:sessionId/blocks/:blockNumber/music/transitions",
+    (request, response) => {
+        const session = getSession(request.params.sessionId);
+        const blockNumber = Number(request.params.blockNumber);
+        const { decisionId, startedMs, completedMs, outcome, error } = request.body ?? {};
+        const decision = session.musicDecisions.find(
+            (item) => item.id === decisionId && item.blockNumber === blockNumber,
+        );
+        if (
+            !decision ||
+            !Number.isFinite(startedMs) ||
+            !Number.isFinite(completedMs) ||
+            completedMs < startedMs ||
+            !["playing", "silent", "failed"].includes(outcome) ||
+            (error !== undefined && error !== null && typeof error !== "string")
+        )
+            throw new Error("Invalid music transition.");
+
+        session.musicTransitions ??= [];
+        session.musicTransitions.push({
+            id: `transition-${session.musicTransitions.length + 1}`,
+            decisionId,
+            blockNumber,
+            previousTrackId: decision.previousTrackId,
+            selectedTrackId: decision.selectedTrackId,
+            startedMs,
+            completedMs,
+            configuredCrossfadeMs: 0,
+            outcome,
+            error: error ?? null,
+        });
+        saveSession(session);
+        response.status(201).json({ saved: true });
     },
 );
 

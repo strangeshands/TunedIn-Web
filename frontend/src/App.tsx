@@ -22,6 +22,7 @@ import {
     exportUrl,
     finishApiBlock,
     getMusicCatalogue,
+    recordMusicTransition,
     sendTaskEvent,
     startApiBlock,
     submitRecord,
@@ -177,6 +178,7 @@ export default function App() {
                     ? result.reason
                     : `Audio could not play. The task will continue silently.`,
             );
+        return result;
     }
 
     async function startMusic(nextCondition: Condition) {
@@ -205,7 +207,15 @@ export default function App() {
                 number,
                 performance.now(),
             );
-            await playTrack(trackById(decision.selectedTrackId));
+            const startedMs = performance.now();
+            const playback = await playTrack(trackById(decision.selectedTrackId));
+            await recordMusicTransition(activeSessionId, number, {
+                decisionId: decision.id,
+                startedMs,
+                completedMs: performance.now(),
+                outcome: playback.status,
+                error: playback.status === "playing" ? null : playback.reason,
+            });
         } catch {
             // A rule-engine request must never interrupt data entry or the timer.
             setAudioMessage(
