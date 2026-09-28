@@ -55,7 +55,7 @@ const orders: Record<OrderId, Condition[]> = {
  */
 const PRACTICE_SECONDS = 10;
 const BASELINE_SECONDS = 20;
-const BLOCK_SECONDS = 60*2;
+const BLOCK_SECONDS = 60 * 2;
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -86,14 +86,24 @@ export default function App() {
     const audio = useRef(new AudioController());
     const order = orders[orderId];
     const condition = order[blockIndex];
-    const duration = stage === "practice" ? PRACTICE_SECONDS : stage === "baseline" ? BASELINE_SECONDS : BLOCK_SECONDS;
+    const duration =
+        stage === "practice"
+            ? PRACTICE_SECONDS
+            : stage === "baseline"
+              ? BASELINE_SECONDS
+              : BLOCK_SECONDS;
     const remaining = useMemo(
         () => Math.max(0, duration - seconds),
         [duration, seconds],
     );
 
     useEffect(() => {
-        if ((stage !== "practice" && stage !== "baseline" && stage !== "task") || started === null)
+        if (
+            (stage !== "practice" &&
+                stage !== "baseline" &&
+                stage !== "task") ||
+            started === null
+        )
             return;
         const timer = window.setInterval(() => {
             const elapsed = Math.floor((performance.now() - started) / 1000);
@@ -208,7 +218,9 @@ export default function App() {
                 performance.now(),
             );
             const startedMs = performance.now();
-            const playback = await playTrack(trackById(decision.selectedTrackId));
+            const playback = await playTrack(
+                trackById(decision.selectedTrackId),
+            );
             await recordMusicTransition(activeSessionId, number, {
                 decisionId: decision.id,
                 startedMs,
@@ -242,7 +254,9 @@ export default function App() {
             firstKey.current = false;
             completing.current = false;
             setStarted(performance.now());
-            setStage(number === 0 ? "practice" : number === 1 ? "baseline" : "task");
+            setStage(
+                number === 0 ? "practice" : number === 1 ? "baseline" : "task",
+            );
             if (number > 0) await startMusic(nextCondition);
             await queue.current!.send({
                 blockNumber: number,
@@ -270,7 +284,12 @@ export default function App() {
         if (!firstKey.current && value.length > form[key].length) {
             firstKey.current = true;
             void queue.current?.send({
-                blockNumber: stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2,
+                blockNumber:
+                    stage === "practice"
+                        ? 0
+                        : stage === "baseline"
+                          ? 1
+                          : blockIndex + 2,
                 recordId: record.id,
                 eventType: "first_key",
                 clientTimeMs: performance.now(),
@@ -287,7 +306,12 @@ export default function App() {
         event.preventDefault();
         if (!sessionId || !record) return;
         try {
-            const number = stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2;
+            const number =
+                stage === "practice"
+                    ? 0
+                    : stage === "baseline"
+                      ? 1
+                      : blockIndex + 2;
             const response = await submitRecord(
                 sessionId,
                 number,
@@ -317,7 +341,12 @@ export default function App() {
         if (!sessionId) return;
         try {
             audio.current.stop();
-            const number = stage === "practice" ? 0 : stage === "baseline" ? 1 : blockIndex + 2;
+            const number =
+                stage === "practice"
+                    ? 0
+                    : stage === "baseline"
+                      ? 1
+                      : blockIndex + 2;
             const response = await finishApiBlock(
                 sessionId,
                 number,
@@ -523,8 +552,16 @@ export default function App() {
                 description="Complete the same task without music. These results become your personal adaptive-music reference."
                 participantId={participantId}
             >
-                <div className="timer-card"><span>Calibration duration</span><strong>{fmt(BASELINE_SECONDS)}</strong></div>
-                <button className="primary large" onClick={startBaselineCalibration}>Start silent calibration <span>→</span></button>
+                <div className="timer-card">
+                    <span>Calibration duration</span>
+                    <strong>{fmt(BASELINE_SECONDS)}</strong>
+                </div>
+                <button
+                    className="primary large"
+                    onClick={startBaselineCalibration}
+                >
+                    Start silent calibration <span>→</span>
+                </button>
             </SimpleStage>
         );
 
@@ -537,12 +574,41 @@ export default function App() {
                 participantId={participantId}
             >
                 <div className="block-results-grid">
-                    <Result label="Median initiation latency" value={calibration.medianInitiationLatencyMs === null ? "—" : `${Math.round(calibration.medianInitiationLatencyMs)} ms`} />
-                    <Result label="Median first-pass entry duration" value={calibration.medianFirstPassEntryDurationMs === null ? "—" : `${Math.round(calibration.medianFirstPassEntryDurationMs)} ms`} />
-                    <Result label="First-pass error rate" value={calibration.firstPassRecordErrorRate === null ? "—" : `${(calibration.firstPassRecordErrorRate * 100).toFixed(1)}%`} />
-                    <Result label="Validated records" value={String(calibration.validatedRecords)} />
+                    <Result
+                        label="Median IL"
+                        value={
+                            calibration.medianInitiationLatencyMs === null
+                                ? "—"
+                                : `${(calibration.medianInitiationLatencyMs / 1000).toFixed(2)} s`
+                        }
+                    />
+                    <Result
+                        label="Median FPED"
+                        value={
+                            calibration.medianFirstPassEntryDurationMs === null
+                                ? "—"
+                                : `${(calibration.medianFirstPassEntryDurationMs / 1000).toFixed(2)} s`
+                        }
+                    />
+                    <Result
+                        label="First-pass error"
+                        value={
+                            calibration.firstPassRecordErrorRate === null
+                                ? "—"
+                                : `${(calibration.firstPassRecordErrorRate * 100).toFixed(1)}%`
+                        }
+                    />
+                    <Result
+                        label="Validated records"
+                        value={String(calibration.validatedRecords)}
+                    />
                 </div>
-                <button className="primary large" onClick={() => setStage("audio-check")}>Continue to audio check <span>→</span></button>
+                <button
+                    className="primary large"
+                    onClick={() => setStage("audio-check")}
+                >
+                    Continue to audio check <span>→</span>
+                </button>
             </SimpleStage>
         );
 
@@ -605,7 +671,7 @@ export default function App() {
                         value={
                             result.medianInitiationLatencyMs === null
                                 ? "—"
-                                : `${Math.round(result.medianInitiationLatencyMs)} ms`
+                                : `${Math.round(result.medianInitiationLatencyMs / 1000).toFixed(2)} s`
                         }
                     />
                     <Result
@@ -613,7 +679,7 @@ export default function App() {
                         value={
                             result.medianFirstPassEntryDurationMs === null
                                 ? "—"
-                                : `${Math.round(result.medianFirstPassEntryDurationMs)} ms`
+                                : `${Math.round(result.medianFirstPassEntryDurationMs / 1000).toFixed(2)} s`
                         }
                     />
                     <Result
@@ -629,7 +695,7 @@ export default function App() {
                         value={
                             result.medianTimeToSuccessfulValidationMs === null
                                 ? "—"
-                                : `${Math.round(result.medianTimeToSuccessfulValidationMs)} ms`
+                                : `${Math.round(result.medianTimeToSuccessfulValidationMs / 1000).toFixed(2)} s`
                         }
                     />
                 </div>
@@ -822,7 +888,9 @@ function SimpleStage(props: {
                 )}
                 {props.children}
             </section>
-            <footer>Version 1: First Iteration of Formative User Feedback</footer>
+            <footer>
+                Version 1: First Iteration of Formative User Feedback
+            </footer>
         </main>
     );
 }
