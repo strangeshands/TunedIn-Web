@@ -24,6 +24,85 @@ input {
 button {
     cursor: pointer;
 }
+.test-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+.test-metrics {
+    margin-top: 28px;
+    padding: 18px;
+    border-radius: 14px;
+    background: #f4f7f4;
+}
+.test-metrics .field {
+    margin-top: 14px;
+}
+.test-state {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 9px;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+.test-state.reduced {
+    background: #f9e9df;
+    color: #8a3c14;
+}
+.test-state.baseline {
+    background: #e6f0e9;
+    color: #284f39;
+}
+.test-state.elevated {
+    background: #e5eef8;
+    color: #1d4f7b;
+}
+.test-message {
+    min-height: 24px;
+    color: #56625c;
+}
+.slider-metric input[type="range"] {
+    width: 100%;
+    padding: 0;
+    accent-color: #284f39;
+}
+.slider-metric b {
+    color: #284f39;
+}
+.change-state {
+    width: 100%;
+    margin-top: 16px;
+}
+.stop-button {
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 22px;
+    margin-bottom: 5px;
+    border: 1px solid #284f39;
+    border-radius: 11px;
+    background: transparent;
+    color: #284f39;
+    font-weight: 750;
+    cursor: pointer;
+}
+.now-playing {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 18px;
+    padding: 12px;
+    border: 1px solid #dce2dd;
+    border-radius: 10px;
+    color: #425049;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+.now-playing b {
+    color: #284f39;
+}
 .app {
     min-height: 100vh;
     padding: 42px 24px 28px;

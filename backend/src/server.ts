@@ -35,6 +35,8 @@ const eventTypes = [
     "record_submitted",
     "validation_result",
 ];
+// CROSSFADE / TEMPORARY: keep this aligned with frontend/src/script/audio.ts.
+const TEMPORARY_CROSSFADE_MS = 5_000;
 const getSession = (id: string) => {
     const session = sessions.get(id);
     if (!session) throw new Error("Session not found.");
@@ -200,7 +202,9 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
             (block) => block.number === 1 && block.endedAt !== null,
         )
     )
-        throw new Error("Finish silent baseline calibration before the comfort check.");
+        throw new Error(
+            "Finish silent baseline calibration before the comfort check.",
+        );
     session.comfortCheckCompletedAt = new Date().toISOString();
     saveSession(session);
     response.json({ ok: true });
@@ -244,9 +248,11 @@ app.post(
     (request, response) => {
         const session = getSession(request.params.sessionId);
         const blockNumber = Number(request.params.blockNumber);
-        const { decisionId, startedMs, completedMs, outcome, error } = request.body ?? {};
+        const { decisionId, startedMs, completedMs, outcome, error } =
+            request.body ?? {};
         const decision = session.musicDecisions.find(
-            (item) => item.id === decisionId && item.blockNumber === blockNumber,
+            (item) =>
+                item.id === decisionId && item.blockNumber === blockNumber,
         );
         if (
             !decision ||
@@ -267,7 +273,7 @@ app.post(
             selectedTrackId: decision.selectedTrackId,
             startedMs,
             completedMs,
-            configuredCrossfadeMs: 0,
+            configuredCrossfadeMs: TEMPORARY_CROSSFADE_MS,
             outcome,
             error: error ?? null,
         });
