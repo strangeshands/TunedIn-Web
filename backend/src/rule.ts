@@ -86,13 +86,12 @@ function measureWindow(
     };
 }
 
-function selectTrack(
+function firstTrack(
     catalogue: MusicCatalogue,
     state: AdaptiveState,
-    decisionNumber: number,
 ): MusicTrack | null {
     const options = state === "silent" ? [] : catalogue[state];
-    return options.length ? options[decisionNumber % options.length] : null;
+    return options[0] ?? null;
 }
 
 /**
@@ -117,9 +116,15 @@ export function evaluateAdaptiveRule(
     );
     // Block 1 is the silent calibration reference.
     const baseline = calculateBlockMeasures(session, 1);
-    const previous = session.musicDecisions.at(-1);
+    const previous = session.musicDecisions
+        .filter((item) => item.blockNumber === blockNumber)
+        .at(-1);
     const previousState: AdaptiveState = previous?.selectedState ?? "baseline";
-    const previousTrackId = previous?.selectedTrackId ?? null;
+    // Adaptive blocks begin on the baseline track. Treat it as active before
+    // the first decision, so a baseline result does not cause a false change.
+    const initialTrack = firstTrack(catalogue, "baseline");
+    const previousTrackId =
+        previous?.selectedTrackId ?? initialTrack?.id ?? null;
     let selectedState: AdaptiveState = previousState;
     let reason =
         "Kept the previous state while waiting for enough recent records.";
@@ -159,11 +164,14 @@ export function evaluateAdaptiveRule(
         }
     }
 
-    const track = selectTrack(
-        catalogue,
-        selectedState,
-        session.musicDecisions.length,
-    );
+    // Retain the current track while its state is retained. Select a new
+    // manifest track only when the rule selects a different state.
+    const track =
+        selectedState === previousState
+            ? (Object.values(catalogue)
+                  .flat()
+                  .find((item) => item.id === previousTrackId) ?? null)
+            : firstTrack(catalogue, selectedState);
     if (!track) {
         selectedState = "silent";
         reason +=

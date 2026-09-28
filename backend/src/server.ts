@@ -256,6 +256,7 @@ app.post(
         );
         if (
             !decision ||
+            decision.previousTrackId === decision.selectedTrackId ||
             !Number.isFinite(startedMs) ||
             !Number.isFinite(completedMs) ||
             completedMs < startedMs ||

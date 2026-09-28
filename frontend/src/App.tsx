@@ -119,7 +119,8 @@ export default function App() {
     // Stop audio if the app is closed or React removes this screen.
     useEffect(() => () => audio.current.stop(), []);
 
-    // Adaptive blocks ask the backend for a new decision every 30 seconds.
+    // The first 60 seconds establish the initial rolling window. After that,
+    // the backend evaluates the rule every 30 seconds.
     useEffect(() => {
         if (
             stage !== "task" ||
@@ -128,10 +129,17 @@ export default function App() {
             started === null
         )
             return;
-        const interval = window.setInterval(() => {
+        let interval: number | null = null;
+        const firstEvaluation = window.setTimeout(() => {
             void applyAdaptiveDecision(sessionId, blockIndex + 2);
-        }, 30_000);
-        return () => window.clearInterval(interval);
+            interval = window.setInterval(() => {
+                void applyAdaptiveDecision(sessionId, blockIndex + 2);
+            }, 30_000);
+        }, 60_000);
+        return () => {
+            window.clearTimeout(firstEvaluation);
+            if (interval !== null) window.clearInterval(interval);
+        };
     }, [stage, condition, sessionId, started, blockIndex, musicCatalogue]);
 
     /**
@@ -217,6 +225,9 @@ export default function App() {
                 number,
                 performance.now(),
             );
+            // The backend retains the active track while the selected state is
+            // unchanged. Do not restart audio or create a transition row.
+            if (decision.previousTrackId === decision.selectedTrackId) return;
             const startedMs = performance.now();
             const playback = await playTrack(
                 trackById(decision.selectedTrackId),
