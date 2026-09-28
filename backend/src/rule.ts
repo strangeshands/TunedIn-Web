@@ -132,37 +132,30 @@ export function evaluateAdaptiveRule(
         current.medianFirstPassEntryDurationMs !== null &&
         current.firstPassRecordErrorRate !== null
     ) {
-        const slow =
-            current.medianInitiationLatencyMs >
-                baseline.medianInitiationLatencyMs *
-                    (1 + config.adaptiveRules.slowerThanBaselinePercent) ||
-            current.medianFirstPassEntryDurationMs >
-                baseline.medianFirstPassEntryDurationMs *
-                    (1 + config.adaptiveRules.slowerThanBaselinePercent);
-        const errorProne =
-            current.firstPassRecordErrorRate >
-            (baseline.firstPassRecordErrorRate ?? 0) +
-                config.adaptiveRules.errorRateIncrease;
-        const fast =
-            current.medianInitiationLatencyMs <
-                baseline.medianInitiationLatencyMs *
-                    (1 - config.adaptiveRules.fasterThanBaselinePercent) &&
-            current.medianFirstPassEntryDurationMs <
-                baseline.medianFirstPassEntryDurationMs *
-                    (1 - config.adaptiveRules.fasterThanBaselinePercent) &&
-            !errorProne;
-        if (slow || errorProne) {
+        const reduced =
+            current.medianInitiationLatencyMs >=
+                baseline.medianInitiationLatencyMs * 1.2 ||
+            current.medianFirstPassEntryDurationMs >=
+                baseline.medianFirstPassEntryDurationMs * 1.2 ||
+            current.firstPassRecordErrorRate > 0.15;
+
+        const elevated =
+            current.medianInitiationLatencyMs <=
+                baseline.medianInitiationLatencyMs * 0.9 &&
+            current.medianFirstPassEntryDurationMs <=
+                baseline.medianFirstPassEntryDurationMs * 0.9 &&
+            current.firstPassRecordErrorRate <= 0.05;
+
+        if (reduced) {
             selectedState = "reduced";
-            reason = slow
-                ? "Recent speed was slower than the baseline threshold."
-                : "Recent first-pass error rate exceeded the baseline threshold.";
-        } else if (fast) {
+            reason = "Recent performance met a reduced-state trigger.";
+        } else if (elevated) {
             selectedState = "elevated";
-            reason =
-                "Recent speed was faster than the baseline threshold without increased errors.";
+            reason = "Recent performance met every elevated-state trigger.";
         } else {
             selectedState = "baseline";
-            reason = "Recent performance remained within the baseline range.";
+            reason =
+                "Neither reduced nor elevated trigger conditions were met.";
         }
     }
 
