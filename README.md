@@ -1,33 +1,55 @@
-# Tuned In
+# Tuned In — Iterative Feedback #1
 
-This is a simple local browser application for the Chapter Six fictional digital encoding task.
-
-It keeps the App.tsx flow you supplied:
+This branch is the version for the group's first iterative-feedback session. It is a local browser prototype of the Chapter Six fictional digital-encoding task.
 
 ```text
-Participant setup
-    → Practice
-    → Silent baseline calibration
-    → Audio-comfort check
-    → Block 1 → results
-    → Block 2 → results
-    → Block 3 → results
-    → Session completea
+Participant setup → Practice → Silent baseline calibration
+→ Calibration results → Audio-comfort check
+→ Experimental Blocks 1–3 → Session complete
 ```
 
-The visible record has three fields: **Record Code**, **Batch Code**, and **Quantity**. The participant uses Tab between fields and Enter to submit. Incorrect fields are highlighted and must be corrected before the next record.
+Participants copy fictional Record Code, Batch Code, and Quantity values into matching fields. They use Tab between fields and Enter to submit; incorrect fields require correction.
 
-## What this version does
+## What this feedback version includes
 
-- Keeps the participant setup, condition-order selector, practice task, audio-comfort screen, timed blocks, block results, and final download flow.
-- Keeps the Chapter Six measures: initiation latency (IL), first-pass entry duration (FPED), first-pass record error rate (FPRER), time to successful validation (TTSV), throughput, and correction cycles.
-- Generates source records, compares answers, calculates measures, writes JSON Lines and CSV files, and saves session data **in the backend**.
-- Organizes browser helper code under `frontend/src/script/`.
-- Includes a SQLite design and a clear `TODO(SQLite)` annotation, but does **not** install or use SQLite yet.
+- No music, Static music, and Adaptive music conditions in a counterbalanced order.
+- Separate practice and silent baseline calibration, with calibration results shown before audio setup.
+- Backend-only calculation of IL, FPED, FPRER, TTSV, throughput, and correction cycles.
+- Adaptive decisions from a 60-second rolling window, evaluated every 30 seconds.
+- Music discovery, browser playback, and backend exports for decisions, tracks, and playback outcomes.
+- A temporary 5-second crossfade and `/test-music` development screen.
 
-## Music integration progress
+It uses local JSON storage. SQLite is documented for later work and is not active.
 
-Step 1 is complete: the backend now discovers usable music files from these folders:
+## Set up
+
+Install **Node.js 20.19 or newer**:
+
+```bash
+node --version
+```
+
+For a new clone:
+
+```bash
+git clone https://github.com/strangeshands/TunedIn-Web.git
+cd TunedIn-Web
+git checkout fuf-ite1
+npm run install:all
+```
+
+For an existing clone:
+
+```bash
+git fetch origin
+git switch fuf-ite1
+git pull
+npm run install:all
+```
+
+## Add music
+
+Place files directly in these folders:
 
 ```text
 music/baseline/
@@ -35,102 +57,80 @@ music/reduced/
 music/elevated/
 ```
 
-Supported files are `.mp3`, `.wav`, `.m4a`, `.ogg`, and `.aac`. Put individual files directly into the appropriate folder. The backend ignores unsupported files, and missing or empty folders are valid: the experiment will continue silently.
+Supported formats: `.mp3`, `.wav`, `.m4a`, `.ogg`, and `.aac`.
 
-You can view the discovered catalogue at [http://localhost:3001/api/music/catalogue](http://localhost:3001/api/music/catalogue) while the backend is running. It returns three empty arrays when no music is present.
+Empty or missing folders do not crash the task; playback remains silent. For useful feedback, include at least one audio file in each bank.
 
-Playback, track selection, crossfades, and the adaptive rule engine are the next steps. The audio-comfort stage remains a manual checklist until playback is added.
+## Run
 
-The backend still creates `decisions.csv`, `transitions.csv`, and `tracks.csv` with headers. They are empty until music playback is implemented; this avoids pretending that a music exposure occurred.
-
-## Run it
-
-Install Node.js 18 or newer. In the `TunedIn-Web` folder:
+From the repository root:
 
 ```bash
-npm run install:all
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Keep both processes running while using the app.
-
-To create a production browser build:
-
-```bash
-npm run build
-npm run start --prefix backend
-```
-
-Then open [http://localhost:3001](http://localhost:3001).
-
-## Make changes
-
-| To change… | Edit this file |
+| Service | Address |
 | --- | --- |
-| Practice length or experimental block length | `config/study.json` |
-| Counterbalanced A/B/C order | `frontend/src/App.tsx` and `backend/src/server.ts` together |
-| How fictional records look | `backend/src/records.ts` |
-| Answer validation | `backend/src/records.ts` |
-| IL, FPED, FPRER, TTSV, throughput or correction formulas | `backend/src/measures.ts` |
-| What an API request does | `backend/src/server.ts` |
-| CSV/JSONL output fields | `backend/src/exports.ts` and `docs/DATA-DICTIONARY.md` |
-| App flow and wording | `frontend/src/App.tsx` |
-| Browser-to-backend requests | `frontend/src/script/api.ts` |
-| Browser event sending | `frontend/src/script/eventQueue.ts` |
-| Visual design | `frontend/src/styles.css` |
-| Pending SQLite migration | `backend/src/store.ts`, `docs/sqlite-schema.sql`, and `docs/SQLITE-NEXT.md` |
+| Participant interface | [http://localhost:5173](http://localhost:5173) |
+| Backend API and exports | [http://localhost:3001](http://localhost:3001) |
 
-Restart the backend after changing `config/study.json`. Give `version` and `taskVersion` a new value before collecting study data with changed settings/materials.
+Keep the terminal running. Press `Ctrl+C` in that terminal to stop the services.
 
-## Folder guide
+## Feedback checklist
 
-```text
-frontend/src/App.tsx          Screen flow and visible participant interface
-frontend/src/script/          Browser helper scripts only
-  api.ts                      Calls the backend
-  eventQueue.ts               Sends raw interaction events
-  format.ts                   Formats the timer for display
-backend/src/server.ts         API routes and session lifecycle
-backend/src/records.ts        Server-side fictional records and answer checking
-backend/src/measures.ts       Server-side calculations
-backend/src/exports.ts        Server-side CSV/JSONL creation
-backend/src/store.ts          JSON storage now; SQLite annotation for later
-backend/src/music.ts          Finds usable music files and safely handles empty folders
-backend/data/                 Created automatically; saved participant data
-config/study.json             Research settings for new sessions
-shared/types.ts               Shared TypeScript data shapes
-docs/DATA-DICTIONARY.md       Meaning of every saved CSV field
-docs/sqlite-schema.sql        Pending SQLite tables and fields
-docs/SQLITE-NEXT.md           SQLite implementation notes
-music/reduced/                Reserved for later music files
-music/baseline/               Reserved for later music files
-music/elevated/               Reserved for later music files
-```
+1. Create a participant and select an order.
+2. Complete practice, silent calibration, and audio-comfort setup.
+3. Check that calibration results appear before the first experimental block.
+4. Complete each music condition and note usability issues.
+5. In Adaptive Music, check that state changes and track changes are understandable.
+6. Download the CSV files after the session and check that they contain data.
+
+The current frontend timings are shortened for feedback. Do not collect final study data until timings, music manifest, threshold values, track-selection policy, and crossfade duration are finalized.
+
+## Temporary music page
+
+Visit [http://localhost:5173/test-music](http://localhost:5173/test-music) to test music without creating a participant session or saving study data. It provides a starting-track selector, metric sliders, predicted state, automatic target-state track selection, and current-track display.
+
+To remove this temporary feature later, delete `frontend/src/TestMusic.tsx`, remove the `/test-music` condition from `frontend/src/main.tsx`, and revert the temporary crossfade changes in `frontend/src/script/audio.ts` and `backend/src/server.ts`.
 
 ## Saved files
 
-At each block completion the backend creates:
+After each block, the backend writes exports to:
 
 ```text
 backend/data/exports/<session-id>/
 ```
 
-| File | What it contains |
+| File | Contents |
 | --- | --- |
-| `blocks.csv` | One row per block and its summary measures |
-| `records.csv` | One row per record, timestamps, IL, FPED, FPRER indicator, TTSV and corrections |
-| `events.jsonl` | Raw presentation, first-key, submission and validation events |
-| `session.json` | Full saved session plus backend-calculated block measures |
-| `decisions.csv` | Header-only until adaptation is implemented |
-| `transitions.csv` | Header-only until crossfades are implemented |
-| `tracks.csv` | Header-only until a final track manifest is implemented |
+| `blocks.csv` | One row per practice, calibration, or experimental block. |
+| `records.csv` | One row per presented record and its measures. |
+| `events.jsonl` | Raw presentation, key, submission, and validation events. |
+| `decisions.csv` | Adaptive windows and resulting state/track decisions. |
+| `transitions.csv` | Playback outcome after each adaptive decision. |
+| `tracks.csv` | Music files discovered when the session began. |
+| `session.json` | Complete local session snapshot. |
 
-See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for a field-by-field explanation. `quantity` is stored as text so leading zeros are retained. Times are browser monotonic milliseconds; rates are fractions from 0 to 1.
+See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Exported timing values are milliseconds, even when the interface displays seconds.
 
-## SQLite later
+## Where to make changes
 
-The current app saves JSON session files so it can be used without a database dependency. SQLite is the next storage step, not an active component. Its required tables cover sessions, blocks, raw events, record measures, block measures, tracks, adaptation decisions, and transitions. Read [docs/SQLITE-NEXT.md](docs/SQLITE-NEXT.md) before adding it.
+| Change | File |
+| --- | --- |
+| Participant flow and feedback timings | `frontend/src/App.tsx` |
+| Temporary music test screen | `frontend/src/TestMusic.tsx` |
+| Playback and crossfade | `frontend/src/script/audio.ts` |
+| Backend routes and session lifecycle | `backend/src/server.ts` |
+| Measures | `backend/src/measures.ts` |
+| Adaptive rules | `backend/src/rule.ts` |
+| Export columns | `backend/src/exports.ts` |
+| Music discovery | `backend/src/music.ts` |
+| Shared data shapes | `shared/types.ts` |
+| Research configuration | `config/study.json` |
 
-## Important study note
+## Current limitations
 
-This app uses fictional data only. Current silent runs must not be described as delivering static or adaptive music conditions. Pilot the final timings, minimum record count, music manifest, playback volume, track selection and crossfade behavior before a main study.
+- Local JSON storage only; SQLite remains pending.
+- Music classification comes from folder names; final manifest and loudness checks remain pending.
+- The 5-second crossfade and `/test-music` page are temporary feedback tools.
+- This app uses fictional records only.

@@ -1,56 +1,101 @@
-# Saved data
+# Tuned In data dictionary
 
-The backend writes all exports in `backend/data/exports/<session-id>/`. Empty values in CSV mean the value was not observed; they do not mean zero.
+The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CSV cells mean that a measure or event was not observed, not that it was zero.
 
-| File | Fields saved | Purpose |
+## Conventions
+
+- `*_ms` fields are milliseconds from the browser's monotonic `performance.now()` clock.
+- Rates are fractions from `0` to `1`; `0.15` means 15%.
+- The interface may display seconds, but exported timing values remain milliseconds.
+- `quantity` remains text so values such as `064` preserve leading zeroes.
+- Blocks: `0` practice, `1` silent baseline calibration, `2`–`4` experimental blocks 1–3.
+
+## Export files
+
+| File | Rows | Purpose |
 | --- | --- | --- |
-| `session.json` | participant ID, session/order IDs, assigned conditions, configuration/task versions, manual comfort-check timestamp, blocks, raw events and calculated block measures | Complete session snapshot for recovery and audit |
-| `events.jsonl` | session ID, participant ID, sequence, block, record ID, event type, monotonic browser timestamp, payload | Raw task-event record |
-| `records.csv` | participant/session/block/record IDs; presented, first-key, first-submission and validation times; first-pass rejection; IL, FPED, TTSV; submission count | One record-level row for verification and later analysis |
-| `blocks.csv` | participant/session/block, assigned condition, duration, records, validated records, throughput, median IL, median FPED, FPRER, first-pass accuracy, median TTSV, correction cycles | One completed block-level row |
+| `session.json` | One session snapshot | Complete local audit record. |
+| `events.jsonl` | One event per line | Raw evidence for measures. |
+| `records.csv` | One row per record | Record-level timing and validation data. |
+| `blocks.csv` | One row per block | Block-level measures. |
+| `decisions.csv` | One adaptive evaluation | Rule input, selected state, and track. |
+| `transitions.csv` | One adaptive playback attempt | Browser playback outcome. |
+| `tracks.csv` | One discovered music file | Session music catalogue. |
 
-`events.jsonl` is append-friendly raw evidence. `records.csv` and `blocks.csv` are backend-derived files. The frontend never calculates or writes these files.
-
-## Definitions
-
-- **IL**: first task-relevant character time minus record presentation time.
-- **FPED**: first full record submission time minus first task-relevant character time.
-- **FPRER**: rejected first full submissions divided by full first submissions.
-- **TTSV**: successful validation time minus presentation time. It is descriptive only and is not an adaptive rule input.
-
-All timing fields are milliseconds from the same browser `performance.now()` clock. Rates are 0–1 fractions. `quantity` remains text so values such as `064` retain their leading zero.
-
-## CSV column details
-
-### `blocks.csv`
+## `blocks.csv`
 
 | Column | Meaning |
 | --- | --- |
-| `participant_id`, `session_id` | Links the block to its saved session. |
-| `block` | `0` is silent practice; `1`–`3` are the experimental blocks. |
-| `condition` | Assigned counterbalanced condition label. |
-| `duration_seconds` | Timed duration supplied when the block finished. |
-| `records_presented`, `validated_records` | Records shown and records eventually accepted. |
-| `validated_records_per_minute` | Validated records divided by duration in minutes. |
-| `median_il_ms`, `median_fped_ms` | Median record timing measures. |
+| `participant_id`, `session_id` | Session identifiers. |
+| `block` | `0` practice, `1` calibration, `2`–`4` experimental. |
+| `condition` | `No music`, `Static music`, or `Adaptive music`; practice and calibration are always `No music`. |
+| `duration_seconds` | Duration supplied when the block ended. |
+| `records_presented`, `validated_records` | Records shown and eventually accepted. |
+| `validated_records_per_minute` | Accepted records per minute. |
+| `median_il_ms`, `median_fped_ms` | Median initiation latency and first-pass entry duration. |
 | `first_pass_error_rate`, `first_pass_accuracy` | FPRER and one minus FPRER. |
-| `median_ttsv_ms` | Median time from record presentation to successful validation. |
-| `correction_cycles`, `correction_cycles_per_validated_record` | Extra full submissions after the first and its per-valid record value. |
+| `median_ttsv_ms` | Median time from presentation to successful validation. |
+| `correction_cycles`, `correction_cycles_per_validated_record` | Extra submissions and the per-valid-record value. |
 
-### `records.csv`
+## `records.csv`
 
 | Column | Meaning |
 | --- | --- |
 | `participant_id`, `session_id`, `block`, `record_id` | Record identity and join fields. |
-| `presented_ms`, `first_key_ms`, `first_submission_ms`, `validated_ms` | Raw time markers used for measures. |
-| `first_pass_rejected` | `true` when the first full submission was rejected; blank when none occurred. |
-| `il_ms`, `fped_ms`, `ttsv_ms` | Derived record-level timing measures. |
-| `submission_count` | Number of complete submissions, including corrections. |
+| `presented_ms`, `first_key_ms`, `first_submission_ms`, `validated_ms` | Source timing markers. |
+| `first_pass_rejected` | `true` when the first full submission was rejected. |
+| `il_ms` | `first_key_ms - presented_ms`. |
+| `fped_ms` | `first_submission_ms - first_key_ms`. |
+| `ttsv_ms` | `validated_ms - presented_ms`. |
+| `submission_count` | Full submissions including corrections. |
 
-### `events.jsonl`
+## `events.jsonl`
 
-Every line has `sessionId`, `participantId`, `sequence`, `blockNumber`, `recordId`, `eventType`, `clientTimeMs`, and `payload`. This is the raw event audit trail. Events are in sequence order.
+Each JSON object contains `sessionId`, `participantId`, `sequence`, `blockNumber`, `recordId`, `eventType`, `clientTimeMs`, and optional `payload`.
 
-## Pending music/SQLite fields
+`eventType` is one of `record_presented`, `first_key`, `record_submitted`, or `validation_result`. The backend assigns `sequence` to preserve event order.
 
-`tracks.csv`, `decisions.csv`, and `transitions.csv` already reserve these future values: final manifest/track identifier, file path, bank/classification information, loudness review, rolling window start/end, median IL/FPED/FPRER, baseline references, previous and selected state/track, reason, crossfade duration, actual transition start/end and load/transition failure. The exact same fields are in `sqlite-schema.sql`.
+## `decisions.csv`
+
+This file is populated only during Adaptive Music blocks.
+
+| Column | Meaning |
+| --- | --- |
+| `participant_id`, `session_id`, `block` | Decision identity and adaptive block. |
+| `window_start_ms`, `window_end_ms` | Evaluated rolling-window bounds. |
+| `record_count` | First-submitted records in the window. |
+| `median_il_ms`, `median_fped_ms`, `first_pass_error_rate` | Recent window measures used by the rule engine. |
+| `baseline_il_ms`, `baseline_fped_ms` | Participant references from silent calibration block `1`. |
+| `previous_state`, `selected_state` | `reduced`, `baseline`, `elevated`, or `silent`. |
+| `previous_track_id`, `selected_track_id` | Track identifiers before and after the decision. |
+| `reason` | Backend reason for the selected state, including insufficient-data cases. |
+
+## `transitions.csv`
+
+This file records the browser outcome after an adaptive decision. It can be empty when no Adaptive Music evaluation occurs.
+
+| Column | Meaning |
+| --- | --- |
+| `participant_id`, `session_id`, `block` | Transition identity and adaptive block. |
+| `decision_id` | Links to the decision that requested playback. |
+| `previous_track_id`, `selected_track_id` | Tracks from that decision. |
+| `started_ms`, `completed_ms` | Timestamps around the browser playback attempt. |
+| `configured_crossfade_ms` | Temporary configured crossfade duration: 5,000 ms. |
+| `outcome` | `playing`, `silent`, or `failed`. |
+| `error` | Playback-error detail; blank when there is no error. |
+
+## `tracks.csv`
+
+| Column | Meaning |
+| --- | --- |
+| `participant_id`, `session_id` | Session identifiers. |
+| `track_id` | Identifier built from music class and filename. |
+| `music_class` | Folder-derived bank: `baseline`, `reduced`, or `elevated`. |
+| `relative_file_path` | Path relative to the project music folder. |
+| `classification_method` | `folder` in this feedback branch. |
+| `classification_version` | Current study configuration version. |
+| `loudness_checked`, `file_sha256` | `pending` until the final music manifest and loudness checks exist. |
+
+## `session.json`
+
+The complete saved session: participant and order data, configuration versions, comfort-check timestamp, blocks, raw events, captured music catalogue, adaptive decisions, playback transitions, and calculated block measures.
