@@ -61,6 +61,10 @@ music/elevated/
 
 Empty or missing folders do not crash the task; playback remains silent. For useful feedback, include at least one audio file in each bank.
 
+## Add data folder
+
+Add `data` folder under /backend for the export files.
+
 ## Run
 
 From the repository root:
