@@ -42,6 +42,7 @@ type Stage =
     | "block-intro"
     | "task"
     | "block-results"
+    | "handover"
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
 const empty: FormValues = { recordCode: "", batchCode: "", quantity: "" };
@@ -402,7 +403,7 @@ export default function App() {
         }
     }
     function nextBlock() {
-        if (blockIndex === 2) setStage("complete");
+        if (blockIndex === 2) setStage("handover");
         else {
             setBlockIndex((old) => old + 1);
             setStage("block-intro");
@@ -750,6 +751,23 @@ export default function App() {
                 </div>
                 <button className="primary new-participant" onClick={restart}>
                     Start another participant
+                </button>
+            </SimpleStage>
+        );
+
+    if (stage === "handover")
+        return (
+            <SimpleStage
+                eyebrow="SESSION COMPLETE"
+                title="Thank you"
+                description="You may now give the device back to the researcher."
+                participantId={participantId}
+            >
+                <button
+                    className="primary large"
+                    onClick={() => setStage("complete")}
+                >
+                    Researcher: proceed <span>→</span>
                 </button>
             </SimpleStage>
         );

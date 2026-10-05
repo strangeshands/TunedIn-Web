@@ -564,10 +564,17 @@ footer {
     font-size: 1.4rem;
 }
 .download-actions {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     margin-top: 24px;
+}
+.download-actions .primary,
+.download-actions .secondary {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    text-decoration: none;
 }
 .secondary {
     min-width: 100%;
@@ -636,7 +643,7 @@ footer {
         grid-template-columns: 1fr 1fr;
     }
     .download-actions {
-        flex-direction: column;
+        grid-template-columns: 1fr;
     }
     .participant-block-heading {
         flex-direction: column;
