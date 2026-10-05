@@ -10,6 +10,17 @@ export const config = JSON.parse(
     practiceSeconds: number;
     blockSeconds: number;
     audioIntegration: "rule-engine";
+    playback: {
+        manifestVersion: string;
+        crossfadeMs: number;
+        crossfadeCurve: "equal-power";
+        masterHeadroomDb: number;
+        loudnessTargetLufs: number;
+        applyPerTrackGain: boolean;
+        maximumTrackTruePeakDbtp: number;
+        avoidImmediateComposerRepeat: boolean;
+        loopTracks: boolean;
+    };
     adaptiveRules: {
         rollingWindowSeconds: number;
         evaluationIntervalSeconds: number;

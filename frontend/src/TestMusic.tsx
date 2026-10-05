@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MusicCatalogue, MusicTrack } from "../../shared/types";
-import { AudioController, CROSSFADE_MS } from "./script/audio";
-import { getMusicCatalogue } from "./script/api";
+import { AudioController } from "./script/audio";
+import { getMusicCatalogue, getPlaybackConfig } from "./script/api";
 
 // TEMPORARY TEST PAGE: delete this file and the /test-music branch in main.tsx when finished.
 // Change these values to test how the rule thresholds behave.
@@ -25,6 +25,7 @@ export default function TestMusic() {
     const [message, setMessage] = useState(
         "Load a track, then press Play selected track.",
     );
+    const [crossfadeMs, setCrossfadeMs] = useState(5_000);
     const audio = useRef(new AudioController());
     const tracks = useMemo(() => Object.values(catalogue).flat(), [catalogue]);
     const startingTrack =
@@ -33,10 +34,12 @@ export default function TestMusic() {
         tracks.find((track) => track.id === activeTrackId) ?? null;
 
     useEffect(() => {
-        void getMusicCatalogue()
-            .then((found) => {
+        void Promise.all([getMusicCatalogue(), getPlaybackConfig()])
+            .then(([found, playback]) => {
                 setCatalogue(found);
                 setStartingTrackId(Object.values(found).flat()[0]?.id ?? "");
+                audio.current.configure(playback);
+                setCrossfadeMs(playback.crossfadeMs);
             })
             .catch(() =>
                 setMessage(
@@ -62,7 +65,7 @@ export default function TestMusic() {
         if (result.status === "playing") setActiveTrackId(result.trackId);
         setMessage(
             result.status === "playing"
-                ? `Playing your starting track. Changes fade for ${CROSSFADE_MS / 1000} seconds.`
+                ? `Playing your starting track. Changes fade for ${crossfadeMs / 1000} seconds.`
                 : result.status === "silent"
                   ? result.reason
                   : result.reason,
@@ -79,7 +82,7 @@ export default function TestMusic() {
         if (result.status === "playing") setActiveTrackId(result.trackId);
         setMessage(
             result.status === "playing"
-                ? `Changed to ${predictedState}. The track transition fades for ${CROSSFADE_MS / 1000} seconds.`
+                ? `Changed to ${predictedState}. The track transition fades for ${crossfadeMs / 1000} seconds.`
                 : result.status === "silent"
                   ? `No ${predictedState} track is available. ${result.reason}`
                   : result.reason,

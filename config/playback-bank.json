@@ -1,0 +1,269 @@
+{
+  "version": "final-playback-bank-v1",
+  "tracks": [
+    {
+      "id": "reduced/R03.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R03.wav",
+      "composer": "Sergei Rachmaninoff",
+      "compositionId": "rachmaninoff-op3-no2",
+      "rotationIndex": 1,
+      "sourceSha256": "deadb7b4d27cf662c5d58dfbcbf1447f7da82a5da2c93fa58a385c67aea2f8d2",
+      "integratedLoudnessLufs": -16.7,
+      "truePeakDbtp": -0.1
+    },
+    {
+      "id": "reduced/R06.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R06.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d894",
+      "rotationIndex": 2,
+      "sourceSha256": "986392aeacb9a82c4138f80b48fa0e1610016e79c4c63f072bd9737ffa8ca958",
+      "integratedLoudnessLufs": -19.1,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "reduced/R08.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R08.wav",
+      "composer": "Alexander Scriabin",
+      "compositionId": "scriabin-op9-prelude-and-nocturne",
+      "rotationIndex": 3,
+      "sourceSha256": "4cda4ef1efa8a2966120db85adfde16784a9cb17c22ad4c65c6017423c89dea9",
+      "integratedLoudnessLufs": -21.1,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "reduced/R09.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R09.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d958",
+      "rotationIndex": 4,
+      "sourceSha256": "2a00e63aea06866d97d85a0f36b8c37365f7bcaa9eed0870c2ff9c748686466d",
+      "integratedLoudnessLufs": -23.8,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "reduced/R12.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R12.wav",
+      "composer": "Johann Sebastian Bach / Ferruccio Busoni",
+      "compositionId": "bach-bwv645",
+      "rotationIndex": 5,
+      "sourceSha256": "759f7aaa0c1083f5b278e2b51901dac7178607a87722648c3e734c3d29e6edc8",
+      "integratedLoudnessLufs": -18.7,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "reduced/R22.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R22.wav",
+      "composer": "Franz Schubert / Franz Liszt",
+      "compositionId": "schubert-der-mueller-und-der-bach",
+      "rotationIndex": 6,
+      "sourceSha256": "ea3bb185cc3dfb4b7c171e7fe5d1c57e6f0295380be56c4287dd51fb1b8f296d",
+      "integratedLoudnessLufs": -27.6,
+      "truePeakDbtp": -10.7
+    },
+    {
+      "id": "reduced/R23.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R23.wav",
+      "composer": "Johannes Brahms",
+      "compositionId": "brahms-op118-no6",
+      "rotationIndex": 7,
+      "sourceSha256": "9f2914dbfdc426422667336330e47f54e9bbb0ee493adb8dde89537db009b922",
+      "integratedLoudnessLufs": -20.8,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "reduced/R26.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/reduced/R26.wav",
+      "composer": "Sergei Rachmaninoff",
+      "compositionId": "rachmaninoff-op16-no3",
+      "rotationIndex": 8,
+      "sourceSha256": "4e12157f4cd5da42560fd2411147dceb6aae8b8990ac051415f0a761514333b2",
+      "integratedLoudnessLufs": -21.3,
+      "truePeakDbtp": -2.3
+    },
+    {
+      "id": "baseline/B01.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B01.wav",
+      "composer": "Isaac Alb\u00e9niz",
+      "compositionId": "albeniz-iberia-triana",
+      "rotationIndex": 1,
+      "sourceSha256": "7b007e57f47b8663d5b8ae0f12fcb0e13a3a68ca2000537cfee80e6d0397b604",
+      "integratedLoudnessLufs": -16.2,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "baseline/B02.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B02.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d899-no3",
+      "rotationIndex": 2,
+      "sourceSha256": "794200c3392a30c1292033404092523411993a3c5fc53750423e729486bf2901",
+      "integratedLoudnessLufs": -17.9,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "baseline/B03.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B03.wav",
+      "composer": "Domenico Scarlatti",
+      "compositionId": "scarlatti-k9",
+      "rotationIndex": 3,
+      "sourceSha256": "a79f165c889b4695e4ce5f4f0218c1e6f6dcf8e28017b808bdf3d187a716043d",
+      "integratedLoudnessLufs": -25.3,
+      "truePeakDbtp": -8.7
+    },
+    {
+      "id": "baseline/B06.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B06.wav",
+      "composer": "Edvard Grieg",
+      "compositionId": "grieg-op47-no1",
+      "rotationIndex": 4,
+      "sourceSha256": "8800126a49545eb73a3aee6533537e407caddb21f9c8603d11cde720e8c4dc68",
+      "integratedLoudnessLufs": -23.5,
+      "truePeakDbtp": -8.5
+    },
+    {
+      "id": "baseline/B07.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B07.wav",
+      "composer": "Domenico Scarlatti",
+      "compositionId": "scarlatti-k141",
+      "rotationIndex": 5,
+      "sourceSha256": "cafa425587e9eaf2bdf31b663195d0c222d22baf9c6f26559f9d5b96a7527ca9",
+      "integratedLoudnessLufs": -24.5,
+      "truePeakDbtp": -8.3
+    },
+    {
+      "id": "baseline/B12.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B12.wav",
+      "composer": "Fr\u00e9d\u00e9ric Chopin",
+      "compositionId": "chopin-op6-no2",
+      "rotationIndex": 6,
+      "sourceSha256": "34b2c2aa50696a0dfced51c1f17ff3b1fc6b1fb341453ee6321b36ded47908b0",
+      "integratedLoudnessLufs": -15.5,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "baseline/B16.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B16.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d537",
+      "rotationIndex": 7,
+      "sourceSha256": "f1feef4c50b7610ab569e4577af30de167ed2023d6e4a89a7ef3b6ec0e244559",
+      "integratedLoudnessLufs": -18.8,
+      "truePeakDbtp": -1.3
+    },
+    {
+      "id": "baseline/B18.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/baseline/B18.wav",
+      "composer": "Isaac Alb\u00e9niz",
+      "compositionId": "albeniz-navarra",
+      "rotationIndex": 8,
+      "sourceSha256": "1a8002ba8d4fc970a6c2f7288d9e94fb76723d770d2518f4860ac24b8d826034",
+      "integratedLoudnessLufs": -17.4,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "elevated/E01.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E01.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv860",
+      "rotationIndex": 1,
+      "sourceSha256": "995d714da9e26380134c6d489c98fe825f5468a8a7060157d58f5e503f4905e0",
+      "integratedLoudnessLufs": -25.5,
+      "truePeakDbtp": -6.9
+    },
+    {
+      "id": "elevated/E02.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E02.wav",
+      "composer": "Franz Liszt",
+      "compositionId": "liszt-s141-no3",
+      "rotationIndex": 2,
+      "sourceSha256": "5e8dcd607d6e2f12b063b1c956258668a7a18eb3b62add6f776259c7da17a711",
+      "integratedLoudnessLufs": -20.1,
+      "truePeakDbtp": -1.5
+    },
+    {
+      "id": "elevated/E04.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E04.wav",
+      "composer": "Fr\u00e9d\u00e9ric Chopin",
+      "compositionId": "chopin-op10-no1",
+      "rotationIndex": 3,
+      "sourceSha256": "f2ea85068695815cf713bed05b9916447c8bf2f91401ab31a4e4c5abd347efe1",
+      "integratedLoudnessLufs": -19.1,
+      "truePeakDbtp": -2.8
+    },
+    {
+      "id": "elevated/E06.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E06.wav",
+      "composer": "Fr\u00e9d\u00e9ric Chopin",
+      "compositionId": "chopin-op10-no2",
+      "rotationIndex": 4,
+      "sourceSha256": "98c1fa94d93bf407d701e0afd22bca7534733972964bd205913af071c8abe838",
+      "integratedLoudnessLufs": -23.2,
+      "truePeakDbtp": -5.5
+    },
+    {
+      "id": "elevated/E08.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E08.wav",
+      "composer": "Joseph Haydn",
+      "compositionId": "haydn-hob-xvi-23",
+      "rotationIndex": 5,
+      "sourceSha256": "bf76aa6e7fcc8b781f6fda1671938ac2c92ad7dc9bf7abaa71cfada4bb0885ee",
+      "integratedLoudnessLufs": -26.7,
+      "truePeakDbtp": -6.5
+    },
+    {
+      "id": "elevated/E10.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E10.wav",
+      "composer": "Sergei Rachmaninoff",
+      "compositionId": "rachmaninoff-op32-no8",
+      "rotationIndex": 6,
+      "sourceSha256": "c2ca6e70a70a5944483eb0792b3c5ddb93c191a10fed19a9fe06a554e8604a9b",
+      "integratedLoudnessLufs": -20.1,
+      "truePeakDbtp": -1.1
+    },
+    {
+      "id": "elevated/E13.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E13.wav",
+      "composer": "Alexander Scriabin",
+      "compositionId": "scriabin-op8-no10",
+      "rotationIndex": 7,
+      "sourceSha256": "53e13d3cf1378c517e77a50e822bc1fa636d155288a6b6fc8f36017cf1309fc3",
+      "integratedLoudnessLufs": -15.1,
+      "truePeakDbtp": 0.0
+    },
+    {
+      "id": "elevated/E14.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/elevated/E14.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv806",
+      "rotationIndex": 8,
+      "sourceSha256": "3bef5cc83c73bc27ad2fef6717e88964380db0bd08b0dd23f4b24f30e1b2454d",
+      "integratedLoudnessLufs": -14.9,
+      "truePeakDbtp": 0.0
+    }
+  ]
+}

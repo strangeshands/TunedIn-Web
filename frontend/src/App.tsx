@@ -22,6 +22,7 @@ import {
     exportUrl,
     finishApiBlock,
     getMusicCatalogue,
+    getPlaybackConfig,
     recordMusicTransition,
     sendTaskEvent,
     startApiBlock,
@@ -53,9 +54,9 @@ const orders: Record<OrderId, Condition[]> = {
 /**
  *  Change duration here.
  */
-const PRACTICE_SECONDS = 10;
-const BASELINE_SECONDS = 20;
-const BLOCK_SECONDS = 60 * 2;
+const PRACTICE_SECONDS = 60 * 2;
+const BASELINE_SECONDS = 60 * 2;
+const BLOCK_SECONDS = 60 * 8;
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -157,7 +158,7 @@ export default function App() {
             });
             setSessionId(response.sessionId);
             queue.current = new EventQueue(response.sessionId);
-            void loadMusicCatalogue();
+            await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             localStorage.setItem("tunedIn.participantId", clean);
             setParticipantId(clean);
             setStage("practice");
@@ -175,6 +176,14 @@ export default function App() {
             setAudioMessage(
                 "Music is unavailable. This session will continue silently.",
             );
+        }
+    }
+
+    async function loadPlaybackConfig() {
+        try {
+            audio.current.configure(await getPlaybackConfig());
+        } catch {
+            // The safe defaults keep playback usable when only the catalogue is available.
         }
     }
 
@@ -199,20 +208,13 @@ export default function App() {
         return result;
     }
 
-    async function startMusic(nextCondition: Condition) {
+    async function startMusic(nextCondition: Condition, initialTrackId: string | null) {
         if (nextCondition === "No music") {
             audio.current.stop();
             setAudioMessage("");
             return;
         }
-        const initialTrack =
-            nextCondition === "Static music"
-                ? (musicCatalogue.baseline[0] ?? null)
-                : (musicCatalogue.baseline[0] ??
-                  musicCatalogue.reduced[0] ??
-                  musicCatalogue.elevated[0] ??
-                  null);
-        await playTrack(initialTrack);
+        await playTrack(trackById(initialTrackId));
     }
 
     async function applyAdaptiveDecision(
@@ -268,7 +270,8 @@ export default function App() {
             setStage(
                 number === 0 ? "practice" : number === 1 ? "baseline" : "task",
             );
-            if (number > 0) await startMusic(nextCondition);
+            if (number > 0)
+                await startMusic(nextCondition, response.initialMusicTrackId);
             await queue.current!.send({
                 blockNumber: number,
                 recordId: response.record.id,

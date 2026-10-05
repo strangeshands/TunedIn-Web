@@ -4,6 +4,17 @@
   "practiceSeconds": 120,
   "blockSeconds": 480,
   "audioIntegration": "rule-engine",
+  "playback": {
+    "manifestVersion": "final-playback-bank-v1",
+    "crossfadeMs": 5000,
+    "crossfadeCurve": "equal-power",
+    "masterHeadroomDb": -3,
+    "loudnessTargetLufs": -25,
+    "applyPerTrackGain": false,
+    "maximumTrackTruePeakDbtp": -1,
+    "avoidImmediateComposerRepeat": true,
+    "loopTracks": false
+  },
   "adaptiveRules": {
     "rollingWindowSeconds": 60,
     "evaluationIntervalSeconds": 30,

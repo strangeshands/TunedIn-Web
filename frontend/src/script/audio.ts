@@ -1,110 +1,141 @@
 import type { MusicTrack } from "../../../shared/types";
 
+export type PlaybackSettings = {
+    crossfadeMs: number;
+    masterHeadroomDb: number;
+    loopTracks: boolean;
+};
+
 export type PlaybackResult =
     | { status: "playing"; trackId: string }
     | { status: "silent"; reason: string }
     | { status: "failed"; trackId: string; reason: string };
 
-// CROSSFADE Config
-export const CROSSFADE_MS = 5_000;
+type ActiveAudio = {
+    element: HTMLAudioElement;
+    trackId: string;
+    fadeGain: GainNode;
+};
 
-function urlFor(track: MusicTrack) {
-    return `/${track.relativeFilePath.split("/").map(encodeURIComponent).join("/")}`;
-}
+const defaultSettings: PlaybackSettings = {
+    crossfadeMs: 5_000,
+    masterHeadroomDb: -3,
+    loopTracks: true,
+};
 
-/**
- * Owns the browser's single audio element. This class does no study
- * computation; it only attempts playback and reports the outcome to its caller.
- */
+const dbToGain = (decibels: number) => 10 ** (decibels / 20);
+const urlFor = (track: MusicTrack) =>
+    `/${track.relativeFilePath.split("/").map(encodeURIComponent).join("/")}`;
+
+/** Browser playback only: the backend decides state, track, and fixed gain. */
 export class AudioController {
-    private audio: HTMLAudioElement | null = null;
-    private trackId: string | null = null;
+    private context: AudioContext | null = null;
+    private masterGain: GainNode | null = null;
+    private active: ActiveAudio | null = null;
+    private retiring: ActiveAudio | null = null;
     private fadeFrame: number | null = null;
-    private fadingOut: HTMLAudioElement | null = null;
+    private settings = defaultSettings;
+
+    configure(settings: PlaybackSettings) {
+        this.settings = settings;
+        if (this.masterGain)
+            this.masterGain.gain.setValueAtTime(
+                dbToGain(settings.masterHeadroomDb),
+                this.context!.currentTime,
+            );
+    }
 
     async play(track: MusicTrack | null): Promise<PlaybackResult> {
         if (!track) {
             this.stop();
-            return {
-                status: "silent",
-                reason: "No suitable music track is available.",
-            };
+            return { status: "silent", reason: "No approved music track is available." };
         }
-        if (this.audio && this.trackId === track.id && !this.audio.paused) {
+        if (this.active?.trackId === track.id && !this.active.element.paused)
             return { status: "playing", trackId: track.id };
-        }
 
-        const previous = this.audio;
-        this.stopFadingOut();
-        const audio = new Audio(urlFor(track));
-        audio.loop = true;
-        audio.preload = "auto";
-        audio.volume = previous && !previous.paused ? 0 : 1;
+        const { context, masterGain } = this.ensureGraph();
+        const element = new Audio(urlFor(track));
+        element.loop = this.settings.loopTracks;
+        element.preload = "auto";
+        const source = context.createMediaElementSource(element);
+        const trackGain = context.createGain();
+        const fadeGain = context.createGain();
+        trackGain.gain.value = dbToGain(track.playbackGainDb);
+        fadeGain.gain.value = this.active ? 0 : 1;
+        source.connect(trackGain).connect(fadeGain).connect(masterGain);
 
         try {
-            await audio.play();
-            this.audio = audio;
-            this.trackId = track.id;
-            if (previous && !previous.paused) this.crossfade(previous, audio);
-            return { status: "playing", trackId: track.id };
+            await context.resume();
+            await element.play();
         } catch (error) {
-            audio.pause();
-            audio.removeAttribute("src");
-            audio.load();
+            element.pause();
+            element.removeAttribute("src");
+            element.load();
             return {
                 status: "failed",
                 trackId: track.id,
-                reason:
-                    error instanceof Error
-                        ? error.message
-                        : "The browser could not start audio.",
+                reason: error instanceof Error ? error.message : "The browser could not start audio.",
             };
         }
+
+        const previous = this.active;
+        this.active = { element, trackId: track.id, fadeGain };
+        if (previous) this.crossfade(previous, this.active);
+        return { status: "playing", trackId: track.id };
     }
 
     stop() {
-        this.cancelFade();
-        if (this.audio) {
-            this.audio.pause();
-            this.audio.removeAttribute("src");
-            this.audio.load();
-        }
-        this.stopFadingOut();
-        this.audio = null;
-        this.trackId = null;
+        if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
+        this.fadeFrame = null;
+        if (this.active) this.dispose(this.active);
+        if (this.retiring) this.dispose(this.retiring);
+        this.active = null;
+        this.retiring = null;
     }
 
-    private crossfade(previous: HTMLAudioElement, next: HTMLAudioElement) {
+    private ensureGraph() {
+        if (!this.context) {
+            this.context = new AudioContext();
+            this.masterGain = this.context.createGain();
+            this.masterGain.connect(this.context.destination);
+        }
+        this.masterGain!.gain.setValueAtTime(
+            dbToGain(this.settings.masterHeadroomDb),
+            this.context.currentTime,
+        );
+        return { context: this.context, masterGain: this.masterGain! };
+    }
+
+    private crossfade(previous: ActiveAudio, next: ActiveAudio) {
+        if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
+        if (this.retiring) this.dispose(this.retiring);
+        this.retiring = previous;
+        const duration = this.settings.crossfadeMs;
+        if (duration <= 0) {
+            next.fadeGain.gain.value = 1;
+            this.dispose(previous);
+            this.retiring = null;
+            return;
+        }
         const startedAt = performance.now();
         const update = (now: number) => {
-            const progress = Math.min(1, (now - startedAt) / CROSSFADE_MS);
-            previous.volume = 1 - progress;
-            next.volume = progress;
+            const progress = Math.min(1, (now - startedAt) / duration);
+            previous.fadeGain.gain.setValueAtTime(Math.cos(progress * Math.PI / 2), this.context!.currentTime);
+            next.fadeGain.gain.setValueAtTime(Math.sin(progress * Math.PI / 2), this.context!.currentTime);
             if (progress < 1) {
                 this.fadeFrame = requestAnimationFrame(update);
                 return;
             }
-            previous.pause();
-            previous.removeAttribute("src");
-            previous.load();
-            this.fadingOut = null;
+            this.dispose(previous);
+            this.retiring = null;
             this.fadeFrame = null;
         };
-        this.fadingOut = previous;
         this.fadeFrame = requestAnimationFrame(update);
     }
 
-    private cancelFade() {
-        if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
-        this.fadeFrame = null;
-    }
-
-    private stopFadingOut() {
-        this.cancelFade();
-        if (!this.fadingOut) return;
-        this.fadingOut.pause();
-        this.fadingOut.removeAttribute("src");
-        this.fadingOut.load();
-        this.fadingOut = null;
+    private dispose(audio: ActiveAudio) {
+        audio.element.pause();
+        audio.element.removeAttribute("src");
+        audio.element.load();
     }
 }

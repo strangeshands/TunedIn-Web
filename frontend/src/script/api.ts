@@ -8,6 +8,7 @@ import type {
     SourceRecord,
     TaskEvent,
 } from "../../../shared/types";
+import type { PlaybackSettings } from "./audio";
 
 /**
  * Sends a request to the local backend API.
@@ -37,6 +38,10 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 
 export function getMusicCatalogue() {
     return request<MusicCatalogue>("/api/music/catalogue");
+}
+
+export function getPlaybackConfig() {
+    return request<PlaybackSettings>("/api/music/playback-config");
 }
 
 export function evaluateAdaptiveMusic(
@@ -98,7 +103,7 @@ export function startApiBlock(
     blockNumber: number,
     condition: Condition,
 ) {
-    return request<{ record: SourceRecord }>(
+    return request<{ record: SourceRecord; initialMusicTrackId: string | null }>(
         `/api/sessions/${sessionId}/blocks/${blockNumber}/start`,
         { condition },
     );

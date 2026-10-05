@@ -16,8 +16,8 @@ Participants copy fictional Record Code, Batch Code, and Quantity values into ma
 - Separate practice and silent baseline calibration, with calibration results shown before audio setup.
 - Backend-only calculation of IL, FPED, FPRER, TTSV, throughput, and correction cycles.
 - Adaptive decisions from a 60-second rolling window, evaluated every 30 seconds.
-- Music discovery, browser playback, and backend exports for decisions, tracks, and playback outcomes.
-- A temporary 5-second crossfade and `/test-music` development screen.
+- Frozen playback-bank metadata, fixed per-track gain, and browser playback with backend exports.
+- Configurable equal-power crossfades and `/test-music` development screen.
 
 It uses local JSON storage. SQLite is documented for later work and is not active.
 
@@ -49,7 +49,7 @@ npm run install:all
 
 ## Add music
 
-Place files directly in these folders:
+Place the exact approved source files directly in these folders:
 
 ```text
 music/baseline/
@@ -57,7 +57,7 @@ music/reduced/
 music/elevated/
 ```
 
-Supported formats: `.mp3`, `.wav`, `.m4a`, `.ogg`, and `.aac`.
+`config/playback-bank.json` is the frozen playback manifest. It records each approved file's checksum, composer/composition metadata, rotation position, loudness, and true peak. A file is available only when its path and SHA-256 match that manifest. This prevents accidental track substitutions.
 
 Empty or missing folders do not crash the task; playback remains silent. For useful feedback, include at least one audio file in each bank.
 
@@ -119,18 +119,18 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 | --- | --- |
 | Participant flow and feedback timings | `frontend/src/App.tsx` |
 | Temporary music test screen | `frontend/src/TestMusic.tsx` |
-| Playback and crossfade | `frontend/src/script/audio.ts` |
+| Playback implementation | `frontend/src/script/audio.ts` |
+| Track rotation and repeat avoidance | `backend/src/playbackPolicy.ts` |
 | Backend routes and session lifecycle | `backend/src/server.ts` |
 | Measures | `backend/src/measures.ts` |
 | Adaptive rules | `backend/src/rule.ts` |
 | Export columns | `backend/src/exports.ts` |
-| Music discovery | `backend/src/music.ts` |
+| Frozen manifest verification and static playback gain | `backend/src/music.ts` |
 | Shared data shapes | `shared/types.ts` |
-| Research configuration | `config/study.json` |
+| Playback settings: gain target, peak limit, headroom, crossfade | `config/study.json` |
+| Approved tracks and their fixed metadata | `config/playback-bank.json` |
 
 ## Current limitations
 
 - Local JSON storage only; SQLite remains pending.
-- Music classification comes from folder names; final manifest and loudness checks remain pending.
-- The 5-second crossfade and `/test-music` page are temporary feedback tools.
-- This app uses fictional records only.
+- The frozen manifest must be regenerated when an approved audio source file changes.

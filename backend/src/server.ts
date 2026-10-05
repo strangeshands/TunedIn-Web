@@ -13,6 +13,7 @@ import { config, root } from "./config.js";
 import { exportFiles, writeExports } from "./exports.js";
 import { calculateBlockMeasures } from "./measures.js";
 import { hasAnyMusic, loadMusicCatalogue } from "./music.js";
+import { selectInitialTrack } from "./playbackPolicy.js";
 import { generateRecord, wrongFields } from "./records.js";
 import { evaluateAdaptiveRule } from "./rule.js";
 import { saveSession, sessions } from "./store.js";
@@ -20,6 +21,7 @@ import { saveSession, sessions } from "./store.js";
 const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "2mb" }));
+
 // A missing or empty music directory is safe: Express simply has no files to serve.
 app.use("/music", express.static(join(root, "music")));
 
@@ -35,8 +37,6 @@ const eventTypes = [
     "record_submitted",
     "validation_result",
 ];
-// CROSSFADE / TEMPORARY: keep this aligned with frontend/src/script/audio.ts.
-const TEMPORARY_CROSSFADE_MS = 5_000;
 const getSession = (id: string) => {
     const session = sessions.get(id);
     if (!session) throw new Error("Session not found.");
@@ -58,6 +58,15 @@ app.get("/api/health", (_request, response) => {
 /** Lets the frontend see which tracks can be used, without exposing file-system paths. */
 app.get("/api/music/catalogue", (_request, response) =>
     response.json(loadMusicCatalogue()),
+);
+
+app.get("/api/music/playback-config", (_request, response) =>
+    response.json({
+        crossfadeMs: config.playback.crossfadeMs,
+        crossfadeCurve: config.playback.crossfadeCurve,
+        masterHeadroomDb: config.playback.masterHeadroomDb,
+        loopTracks: config.playback.loopTracks,
+    }),
 );
 
 app.post("/api/sessions", (request, response) => {
@@ -108,16 +117,26 @@ app.post(
         const condition = number <= 1 ? "No music" : request.body?.condition;
         if (!conditions.includes(condition))
             throw new Error("Invalid condition.");
+        const initialMusicTrack = selectInitialTrack(
+            session.id,
+            number,
+            condition,
+            loadMusicCatalogue(),
+        );
         const block: Block = {
             number,
             condition,
             startedAt: new Date().toISOString(),
             endedAt: null,
             durationSeconds: null,
+            initialMusicTrackId: initialMusicTrack?.id ?? null,
         };
         session.blocks.push(block);
         saveSession(session);
-        response.json({ record: generateRecord(0, number) });
+        response.json({
+            record: generateRecord(0, number),
+            initialMusicTrackId: block.initialMusicTrackId,
+        });
     },
 );
 
@@ -274,7 +293,7 @@ app.post(
             selectedTrackId: decision.selectedTrackId,
             startedMs,
             completedMs,
-            configuredCrossfadeMs: TEMPORARY_CROSSFADE_MS,
+            configuredCrossfadeMs: config.playback.crossfadeMs,
             outcome,
             error: error ?? null,
         });

@@ -20,7 +20,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 | `blocks.csv` | One row per block | Block-level measures. |
 | `decisions.csv` | One adaptive evaluation | Rule input, selected state, and track. |
 | `transitions.csv` | One adaptive playback attempt | Browser playback outcome. |
-| `tracks.csv` | One discovered music file | Session music catalogue. |
+| `tracks.csv` | One approved music file | Frozen session playback catalogue. |
 
 ## `blocks.csv`
 
@@ -80,7 +80,7 @@ This file records the browser outcome after an adaptive decision. It can be empt
 | `decision_id` | Links to the decision that requested playback. |
 | `previous_track_id`, `selected_track_id` | Tracks from that decision. |
 | `started_ms`, `completed_ms` | Timestamps around the browser playback attempt. |
-| `configured_crossfade_ms` | Temporary configured crossfade duration: 5,000 ms. |
+| `configured_crossfade_ms` | Crossfade duration taken from `config/study.json`. |
 | `outcome` | `playing`, `silent`, or `failed`. |
 | `error` | Playback-error detail; blank when there is no error. |
 
@@ -89,12 +89,13 @@ This file records the browser outcome after an adaptive decision. It can be empt
 | Column | Meaning |
 | --- | --- |
 | `participant_id`, `session_id` | Session identifiers. |
-| `track_id` | Identifier built from music class and filename. |
-| `music_class` | Folder-derived bank: `baseline`, `reduced`, or `elevated`. |
+| `track_id` | Frozen manifest identifier. |
+| `music_class` | Frozen manifest bank: `baseline`, `reduced`, or `elevated`. |
 | `relative_file_path` | Path relative to the project music folder. |
-| `classification_method` | `folder` in this feedback branch. |
-| `classification_version` | Current study configuration version. |
-| `loudness_checked`, `file_sha256` | `pending` until the final music manifest and loudness checks exist. |
+| `composer`, `composition_id`, `rotation_index` | Metadata used to document deterministic bank rotation and avoid immediate composer/composition repeats. |
+| `classification_method`, `classification_version` | `frozen_manifest` and its manifest version. |
+| `integrated_loudness_lufs`, `true_peak_dbtp`, `playback_gain_db` | Source measurements and the backend-calculated fixed gain for that track. |
+| `file_sha256` | Source-file SHA-256 expected by the frozen manifest. Files with another hash are not played. |
 
 ## `session.json`
 

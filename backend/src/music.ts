@@ -1,40 +1,102 @@
-import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
-import type { MusicCatalogue, MusicClass, MusicTrack } from "../../shared/types.js";
-import { root } from "./config.js";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { join, normalize } from "node:path";
+import type {
+    MusicCatalogue,
+    MusicClass,
+    MusicTrack,
+} from "../../shared/types.js";
+import { config, root } from "./config.js";
+
+type ManifestTrack = Omit<MusicTrack, "playbackGainDb">;
+type PlaybackManifest = { version: string; tracks: ManifestTrack[] };
 
 const musicClasses: MusicClass[] = ["baseline", "reduced", "elevated"];
-const supportedExtensions = new Set([".mp3", ".wav", ".m4a", ".ogg", ".aac"]);
+const manifestPath = join(root, "config", "playback-bank.json");
+const hashes = new Map<
+    string,
+    { mtimeMs: number; size: number; sha256: string }
+>();
 
-function isSupportedAudioFile(fileName: string) {
-  const extension = fileName.slice(fileName.lastIndexOf(".")).toLowerCase();
-  return supportedExtensions.has(extension);
+function readManifest(): PlaybackManifest {
+    return JSON.parse(readFileSync(manifestPath, "utf8")) as PlaybackManifest;
+}
+
+function playbackGainDb(track: ManifestTrack) {
+    const loudnessGain =
+        config.playback.loudnessTargetLufs - track.integratedLoudnessLufs;
+    const peakLimitedGain =
+        config.playback.maximumTrackTruePeakDbtp - track.truePeakDbtp;
+    return Math.round(Math.min(loudnessGain, peakLimitedGain) * 1000) / 1000;
+}
+
+function fileSha256(filePath: string) {
+    const stat = statSync(filePath);
+    const known = hashes.get(filePath);
+    if (known && known.mtimeMs === stat.mtimeMs && known.size === stat.size)
+        return known.sha256;
+
+    const sha256 = createHash("sha256")
+        .update(readFileSync(filePath))
+        .digest("hex");
+    hashes.set(filePath, { mtimeMs: stat.mtimeMs, size: stat.size, sha256 });
+    return sha256;
+}
+
+function safeTrackPath(track: ManifestTrack) {
+    if (!track.relativeFilePath.startsWith(`music/${track.musicClass}/`))
+        return null;
+    const resolved = normalize(join(root, track.relativeFilePath));
+    const musicRoot = normalize(join(root, "music"));
+    return resolved.startsWith(`${musicRoot}/`) ? resolved : null;
 }
 
 /**
- * Reads the three music folders. Missing or empty folders deliberately produce
- * empty lists, so the experiment can continue silently.
+ * Reads only manifest-approved audio files. A missing manifest, missing file, or
+ * changed source file produces an empty entry, allowing the experiment to run silently.
  */
 export function loadMusicCatalogue(): MusicCatalogue {
-  const catalogue: MusicCatalogue = { baseline: [], reduced: [], elevated: [] };
+    const catalogue: MusicCatalogue = {
+        baseline: [],
+        reduced: [],
+        elevated: [],
+    };
+    if (!existsSync(manifestPath)) return catalogue;
 
-  for (const musicClass of musicClasses) {
-    const directory = join(root, "music", musicClass);
-    if (!existsSync(directory)) continue;
+    let manifest: PlaybackManifest;
+    try {
+        manifest = readManifest();
+    } catch {
+        return catalogue;
+    }
+    if (manifest.version !== config.playback.manifestVersion) return catalogue;
 
-    catalogue[musicClass] = readdirSync(directory, { withFileTypes: true })
-      .filter(entry => entry.isFile() && isSupportedAudioFile(entry.name))
-      .sort((left, right) => left.name.localeCompare(right.name))
-      .map((entry): MusicTrack => ({
-        id: `${musicClass}/${entry.name}`,
-        musicClass,
-        relativeFilePath: `music/${musicClass}/${entry.name}`,
-      }));
-  }
+    for (const track of manifest.tracks) {
+        if (!musicClasses.includes(track.musicClass)) continue;
+        const filePath = safeTrackPath(track);
+        if (!filePath || !existsSync(filePath)) continue;
+        try {
+            if (fileSha256(filePath) !== track.sourceSha256) continue;
+        } catch {
+            continue;
+        }
 
-  return catalogue;
+        catalogue[track.musicClass].push({
+            ...track,
+            playbackGainDb: config.playback.applyPerTrackGain
+                ? playbackGainDb(track)
+                : 0,
+        });
+    }
+
+    for (const musicClass of musicClasses)
+        catalogue[musicClass].sort(
+            (left, right) => left.rotationIndex - right.rotationIndex,
+        );
+
+    return catalogue;
 }
 
 export function hasAnyMusic(catalogue: MusicCatalogue) {
-  return musicClasses.some(musicClass => catalogue[musicClass].length > 0);
+    return musicClasses.some((musicClass) => catalogue[musicClass].length > 0);
 }

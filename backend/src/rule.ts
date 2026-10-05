@@ -2,11 +2,11 @@ import type {
     AdaptiveState,
     MusicCatalogue,
     MusicDecision,
-    MusicTrack,
     Session,
 } from "../../shared/types.js";
 import { config } from "./config.js";
 import { calculateBlockMeasures } from "./measures.js";
+import { selectTransitionTrack } from "./playbackPolicy.js";
 
 type WindowMeasures = Pick<
     MusicDecision,
@@ -86,14 +86,6 @@ function measureWindow(
     };
 }
 
-function firstTrack(
-    catalogue: MusicCatalogue,
-    state: AdaptiveState,
-): MusicTrack | null {
-    const options = state === "silent" ? [] : catalogue[state];
-    return options[0] ?? null;
-}
-
 /**
  * Applies the Chapter Six-style performance rule. This is pure backend logic:
  * it selects a desired state and track but does not play any audio.
@@ -122,9 +114,11 @@ export function evaluateAdaptiveRule(
     const previousState: AdaptiveState = previous?.selectedState ?? "baseline";
     // Adaptive blocks begin on the baseline track. Treat it as active before
     // the first decision, so a baseline result does not cause a false change.
-    const initialTrack = firstTrack(catalogue, "baseline");
+    const initialTrackId = session.blocks.find(
+        (block) => block.number === blockNumber,
+    )?.initialMusicTrackId ?? null;
     const previousTrackId =
-        previous?.selectedTrackId ?? initialTrack?.id ?? null;
+        previous?.selectedTrackId ?? initialTrackId;
     let selectedState: AdaptiveState = previousState;
     let reason =
         "Kept the previous state while waiting for enough recent records.";
@@ -171,7 +165,15 @@ export function evaluateAdaptiveRule(
             ? (Object.values(catalogue)
                   .flat()
                   .find((item) => item.id === previousTrackId) ?? null)
-            : firstTrack(catalogue, selectedState);
+            : selectedState === "silent"
+              ? null
+              : selectTransitionTrack(
+                    session,
+                    blockNumber,
+                    selectedState,
+                    previousTrackId,
+                    catalogue,
+                );
     if (!track) {
         selectedState = "silent";
         reason +=

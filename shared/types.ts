@@ -13,14 +13,20 @@ export type Stage =
     | "complete";
 export type MusicClass = "baseline" | "reduced" | "elevated";
 
-/** One audio file that the backend has found in the project's music folder. */
+/** One manifest-approved audio file with fixed playback metadata. */
 export type MusicTrack = {
     id: string;
     musicClass: MusicClass;
     relativeFilePath: string;
+    composer: string;
+    compositionId: string;
+    rotationIndex: number;
+    sourceSha256: string;
+    integratedLoudnessLufs: number;
+    truePeakDbtp: number;
+    playbackGainDb: number;
 };
 
-/** Empty arrays are valid: the study must still run without music files. */
 export type MusicCatalogue = Record<MusicClass, MusicTrack[]>;
 export type AdaptiveState = MusicClass | "silent";
 
@@ -115,4 +121,5 @@ export type Block = {
     startedAt: string;
     endedAt: string | null;
     durationSeconds: number | null;
+    initialMusicTrackId: string | null;
 };
