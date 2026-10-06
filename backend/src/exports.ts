@@ -48,6 +48,7 @@ export function exportFiles(session: Session) {
         [
             "participant_id",
             "session_id",
+            "study_mode",
             "block",
             "condition",
             "duration_seconds",
@@ -65,6 +66,7 @@ export function exportFiles(session: Session) {
         measures.map((item) => [
             session.participantId,
             session.id,
+            session.studyMode,
             item.block,
             item.condition,
             item.durationSeconds,
@@ -84,6 +86,7 @@ export function exportFiles(session: Session) {
         [
             "participant_id",
             "session_id",
+            "study_mode",
             "block",
             "record_id",
             "presented_ms",
@@ -101,6 +104,7 @@ export function exportFiles(session: Session) {
             return [
                 session.participantId,
                 session.id,
+                session.studyMode,
                 block,
                 recordId,
                 row.presented,
@@ -127,6 +131,7 @@ export function exportFiles(session: Session) {
                 JSON.stringify({
                     sessionId: session.id,
                     participantId: session.participantId,
+                    studyMode: session.studyMode,
                     ...event,
                 }),
             )
@@ -135,6 +140,7 @@ export function exportFiles(session: Session) {
         [
             "participant_id",
             "session_id",
+            "study_mode",
             "block",
             "window_start_ms",
             "window_end_ms",
@@ -151,7 +157,7 @@ export function exportFiles(session: Session) {
             "reason",
         ],
         session.musicDecisions.map((item) => [
-            session.participantId, session.id, item.blockNumber,
+            session.participantId, session.id, session.studyMode, item.blockNumber,
             item.windowStartMs, item.windowEndMs, item.recordCount,
             item.medianInitiationLatencyMs, item.medianFirstPassEntryDurationMs,
             item.firstPassRecordErrorRate, item.baselineInitiationLatencyMs,
@@ -164,6 +170,7 @@ export function exportFiles(session: Session) {
         [
             "participant_id",
             "session_id",
+            "study_mode",
             "block",
             "decision_id",
             "previous_track_id",
@@ -175,7 +182,7 @@ export function exportFiles(session: Session) {
             "error",
         ],
         (session.musicTransitions ?? []).map((item) => [
-            session.participantId, session.id, item.blockNumber,
+            session.participantId, session.id, session.studyMode, item.blockNumber,
             item.decisionId, item.previousTrackId, item.selectedTrackId,
             item.startedMs, item.completedMs, item.configuredCrossfadeMs,
             item.outcome, item.error,
@@ -185,6 +192,7 @@ export function exportFiles(session: Session) {
         [
             "participant_id",
             "session_id",
+            "study_mode",
             "track_id",
             "music_class",
             "relative_file_path",
@@ -199,7 +207,7 @@ export function exportFiles(session: Session) {
             "file_sha256",
         ],
         session.musicTracks.map((track) => [
-            session.participantId, session.id, track.id, track.musicClass,
+            session.participantId, session.id, session.studyMode, track.id, track.musicClass,
             track.relativeFilePath, track.composer, track.compositionId,
             track.rotationIndex, "frozen_manifest", config.playback.manifestVersion,
             track.integratedLoudnessLufs, track.truePeakDbtp, track.playbackGainDb,

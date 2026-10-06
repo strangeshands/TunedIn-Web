@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import type { Condition } from "../../shared/types.js";
 
 export const root = fileURLToPath(new URL("../../", import.meta.url));
 export const config = JSON.parse(
@@ -7,6 +8,8 @@ export const config = JSON.parse(
 ) as {
     version: string;
     taskVersion: string;
+    conditionOrders: Record<string, Condition[]>;
+    formativeConditionOrder: Condition[];
     practiceSeconds: number;
     blockSeconds: number;
     audioIntegration: "rule-engine";

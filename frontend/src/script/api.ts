@@ -6,6 +6,7 @@ import type {
     MusicTransition,
     OrderId,
     SourceRecord,
+    StudyMode,
     TaskEvent,
 } from "../../../shared/types";
 import type { PlaybackSettings } from "./audio";
@@ -38,6 +39,14 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 
 export function getMusicCatalogue() {
     return request<MusicCatalogue>("/api/music/catalogue");
+}
+
+export function getStudySetup() {
+    return request<{
+        conditionOrders: Record<OrderId, Condition[]>;
+        formativeConditionOrder: Condition[];
+        configVersion: string;
+    }>("/api/study-setup");
 }
 
 export function getPlaybackConfig() {
@@ -80,6 +89,7 @@ export function recordMusicTransition(
  */
 export function createSession(data: {
     participantId: string;
+    studyMode: StudyMode;
     orderId: OrderId;
     conditionOrder: Condition[];
 }) {

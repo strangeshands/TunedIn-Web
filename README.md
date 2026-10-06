@@ -5,7 +5,7 @@ This branch is the version for the group's first iterative-feedback session. It 
 ```text
 Participant setup → Practice → Silent baseline calibration
 → Calibration results → Audio-comfort check
-→ Experimental Blocks 1–3 → Session complete
+→ Configured experimental block(s) → Session complete
 ```
 
 Participants copy fictional Record Code, Batch Code, and Quantity values into matching fields. They use Tab between fields and Enter to submit; incorrect fields require correction.
@@ -18,6 +18,15 @@ Participants copy fictional Record Code, Batch Code, and Quantity values into ma
 - Adaptive decisions from a 60-second rolling window, evaluated every 30 seconds.
 - Frozen playback-bank metadata, fixed per-track gain, and browser playback with backend exports.
 - Configurable equal-power crossfades and `/test-music` development screen.
+
+## Choose the study mode
+
+The participant setup screen records one of three modes with every session:
+
+- **Pilot** and **Main** use the counterbalanced orders in `conditionOrders`.
+- **Formative Testing** automatically uses `formativeConditionOrder`, currently one `Adaptive music` block.
+
+Change these arrays in `config/study.json` to configure the blocks without editing application code. The chosen mode is saved in `session.json`, `events.jsonl`, and every CSV export.
 
 It uses local JSON storage. SQLite is documented for later work and is not active.
 

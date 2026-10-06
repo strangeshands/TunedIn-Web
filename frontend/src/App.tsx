@@ -14,6 +14,7 @@ import type {
     MusicTrack,
     OrderId,
     SourceRecord,
+    StudyMode,
 } from "../../shared/types";
 import {
     confirmComfortCheck,
@@ -23,6 +24,7 @@ import {
     finishApiBlock,
     getMusicCatalogue,
     getPlaybackConfig,
+    getStudySetup,
     recordMusicTransition,
     sendTaskEvent,
     startApiBlock,
@@ -46,18 +48,13 @@ type Stage =
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
 const empty: FormValues = { recordCode: "", batchCode: "", quantity: "" };
-const orders: Record<OrderId, Condition[]> = {
-    A: ["No music", "Static music", "Adaptive music"],
-    B: ["Static music", "Adaptive music", "No music"],
-    C: ["Adaptive music", "No music", "Static music"],
-};
 
 /**
  *  Change duration here.
  */
-const PRACTICE_SECONDS = 60 * 2;
-const BASELINE_SECONDS = 60 * 2;
-const BLOCK_SECONDS = 60 * 8;
+const PRACTICE_SECONDS = 5;
+const BASELINE_SECONDS = 5;
+const BLOCK_SECONDS = 60 * 2;
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -65,6 +62,9 @@ export default function App() {
         () => localStorage.getItem("tunedIn.participantId") ?? "",
     );
     const [orderId, setOrderId] = useState<OrderId>("A");
+    const [orders, setOrders] = useState<Record<OrderId, Condition[]>>({});
+    const [studyMode, setStudyMode] = useState<StudyMode>("Pilot");
+    const [formativeOrder, setFormativeOrder] = useState<Condition[]>([]);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [blockIndex, setBlockIndex] = useState(0);
     const [record, setRecord] = useState<SourceRecord | null>(null);
@@ -86,8 +86,9 @@ export default function App() {
     const completing = useRef(false);
     const queue = useRef<EventQueue | null>(null);
     const audio = useRef(new AudioController());
-    const order = orders[orderId];
-    const condition = order[blockIndex];
+    const conditionOrder =
+        studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []);
+    const condition = conditionOrder[blockIndex] ?? "No music";
     const duration =
         stage === "practice"
             ? PRACTICE_SECONDS
@@ -121,6 +122,21 @@ export default function App() {
     // Stop audio if the app is closed or React removes this screen.
     useEffect(() => () => audio.current.stop(), []);
 
+    useEffect(() => {
+        void getStudySetup()
+            .then(({ conditionOrders, formativeConditionOrder }) => {
+                const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
+                setOrders(conditionOrders);
+                setFormativeOrder(formativeConditionOrder);
+                setOrderId((current) =>
+                    conditionOrders[current] ? current : firstOrderId,
+                );
+            })
+            .catch(() =>
+                setMessage("Could not load the configured study setup."),
+            );
+    }, []);
+
     // The first 60 seconds establish the initial rolling window. After that,
     // the backend evaluates the rule every 30 seconds.
     useEffect(() => {
@@ -150,12 +166,13 @@ export default function App() {
     async function saveParticipant(event: FormEvent) {
         event.preventDefault();
         const clean = participantId.trim();
-        if (!clean) return;
+        if (!clean || !conditionOrder.length) return;
         try {
             const response = await createSession({
                 participantId: clean,
-                orderId,
-                conditionOrder: order,
+                studyMode,
+                orderId: studyMode === "Formative" ? "formative" : orderId,
+                conditionOrder,
             });
             setSessionId(response.sessionId);
             queue.current = new EventQueue(response.sessionId);
@@ -209,7 +226,10 @@ export default function App() {
         return result;
     }
 
-    async function startMusic(nextCondition: Condition, initialTrackId: string | null) {
+    async function startMusic(
+        nextCondition: Condition,
+        initialTrackId: string | null,
+    ) {
         if (nextCondition === "No music") {
             audio.current.stop();
             setAudioMessage("");
@@ -403,7 +423,7 @@ export default function App() {
         }
     }
     function nextBlock() {
-        if (blockIndex === 2) setStage("handover");
+        if (blockIndex === conditionOrder.length - 1) setStage("handover");
         else {
             setBlockIndex((old) => old + 1);
             setStage("block-intro");
@@ -443,34 +463,60 @@ export default function App() {
                         onChange={setParticipantId}
                     />
                     <label className="field">
-                        <span>Counterbalanced Condition Order</span>
+                        <span>Mode</span>
                         <select
-                            value={orderId}
+                            value={studyMode}
                             onChange={(event) =>
-                                setOrderId(event.target.value as OrderId)
+                                setStudyMode(event.target.value as StudyMode)
                             }
                         >
-                            <option value="A">
-                                Order A: No → Static → Adaptive
-                            </option>
-                            <option value="B">
-                                Order B: Static → Adaptive → No
-                            </option>
-                            <option value="C">
-                                Order C: Adaptive → No → Static
-                            </option>
+                            <option value="Pilot">Pilot</option>
+                            <option value="Main">Main</option>
+                            <option value="Formative">Formative Testing</option>
                         </select>
                     </label>
+                    {studyMode === "Formative" ? (
+                        <div className="instructions">
+                            <b>Formative Testing</b>
+                            <p>
+                                This session will run one Adaptive Music block.
+                            </p>
+                        </div>
+                    ) : (
+                        <label className="field">
+                            <span>Counterbalanced Condition Order</span>
+                            <select
+                                value={orderId}
+                                onChange={(event) =>
+                                    setOrderId(event.target.value as OrderId)
+                                }
+                            >
+                                {Object.entries(orders).map(
+                                    ([id, conditions]) => (
+                                        <option key={id} value={id}>
+                                            {id}: {conditions.join(" → ")}
+                                        </option>
+                                    ),
+                                )}
+                            </select>
+                        </label>
+                    )}
                     <div className="instructions">
                         <b>Experiment Sequence</b>
                         <ol>
                             <li>Practice task</li>
                             <li>Silent baseline calibration</li>
                             <li>Audio-comfort check</li>
-                            <li>Three timed encoding blocks</li>
+                            <li>
+                                {conditionOrder.length} timed encoding block
+                                {conditionOrder.length === 1 ? "" : "s"}
+                            </li>
                         </ol>
                     </div>
-                    <button className="primary large">
+                    <button
+                        className="primary large"
+                        disabled={!conditionOrder.length}
+                    >
                         Save participant & continue <span>→</span>
                     </button>
                 </form>
@@ -634,7 +680,7 @@ export default function App() {
     if (stage === "block-intro")
         return (
             <SimpleStage
-                eyebrow={`BLOCK ${blockIndex + 1} OF 3`}
+                eyebrow={`BLOCK ${blockIndex + 1} OF ${conditionOrder.length}`}
                 title={condition}
                 description="Continue entering records until the timer ends."
                 participantId={participantId}
@@ -715,7 +761,7 @@ export default function App() {
                     />
                 </div>
                 <button className="primary large" onClick={nextBlock}>
-                    {blockIndex === 2
+                    {blockIndex === conditionOrder.length - 1
                         ? "Finish participant"
                         : `Continue to Block ${blockIndex + 2}`}{" "}
                     <span>→</span>
@@ -726,9 +772,9 @@ export default function App() {
     if (stage === "complete")
         return (
             <SimpleStage
-                eyebrow="THREE BLOCKS COMPLETE"
+                eyebrow="EXPERIMENTAL BLOCKS COMPLETE"
                 title="Encoding session finished."
-                description={`Participant ${participantId} has completed all three conditions.`}
+                description={`Participant ${participantId} has completed all ${conditionOrder.length} configured conditions.`}
                 participantId={participantId}
             >
                 <div className="download-actions">
@@ -749,7 +795,7 @@ export default function App() {
                         </>
                     )}
                 </div>
-                <button className="primary new-participant" onClick={restart}>
+                <button className="primary large" onClick={restart}>
                     Start another participant
                 </button>
             </SimpleStage>
@@ -767,7 +813,7 @@ export default function App() {
                     className="primary large"
                     onClick={() => setStage("complete")}
                 >
-                    Researcher: proceed <span>→</span>
+                    Proceed
                 </button>
             </SimpleStage>
         );
@@ -791,7 +837,7 @@ export default function App() {
                             ? "Calibration"
                             : isPractice
                               ? "Practice"
-                              : `Block ${blockIndex + 1} / 3`}
+                              : `Block ${blockIndex + 1} / ${conditionOrder.length}`}
                     </span>
                     <span className="pill">
                         {isPractice ? "No music" : condition}

@@ -1,6 +1,12 @@
 {
   "version": "pilot-1",
   "taskVersion": "fictional-records-1",
+  "conditionOrders": {
+    "A": ["No music", "Static music", "Adaptive music"],
+    "B": ["Static music", "Adaptive music", "No music"],
+    "C": ["Adaptive music", "No music", "Static music"]
+  },
+  "formativeConditionOrder": ["Adaptive music"],
   "practiceSeconds": 120,
   "blockSeconds": 480,
   "audioIntegration": "rule-engine",

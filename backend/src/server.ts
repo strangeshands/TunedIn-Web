@@ -7,6 +7,7 @@ import type {
     Condition,
     OrderId,
     Session,
+    StudyMode,
     TaskEvent,
 } from "../../shared/types.js";
 import { config, root } from "./config.js";
@@ -25,11 +26,7 @@ app.use(express.json({ limit: "2mb" }));
 // A missing or empty music directory is safe: Express simply has no files to serve.
 app.use("/music", express.static(join(root, "music")));
 
-const orders: Record<OrderId, Condition[]> = {
-    A: ["No music", "Static music", "Adaptive music"],
-    B: ["Static music", "Adaptive music", "No music"],
-    C: ["Adaptive music", "No music", "Static music"],
-};
+const orders = config.conditionOrders;
 const conditions: Condition[] = ["No music", "Static music", "Adaptive music"];
 const eventTypes = [
     "record_presented",
@@ -69,18 +66,37 @@ app.get("/api/music/playback-config", (_request, response) =>
     }),
 );
 
+/** Supplies the configured condition orders without duplicating them in the UI. */
+app.get("/api/study-setup", (_request, response) =>
+    response.json({
+        conditionOrders: orders,
+        formativeConditionOrder: config.formativeConditionOrder,
+        configVersion: config.version,
+    }),
+);
+
 app.post("/api/sessions", (request, response) => {
     const participantId = String(request.body?.participantId ?? "").trim();
-    const orderId = request.body?.orderId as OrderId;
-    if (!participantId || !Object.hasOwn(orders, orderId))
+    const orderId = String(request.body?.orderId ?? "") as OrderId;
+    const studyMode = request.body?.studyMode as StudyMode;
+    const conditionOrder =
+        studyMode === "Formative"
+            ? config.formativeConditionOrder
+            : orders[orderId];
+    if (
+        !participantId ||
+        !["Formative", "Pilot", "Main"].includes(studyMode) ||
+        !conditionOrder?.length
+    )
         throw new Error("Participant ID and order are required.");
     const now = new Date().toISOString();
     const musicCatalogue = loadMusicCatalogue();
     const session: Session = {
         id: randomUUID(),
         participantId,
+        studyMode,
         orderId,
-        conditionOrder: orders[orderId],
+        conditionOrder,
         createdAt: now,
         updatedAt: now,
         configVersion: config.version,
@@ -107,15 +123,21 @@ app.post(
             !Number.isInteger(number) ||
             number !== expected ||
             number < 0 ||
-            number > 4
+            number > session.conditionOrder.length + 1
         )
             throw new Error("Blocks must be started in order.");
         if (number > 1 && session.comfortCheckCompletedAt === null)
             throw new Error(
                 "Complete the manual comfort check before Block 1.",
             );
-        const condition = number <= 1 ? "No music" : request.body?.condition;
-        if (!conditions.includes(condition))
+        const assignedCondition =
+            number <= 1 ? "No music" : session.conditionOrder[number - 2];
+        const condition = request.body?.condition;
+        if (
+            !assignedCondition ||
+            !conditions.includes(condition) ||
+            condition !== assignedCondition
+        )
             throw new Error("Invalid condition.");
         const initialMusicTrack = selectInitialTrack(
             session.id,
