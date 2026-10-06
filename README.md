@@ -2,6 +2,8 @@
 
 This branch is the version for the group's first iterative-feedback session. It is a local browser prototype of the Chapter Six fictional digital-encoding task.
 
+The current build identifier is `fuf-iteration-1.0.0`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
+
 ```text
 Participant setup → Practice → Silent baseline calibration
 → Calibration results → Audio-comfort check
@@ -141,6 +143,7 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 | Frozen manifest verification and static playback gain | `backend/src/music.ts` |
 | Shared data shapes | `shared/types.ts` |
 | Playback settings: gain target, peak limit, headroom, crossfade | `config/study.json` |
+| Formative build identifier | `config/study.json` (`buildVersion`) |
 | Approved tracks and their fixed metadata | `config/playback-bank.json` |
 
 ## Current limitations

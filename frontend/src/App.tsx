@@ -321,10 +321,16 @@ export default function App() {
             const playback = await playTrack(
                 trackById(decision.selectedTrackId),
             );
+            // A playing result resolves after the crossfade, so the exported
+            // completion timestamp describes the end of the transition.
+            const completedMs =
+                playback.status === "playing"
+                    ? await playback.transitionCompleted
+                    : performance.now();
             await recordMusicTransition(activeSessionId, number, {
                 decisionId: decision.id,
                 startedMs,
-                completedMs: performance.now(),
+                completedMs,
                 outcome: playback.status,
                 error: playback.status === "playing" ? null : playback.reason,
             });

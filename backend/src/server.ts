@@ -65,6 +65,7 @@ app.get("/api/health", (_request, response) => {
         ok: true,
         storage: "JSON files now; SQLite pending",
         audioIntegration: config.audioIntegration,
+        buildVersion: config.buildVersion,
         musicAvailable: hasAnyMusic(catalogue),
     });
 });
@@ -123,6 +124,7 @@ app.post("/api/sessions", (request, response) => {
         createdAt: now,
         updatedAt: now,
         configVersion: config.version,
+        buildVersion: config.buildVersion,
         taskVersion: config.taskVersion,
         audioIntegration: "rule-engine",
         comfortCheckCompletedAt: null,

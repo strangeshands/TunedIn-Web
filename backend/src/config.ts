@@ -7,6 +7,7 @@ export const config = JSON.parse(
     readFileSync(new URL("../../config/study.json", import.meta.url), "utf8"),
 ) as {
     version: string;
+    buildVersion: string;
     taskVersion: string;
     conditionOrders: Record<string, Condition[]>;
     formativeConditionOrder: Condition[];

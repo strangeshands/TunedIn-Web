@@ -7,7 +7,12 @@ export type PlaybackSettings = {
 };
 
 export type PlaybackResult =
-    | { status: "playing"; trackId: string }
+    | {
+          status: "playing";
+          trackId: string;
+          /** Resolves only after this track's crossfade has ended. */
+          transitionCompleted: Promise<number>;
+      }
     | { status: "silent"; reason: string }
     | { status: "failed"; trackId: string; reason: string };
 
@@ -38,6 +43,7 @@ export class AudioController {
     private active: ActiveAudio | null = null;
     private retiring: ActiveAudio | null = null;
     private fadeFrame: number | null = null;
+    private resolveFade: ((completedMs: number) => void) | null = null;
     private settings = defaultSettings;
     private trackEndedHandler: ((trackId: string) => void) | null = null;
 
@@ -79,7 +85,11 @@ export class AudioController {
             return { status: "silent", reason: "No approved music track is available." };
         }
         if (this.active?.trackId === track.id && !this.active.element.paused)
-            return { status: "playing", trackId: track.id };
+            return {
+                status: "playing",
+                trackId: track.id,
+                transitionCompleted: Promise.resolve(performance.now()),
+            };
 
         const previous =
             this.active && !this.active.element.paused ? this.active : null;
@@ -114,13 +124,16 @@ export class AudioController {
 
         if (this.active && !previous) this.dispose(this.active);
         this.active = { element, trackId: track.id, fadeGain };
-        if (previous) this.crossfade(previous, this.active);
-        return { status: "playing", trackId: track.id };
+        const transitionCompleted = previous
+            ? this.crossfade(previous, this.active)
+            : Promise.resolve(performance.now());
+        return { status: "playing", trackId: track.id, transitionCompleted };
     }
 
     stop() {
         if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
         this.fadeFrame = null;
+        this.finishFade(performance.now());
         if (this.active) this.dispose(this.active);
         if (this.retiring) this.dispose(this.retiring);
         this.active = null;
@@ -140,31 +153,51 @@ export class AudioController {
         return { context: this.context, masterGain: this.masterGain! };
     }
 
-    private crossfade(previous: ActiveAudio, next: ActiveAudio) {
-        if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
+    private crossfade(previous: ActiveAudio, next: ActiveAudio): Promise<number> {
+        if (this.fadeFrame !== null) {
+            cancelAnimationFrame(this.fadeFrame);
+            this.finishFade(performance.now());
+        }
         if (this.retiring) this.dispose(this.retiring);
         this.retiring = previous;
         const duration = this.settings.crossfadeMs;
-        if (duration <= 0) {
-            next.fadeGain.gain.value = 1;
-            this.dispose(previous);
-            this.retiring = null;
-            return;
-        }
-        const startedAt = performance.now();
-        const update = (now: number) => {
-            const progress = Math.min(1, (now - startedAt) / duration);
-            previous.fadeGain.gain.setValueAtTime(Math.cos(progress * Math.PI / 2), this.context!.currentTime);
-            next.fadeGain.gain.setValueAtTime(Math.sin(progress * Math.PI / 2), this.context!.currentTime);
-            if (progress < 1) {
-                this.fadeFrame = requestAnimationFrame(update);
+        return new Promise((resolve) => {
+            this.resolveFade = resolve;
+            if (duration <= 0) {
+                next.fadeGain.gain.value = 1;
+                this.dispose(previous);
+                this.retiring = null;
+                this.finishFade(performance.now());
                 return;
             }
-            this.dispose(previous);
-            this.retiring = null;
-            this.fadeFrame = null;
-        };
-        this.fadeFrame = requestAnimationFrame(update);
+            const startedAt = performance.now();
+            const update = (now: number) => {
+                const progress = Math.min(1, (now - startedAt) / duration);
+                previous.fadeGain.gain.setValueAtTime(
+                    Math.cos((progress * Math.PI) / 2),
+                    this.context!.currentTime,
+                );
+                next.fadeGain.gain.setValueAtTime(
+                    Math.sin((progress * Math.PI) / 2),
+                    this.context!.currentTime,
+                );
+                if (progress < 1) {
+                    this.fadeFrame = requestAnimationFrame(update);
+                    return;
+                }
+                this.dispose(previous);
+                this.retiring = null;
+                this.fadeFrame = null;
+                this.finishFade(now);
+            };
+            this.fadeFrame = requestAnimationFrame(update);
+        });
+    }
+
+    private finishFade(completedMs: number) {
+        const resolve = this.resolveFade;
+        this.resolveFade = null;
+        resolve?.(completedMs);
     }
 
     private dispose(audio: ActiveAudio) {

@@ -115,6 +115,7 @@ export type Session = {
     createdAt: string;
     updatedAt: string;
     configVersion: string;
+    buildVersion: string;
     taskVersion: string;
     audioIntegration: "rule-engine";
     comfortCheckCompletedAt: string | null;

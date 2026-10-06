@@ -1,18 +1,19 @@
 {
-  "version": "pilot-1",
-  "taskVersion": "fictional-records-1",
+  "version": "formative-feedback",
+  "buildVersion": "fuf-iteration-1.0.0",
+  "taskVersion": "fictional-records",
   "conditionOrders": {
     "A": ["No music", "Static music", "Adaptive music"],
     "B": ["Static music", "Adaptive music", "No music"],
     "C": ["Adaptive music", "No music", "Static music"]
   },
   "formativeConditionOrder": ["Adaptive music"],
-  "practiceSeconds": 10,
-  "baselineSeconds": 10,
-  "blockSeconds": 30,
+  "practiceSeconds": 120,
+  "baselineSeconds": 120,
+  "blockSeconds": 480,
   "audioIntegration": "rule-engine",
   "playback": {
-    "manifestVersion": "final-playback-bank-v1",
+    "manifestVersion": "final-playback-bank",
     "crossfadeMs": 5000,
     "crossfadeCurve": "equal-power",
     "masterHeadroomDb": -3,
