@@ -1,6 +1,6 @@
 {
   "version": "formative-feedback",
-  "buildVersion": "fuf-iteration-1.0.0",
+  "buildVersion": "fuf-iteration-1.0.1",
   "taskVersion": "fictional-records",
   "conditionOrders": {
     "A": ["No music", "Static music", "Adaptive music"],
