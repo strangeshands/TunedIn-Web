@@ -354,6 +354,7 @@ export default function App() {
      */
     async function beginBlock(number: number, nextCondition: Condition) {
         if (!sessionId) return;
+        setMessage("");
         try {
             const response = await startApiBlock(
                 sessionId,
@@ -435,6 +436,7 @@ export default function App() {
         if (!sessionId || !record || submitting.current || completing.current)
             return;
         submitting.current = true;
+        setMessage("");
         try {
             const number =
                 stage === "practice"
@@ -442,12 +444,12 @@ export default function App() {
                     : stage === "baseline"
                       ? 1
                       : blockIndex + 2;
-            const submission = submitRecord(
-                sessionId,
-                number,
-                record.id,
-                form,
-                performance.now(),
+            const submittedAt = performance.now();
+            // send() retains failed events but swallows delivery errors. Validation
+            // depends on the presentation being saved, so retry/await the queue
+            // first and include that wait in the activity block completion awaits.
+            const submission = queue.current!.flush().then(() =>
+                submitRecord(sessionId, number, record.id, form, submittedAt),
             );
             pendingSubmissions.current.add(submission);
             const response = await submission.finally(() =>
@@ -471,7 +473,9 @@ export default function App() {
                 });
             }
         } catch (error) {
-            setMessage(String(error));
+            setMessage(
+                `Could not save this record. Check the backend connection and submit again. ${String(error)}`,
+            );
         } finally {
             submitting.current = false;
         }
@@ -1106,6 +1110,7 @@ export default function App() {
                 {audioMessage && !isPractice && (
                     <p className="error">{audioMessage}</p>
                 )}
+                {message && <p className="error" role="alert">{message}</p>}
             </section>
         </main>
     );
