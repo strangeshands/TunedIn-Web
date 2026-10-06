@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { join, normalize } from "node:path";
+import { isAbsolute, join, normalize, relative } from "node:path";
 import type {
     MusicCatalogue,
     MusicClass,
@@ -44,11 +44,18 @@ function fileSha256(filePath: string) {
 }
 
 function safeTrackPath(track: ManifestTrack) {
-    if (!track.relativeFilePath.startsWith(`music/${track.musicClass}/`))
+    // Manifests use portable `/` separators; accept `\` too when running on Windows.
+    const portablePath = track.relativeFilePath.replaceAll("\\", "/");
+    if (!portablePath.startsWith(`music/${track.musicClass}/`))
         return null;
-    const resolved = normalize(join(root, track.relativeFilePath));
+    const resolved = normalize(join(root, portablePath));
     const musicRoot = normalize(join(root, "music"));
-    return resolved.startsWith(`${musicRoot}/`) ? resolved : null;
+    const pathFromMusicRoot = relative(musicRoot, resolved);
+    return pathFromMusicRoot &&
+        !pathFromMusicRoot.startsWith("..") &&
+        !isAbsolute(pathFromMusicRoot)
+        ? resolved
+        : null;
 }
 
 /**

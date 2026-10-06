@@ -27,11 +27,23 @@ export default function TestMusic() {
     );
     const [crossfadeMs, setCrossfadeMs] = useState(5_000);
     const audio = useRef(new AudioController());
+    const catalogueRef = useRef<MusicCatalogue>(emptyCatalogue);
     const tracks = useMemo(() => Object.values(catalogue).flat(), [catalogue]);
     const startingTrack =
         tracks.find((track) => track.id === startingTrackId) ?? null;
     const activeTrack =
         tracks.find((track) => track.id === activeTrackId) ?? null;
+
+    useEffect(() => {
+        catalogueRef.current = catalogue;
+    }, [catalogue]);
+
+    useEffect(() => {
+        audio.current.onTrackEnded((trackId) => {
+            void playNextTrackInSameState(trackId);
+        });
+        return () => audio.current.onTrackEnded(null);
+    }, []);
 
     useEffect(() => {
         void Promise.all([getMusicCatalogue(), getPlaybackConfig()])
@@ -89,6 +101,21 @@ export default function TestMusic() {
         );
     }
 
+    async function playNextTrackInSameState(currentTrackId: string) {
+        const current = Object.values(catalogueRef.current)
+            .flat()
+            .find((track) => track.id === currentTrackId);
+        if (!current) return;
+        const bank = catalogueRef.current[current.musicClass];
+        const index = bank.findIndex((track) => track.id === currentTrackId);
+        const nextTrack = index < 0 ? null : bank[(index + 1) % bank.length];
+        const result = await audio.current.play(nextTrack ?? null);
+        if (result.status === "playing") {
+            setActiveTrackId(result.trackId);
+            setMessage(`Track ended. Continuing with ${result.trackId}.`);
+        } else setMessage(result.reason);
+    }
+
     return (
         <main className="app test-music">
             <div className="brand">TUNED IN · TEMPORARY MUSIC TEST</div>
@@ -136,6 +163,23 @@ export default function TestMusic() {
                     >
                         Stop
                     </button>
+                    <button
+                        className="stop-button"
+                        disabled={!activeTrack}
+                        onClick={() => {
+                            void audio.current
+                                .jumpToFinalSeconds(10)
+                                .then((jumped) =>
+                                    setMessage(
+                                        jumped
+                                            ? "Jumped to the final 10 seconds. Waiting for the next track."
+                                            : "No track is currently playing.",
+                                    ),
+                                );
+                        }}
+                    >
+                        Jump to final 10 seconds
+                    </button>
                 </div>
                 <div className="now-playing">
                     <b>Now playing</b>
@@ -147,7 +191,8 @@ export default function TestMusic() {
                 </div>
                 <p className="helper">
                     This is the only manual track selection. Use Change state
-                    below to select the target-state track automatically.
+                    below to select the target-state track automatically, or
+                    Jump to final 10 seconds to test same-state continuation.
                 </p>
 
                 <div className="test-metrics">

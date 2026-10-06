@@ -99,3 +99,19 @@ export function selectTransitionTrack(
         current,
     );
 }
+
+/** Selects the following approved track when playback reaches a track's end. */
+export function selectNextTrackInState(
+    catalogue: MusicCatalogue,
+    state: MusicClass,
+    currentTrackId: string,
+) {
+    const bank = catalogue[state];
+    const current = trackFor(catalogue, currentTrackId);
+    const currentIndex = bank.findIndex((track) => track.id === currentTrackId);
+    if (!bank.length || currentIndex < 0) return null;
+    const candidates = bank.map(
+        (_, index) => bank[(currentIndex + index + 1) % bank.length],
+    );
+    return choose(candidates, current);
+}

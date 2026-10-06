@@ -24,6 +24,7 @@ import {
     exportUrl,
     finishApiBlock,
     getMusicCatalogue,
+    getNextMusicTrack,
     getPlaybackConfig,
     getStudySetup,
     recordMusicTransition,
@@ -90,6 +91,11 @@ export default function App() {
     const completing = useRef(false);
     const queue = useRef<EventQueue | null>(null);
     const audio = useRef(new AudioController());
+    const musicCatalogueRef = useRef(musicCatalogue);
+    const playbackBlock = useRef<{
+        sessionId: string;
+        blockNumber: number;
+    } | null>(null);
     const conditionOrder =
         studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []);
     const condition = conditionOrder[blockIndex] ?? "No music";
@@ -127,6 +133,23 @@ export default function App() {
 
     // Stop audio if the app is closed or React removes this screen.
     useEffect(() => () => audio.current.stop(), []);
+
+    useEffect(() => {
+        musicCatalogueRef.current = musicCatalogue;
+    }, [musicCatalogue]);
+
+    useEffect(() => {
+        audio.current.onTrackEnded((currentTrackId) => {
+            const activeBlock = playbackBlock.current;
+            if (activeBlock)
+                void continueAfterTrackEnd(
+                    activeBlock.sessionId,
+                    activeBlock.blockNumber,
+                    currentTrackId,
+                );
+        });
+        return () => audio.current.onTrackEnded(null);
+    }, []);
 
     useEffect(() => {
         void getStudySetup()
@@ -238,13 +261,42 @@ export default function App() {
     async function startMusic(
         nextCondition: Condition,
         initialTrackId: string | null,
+        number: number,
     ) {
         if (nextCondition === "No music") {
+            playbackBlock.current = null;
             audio.current.stop();
             setAudioMessage("");
             return;
         }
+        if (sessionId)
+            playbackBlock.current = { sessionId, blockNumber: number };
         await playTrack(trackById(initialTrackId));
+    }
+
+    async function continueAfterTrackEnd(
+        activeSessionId: string,
+        number: number,
+        currentTrackId: string,
+    ) {
+        try {
+            const { trackId } = await getNextMusicTrack(
+                activeSessionId,
+                number,
+                currentTrackId,
+            );
+            // Ignore a late reply if an adaptive decision already changed track.
+            if (audio.current.currentTrackId() !== currentTrackId) return;
+            await playTrack(
+                trackId
+                    ? (Object.values(musicCatalogueRef.current)
+                          .flat()
+                          .find((track) => track.id === trackId) ?? null)
+                    : null,
+            );
+        } catch {
+            setAudioMessage("The next music track could not be loaded.");
+        }
     }
 
     async function applyAdaptiveDecision(
@@ -301,7 +353,11 @@ export default function App() {
                 number === 0 ? "practice" : number === 1 ? "baseline" : "task",
             );
             if (number > 0)
-                await startMusic(nextCondition, response.initialMusicTrackId);
+                await startMusic(
+                    nextCondition,
+                    response.initialMusicTrackId,
+                    number,
+                );
             await queue.current!.send({
                 blockNumber: number,
                 recordId: response.record.id,
@@ -393,6 +449,7 @@ export default function App() {
     async function finishBlock(elapsedSeconds: number) {
         if (!sessionId) return;
         try {
+            playbackBlock.current = null;
             audio.current.stop();
             const number =
                 stage === "practice"
@@ -448,6 +505,7 @@ export default function App() {
         }
     }
     function restart() {
+        playbackBlock.current = null;
         audio.current.stop();
         setStage("participant");
         setSessionId(null);

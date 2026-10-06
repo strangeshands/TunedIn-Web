@@ -15,7 +15,7 @@ import { config, root } from "./config.js";
 import { exportFiles, writeExports } from "./exports.js";
 import { calculateBlockMeasures } from "./measures.js";
 import { hasAnyMusic, loadMusicCatalogue } from "./music.js";
-import { selectInitialTrack } from "./playbackPolicy.js";
+import { selectInitialTrack, selectNextTrackInState } from "./playbackPolicy.js";
 import { generateRecord, wrongFields } from "./records.js";
 import { evaluateAdaptiveRule } from "./rule.js";
 import { saveSession, sessions } from "./store.js";
@@ -303,6 +303,40 @@ app.post(
         session.musicDecisions.push(decision);
         saveSession(session);
         response.json({ decision });
+    },
+);
+
+/** Selects the next track in the active bank after a browser audio element ends. */
+app.post(
+    "/api/sessions/:sessionId/blocks/:blockNumber/music/next",
+    (request, response) => {
+        const session = getSession(request.params.sessionId);
+        const blockNumber = Number(request.params.blockNumber);
+        const block = session.blocks.find(
+            (item) => item.number === blockNumber && item.endedAt === null,
+        );
+        const currentTrackId = String(request.body?.currentTrackId ?? "");
+        if (
+            !block ||
+            !["Static music", "Adaptive music"].includes(block.condition) ||
+            !currentTrackId
+        )
+            throw new Error("Invalid next-track request.");
+
+        const state =
+            block.condition === "Static music"
+                ? "baseline"
+                : (session.musicDecisions
+                      .filter((item) => item.blockNumber === blockNumber)
+                      .at(-1)?.selectedState ?? "baseline");
+        if (state === "silent") return response.json({ trackId: null });
+
+        const track = selectNextTrackInState(
+            loadMusicCatalogue(),
+            state,
+            currentTrackId,
+        );
+        response.json({ trackId: track?.id ?? null });
     },
 );
 

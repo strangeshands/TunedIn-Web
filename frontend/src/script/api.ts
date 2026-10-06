@@ -66,6 +66,17 @@ export function evaluateAdaptiveMusic(
     );
 }
 
+export function getNextMusicTrack(
+    sessionId: string,
+    blockNumber: number,
+    currentTrackId: string,
+) {
+    return request<{ trackId: string | null }>(
+        `/api/sessions/${sessionId}/blocks/${blockNumber}/music/next`,
+        { currentTrackId },
+    );
+}
+
 export function recordMusicTransition(
     sessionId: string,
     blockNumber: number,

@@ -25,7 +25,11 @@ const defaultSettings: PlaybackSettings = {
 
 const dbToGain = (decibels: number) => 10 ** (decibels / 20);
 const urlFor = (track: MusicTrack) =>
-    `/${track.relativeFilePath.split("/").map(encodeURIComponent).join("/")}`;
+    `/${track.relativeFilePath
+        .replaceAll("\\", "/")
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/")}`;
 
 /** Browser playback only: the backend decides state, track, and fixed gain. */
 export class AudioController {
@@ -35,6 +39,7 @@ export class AudioController {
     private retiring: ActiveAudio | null = null;
     private fadeFrame: number | null = null;
     private settings = defaultSettings;
+    private trackEndedHandler: ((trackId: string) => void) | null = null;
 
     configure(settings: PlaybackSettings) {
         this.settings = settings;
@@ -45,6 +50,29 @@ export class AudioController {
             );
     }
 
+    onTrackEnded(handler: ((trackId: string) => void) | null) {
+        this.trackEndedHandler = handler;
+    }
+
+    currentTrackId() {
+        return this.active?.trackId ?? null;
+    }
+
+    /** Development helper: jumps to the final seconds so the normal ended event runs. */
+    async jumpToFinalSeconds(seconds = 10) {
+        const active = this.active;
+        if (!active || active.element.paused) return false;
+        if (!Number.isFinite(active.element.duration))
+            await new Promise<void>((resolve) =>
+                active.element.addEventListener("loadedmetadata", () => resolve(), {
+                    once: true,
+                }),
+            );
+        if (!Number.isFinite(active.element.duration)) return false;
+        active.element.currentTime = Math.max(0, active.element.duration - seconds);
+        return true;
+    }
+
     async play(track: MusicTrack | null): Promise<PlaybackResult> {
         if (!track) {
             this.stop();
@@ -53,6 +81,8 @@ export class AudioController {
         if (this.active?.trackId === track.id && !this.active.element.paused)
             return { status: "playing", trackId: track.id };
 
+        const previous =
+            this.active && !this.active.element.paused ? this.active : null;
         const { context, masterGain } = this.ensureGraph();
         const element = new Audio(urlFor(track));
         element.loop = this.settings.loopTracks;
@@ -61,8 +91,12 @@ export class AudioController {
         const trackGain = context.createGain();
         const fadeGain = context.createGain();
         trackGain.gain.value = dbToGain(track.playbackGainDb);
-        fadeGain.gain.value = this.active ? 0 : 1;
+        fadeGain.gain.value = previous ? 0 : 1;
         source.connect(trackGain).connect(fadeGain).connect(masterGain);
+        element.addEventListener("ended", () => {
+            if (this.active?.element === element)
+                this.trackEndedHandler?.(track.id);
+        });
 
         try {
             await context.resume();
@@ -78,7 +112,7 @@ export class AudioController {
             };
         }
 
-        const previous = this.active;
+        if (this.active && !previous) this.dispose(this.active);
         this.active = { element, trackId: track.id, fadeGain };
         if (previous) this.crossfade(previous, this.active);
         return { status: "playing", trackId: track.id };
