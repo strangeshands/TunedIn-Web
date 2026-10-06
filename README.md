@@ -24,9 +24,9 @@ Participants copy fictional Record Code, Batch Code, and Quantity values into ma
 The participant setup screen records one of three modes with every session:
 
 - **Pilot** and **Main** use the counterbalanced orders in `conditionOrders`.
-- **Formative Testing** automatically uses `formativeConditionOrder`, currently one `Adaptive music` block.
+- **Formative Testing** automatically uses `formativeConditionOrder`, currently one `Adaptive music` block. It also shows editable practice, baseline, and block durations in seconds.
 
-Change these arrays in `config/study.json` to configure the blocks without editing application code. The chosen mode is saved in `session.json`, `events.jsonl`, and every CSV export.
+Change these arrays and default timings in `config/study.json` to configure the study without editing application code. Formative timing values are saved as an immutable session snapshot in `session.json`, `events.jsonl`, and every CSV export.
 
 It uses local JSON storage. SQLite is documented for later work and is not active.
 

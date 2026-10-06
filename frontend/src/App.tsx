@@ -15,6 +15,7 @@ import type {
     OrderId,
     SourceRecord,
     StudyMode,
+    StudyTiming,
 } from "../../shared/types";
 import {
     confirmComfortCheck,
@@ -49,12 +50,11 @@ type Stage =
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
 const empty: FormValues = { recordCode: "", batchCode: "", quantity: "" };
 
-/**
- *  Change duration here.
- */
-const PRACTICE_SECONDS = 5;
-const BASELINE_SECONDS = 5;
-const BLOCK_SECONDS = 60 * 2;
+const fallbackTiming: StudyTiming = {
+    practiceSeconds: 60 * 2,
+    baselineSeconds: 60 * 2,
+    blockSeconds: 60 * 8,
+};
 
 export default function App() {
     const [stage, setStage] = useState<Stage>("participant");
@@ -65,6 +65,10 @@ export default function App() {
     const [orders, setOrders] = useState<Record<OrderId, Condition[]>>({});
     const [studyMode, setStudyMode] = useState<StudyMode>("Pilot");
     const [formativeOrder, setFormativeOrder] = useState<Condition[]>([]);
+    const [configuredTiming, setConfiguredTiming] =
+        useState<StudyTiming>(fallbackTiming);
+    const [formativeTiming, setFormativeTiming] =
+        useState<StudyTiming>(fallbackTiming);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [blockIndex, setBlockIndex] = useState(0);
     const [record, setRecord] = useState<SourceRecord | null>(null);
@@ -89,12 +93,14 @@ export default function App() {
     const conditionOrder =
         studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []);
     const condition = conditionOrder[blockIndex] ?? "No music";
+    const timing =
+        studyMode === "Formative" ? formativeTiming : configuredTiming;
     const duration =
         stage === "practice"
-            ? PRACTICE_SECONDS
+            ? timing.practiceSeconds
             : stage === "baseline"
-              ? BASELINE_SECONDS
-              : BLOCK_SECONDS;
+              ? timing.baselineSeconds
+              : timing.blockSeconds;
     const remaining = useMemo(
         () => Math.max(0, duration - seconds),
         [duration, seconds],
@@ -124,10 +130,12 @@ export default function App() {
 
     useEffect(() => {
         void getStudySetup()
-            .then(({ conditionOrders, formativeConditionOrder }) => {
+            .then(({ conditionOrders, formativeConditionOrder, timing }) => {
                 const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
                 setOrders(conditionOrders);
                 setFormativeOrder(formativeConditionOrder);
+                setConfiguredTiming(timing);
+                setFormativeTiming(timing);
                 setOrderId((current) =>
                     conditionOrders[current] ? current : firstOrderId,
                 );
@@ -173,6 +181,7 @@ export default function App() {
                 studyMode,
                 orderId: studyMode === "Formative" ? "formative" : orderId,
                 conditionOrder,
+                timing,
             });
             setSessionId(response.sessionId);
             queue.current = new EventQueue(response.sessionId);
@@ -334,6 +343,15 @@ export default function App() {
         setErrors([]);
     }
 
+    function updateFormativeTiming(key: keyof StudyTiming, value: string) {
+        const seconds = Number(value);
+        if (!Number.isFinite(seconds) || seconds <= 0) return;
+        setFormativeTiming((current) => ({
+            ...current,
+            [key]: seconds,
+        }));
+    }
+
     /**
      *  Calls when a record is submitted.
      */
@@ -481,25 +499,65 @@ export default function App() {
                             <p>
                                 This session will run one Adaptive Music block.
                             </p>
+                            <label className="field">
+                                <span>Practice duration (seconds)</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={formativeTiming.practiceSeconds}
+                                    onChange={(event) =>
+                                        updateFormativeTiming(
+                                            "practiceSeconds",
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                            </label>
+                            <label className="field">
+                                <span>Baseline duration (seconds)</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={formativeTiming.baselineSeconds}
+                                    onChange={(event) =>
+                                        updateFormativeTiming(
+                                            "baselineSeconds",
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                            </label>
+                            <label className="field">
+                                <span>Adaptive block duration (seconds)</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={formativeTiming.blockSeconds}
+                                    onChange={(event) =>
+                                        updateFormativeTiming(
+                                            "blockSeconds",
+                                            event.target.value,
+                                        )
+                                    }
+                                />
+                            </label>
                         </div>
                     ) : (
-                        <label className="field">
-                            <span>Counterbalanced Condition Order</span>
-                            <select
-                                value={orderId}
-                                onChange={(event) =>
-                                    setOrderId(event.target.value as OrderId)
-                                }
-                            >
-                                {Object.entries(orders).map(
-                                    ([id, conditions]) => (
-                                        <option key={id} value={id}>
-                                            {id}: {conditions.join(" → ")}
-                                        </option>
-                                    ),
-                                )}
-                            </select>
-                        </label>
+                    <label className="field">
+                        <span>Counterbalanced Condition Order</span>
+                        <select
+                            value={orderId}
+                            onChange={(event) =>
+                                setOrderId(event.target.value as OrderId)
+                            }
+                        >
+                            {Object.entries(orders).map(([id, conditions]) => (
+                                <option key={id} value={id}>
+                                    {id}: {conditions.join(" → ")}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
                     )}
                     <div className="instructions">
                         <b>Experiment Sequence</b>
@@ -507,16 +565,10 @@ export default function App() {
                             <li>Practice task</li>
                             <li>Silent baseline calibration</li>
                             <li>Audio-comfort check</li>
-                            <li>
-                                {conditionOrder.length} timed encoding block
-                                {conditionOrder.length === 1 ? "" : "s"}
-                            </li>
+                            <li>{conditionOrder.length} timed encoding block{conditionOrder.length === 1 ? "" : "s"}</li>
                         </ol>
                     </div>
-                    <button
-                        className="primary large"
-                        disabled={!conditionOrder.length}
-                    >
+                    <button className="primary large" disabled={!conditionOrder.length}>
                         Save participant & continue <span>→</span>
                     </button>
                 </form>
@@ -597,7 +649,7 @@ export default function App() {
                 </div>
                 <div className="timer-card">
                     <span>Practice duration</span>
-                    <strong>{fmt(PRACTICE_SECONDS)}</strong>
+                    <strong>{fmt(timing.practiceSeconds)}</strong>
                 </div>
                 <button className="primary large" onClick={startPractice}>
                     Start practice <span>→</span>
@@ -615,7 +667,7 @@ export default function App() {
             >
                 <div className="timer-card">
                     <span>Calibration duration</span>
-                    <strong>{fmt(BASELINE_SECONDS)}</strong>
+                    <strong>{fmt(timing.baselineSeconds)}</strong>
                 </div>
                 <button
                     className="primary large"
@@ -696,7 +748,7 @@ export default function App() {
                     </div>
                     <div>
                         <span>Current duration</span>
-                        <b>{fmt(BLOCK_SECONDS)}</b>
+                        <b>{fmt(timing.blockSeconds)}</b>
                     </div>
                 </div>
                 <button className="primary large" onClick={startBlock}>

@@ -8,6 +8,7 @@ import type {
     OrderId,
     Session,
     StudyMode,
+    StudyTiming,
     TaskEvent,
 } from "../../shared/types.js";
 import { config, root } from "./config.js";
@@ -28,6 +29,22 @@ app.use("/music", express.static(join(root, "music")));
 
 const orders = config.conditionOrders;
 const conditions: Condition[] = ["No music", "Static music", "Adaptive music"];
+const defaultTiming: StudyTiming = {
+    practiceSeconds: config.practiceSeconds,
+    baselineSeconds: config.baselineSeconds,
+    blockSeconds: config.blockSeconds,
+};
+const validTiming = (value: unknown): value is StudyTiming => {
+    if (!value || typeof value !== "object") return false;
+    const timing = value as Record<string, unknown>;
+    return ["practiceSeconds", "baselineSeconds", "blockSeconds"].every(
+        (key) =>
+            typeof timing[key] === "number" &&
+            Number.isFinite(timing[key]) &&
+            timing[key] > 0 &&
+            timing[key] <= 86_400,
+    );
+};
 const eventTypes = [
     "record_presented",
     "first_key",
@@ -71,6 +88,7 @@ app.get("/api/study-setup", (_request, response) =>
     response.json({
         conditionOrders: orders,
         formativeConditionOrder: config.formativeConditionOrder,
+        timing: defaultTiming,
         configVersion: config.version,
     }),
 );
@@ -83,6 +101,10 @@ app.post("/api/sessions", (request, response) => {
         studyMode === "Formative"
             ? config.formativeConditionOrder
             : orders[orderId];
+    const timing =
+        studyMode === "Formative" && validTiming(request.body?.timing)
+            ? request.body.timing
+            : defaultTiming;
     if (
         !participantId ||
         !["Formative", "Pilot", "Main"].includes(studyMode) ||
@@ -95,6 +117,7 @@ app.post("/api/sessions", (request, response) => {
         id: randomUUID(),
         participantId,
         studyMode,
+        timing,
         orderId,
         conditionOrder,
         createdAt: now,

@@ -2,6 +2,11 @@ export type Condition = "No music" | "Static music" | "Adaptive music";
 /** Configured condition-order key, for example "A" or "Adaptive-only". */
 export type OrderId = string;
 export type StudyMode = "Formative" | "Pilot" | "Main";
+export type StudyTiming = {
+    practiceSeconds: number;
+    baselineSeconds: number;
+    blockSeconds: number;
+};
 export type Stage =
     | "participant"
     | "practice"
@@ -104,6 +109,7 @@ export type Session = {
     id: string;
     participantId: string;
     studyMode: StudyMode;
+    timing: StudyTiming;
     orderId: OrderId;
     conditionOrder: Condition[];
     createdAt: string;

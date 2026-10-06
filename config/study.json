@@ -8,6 +8,7 @@
   },
   "formativeConditionOrder": ["Adaptive music"],
   "practiceSeconds": 120,
+  "baselineSeconds": 120,
   "blockSeconds": 480,
   "audioIntegration": "rule-engine",
   "playback": {

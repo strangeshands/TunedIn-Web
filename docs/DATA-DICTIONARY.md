@@ -10,6 +10,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 - `quantity` remains text so values such as `064` preserve leading zeroes.
 - Blocks: `0` practice, `1` silent baseline calibration, then `2+` configured experimental blocks. The number of experimental blocks depends on the selected study mode.
 - `study_mode` is `Formative`, `Pilot`, or `Main`, selected when the session begins.
+- `configured_practice_seconds`, `configured_baseline_seconds`, and `configured_block_seconds` record the durations locked in when the session began.
 
 ## Export files
 
@@ -27,7 +28,8 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 
 | Column | Meaning |
 | --- | --- |
-| `participant_id`, `session_id` | Session identifiers. |
+| `participant_id`, `session_id`, `study_mode` | Session identifiers and selected study mode. |
+| `configured_practice_seconds`, `configured_baseline_seconds`, `configured_block_seconds` | Timing snapshot used for this session. |
 | `block` | `0` practice, `1` calibration, `2`–`4` experimental. |
 | `condition` | `No music`, `Static music`, or `Adaptive music`; practice and calibration are always `No music`. |
 | `duration_seconds` | Duration supplied when the block ended. |

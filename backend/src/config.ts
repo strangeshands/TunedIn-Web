@@ -11,6 +11,7 @@ export const config = JSON.parse(
     conditionOrders: Record<string, Condition[]>;
     formativeConditionOrder: Condition[];
     practiceSeconds: number;
+    baselineSeconds: number;
     blockSeconds: number;
     audioIntegration: "rule-engine";
     playback: {

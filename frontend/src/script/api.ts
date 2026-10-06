@@ -7,6 +7,7 @@ import type {
     OrderId,
     SourceRecord,
     StudyMode,
+    StudyTiming,
     TaskEvent,
 } from "../../../shared/types";
 import type { PlaybackSettings } from "./audio";
@@ -45,6 +46,7 @@ export function getStudySetup() {
     return request<{
         conditionOrders: Record<OrderId, Condition[]>;
         formativeConditionOrder: Condition[];
+        timing: StudyTiming;
         configVersion: string;
     }>("/api/study-setup");
 }
@@ -90,6 +92,7 @@ export function recordMusicTransition(
 export function createSession(data: {
     participantId: string;
     studyMode: StudyMode;
+    timing: StudyTiming;
     orderId: OrderId;
     conditionOrder: Condition[];
 }) {
