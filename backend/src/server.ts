@@ -205,6 +205,18 @@ app.post("/api/sessions/:sessionId/events", (request, response) => {
             !Number.isFinite(event.clientTimeMs)
         )
             throw new Error("Invalid task event.");
+        // The queue may retry after a saved event's acknowledgement is lost.
+        if (
+            ["record_presented", "first_key"].includes(event.eventType) &&
+            session.events.some(
+                (saved) =>
+                    saved.blockNumber === event.blockNumber &&
+                    saved.recordId === event.recordId &&
+                    saved.eventType === event.eventType &&
+                    saved.clientTimeMs === event.clientTimeMs,
+            )
+        )
+            continue;
         appendEvent(session, event);
     }
     saveSession(session);
@@ -379,6 +391,8 @@ app.post(
             error: error ?? null,
         });
         saveSession(session);
+        if (session.blocks.find((item) => item.number === blockNumber)?.endedAt)
+            writeExports(session);
         response.status(201).json({ saved: true });
     },
 );
@@ -392,12 +406,13 @@ app.post(
         const durationSeconds = Number(request.body?.durationSeconds);
         if (
             !block ||
-            block.endedAt !== null ||
+            (block.endedAt !== null &&
+                block.durationSeconds !== durationSeconds) ||
             !Number.isFinite(durationSeconds) ||
             durationSeconds < 0
         )
             throw new Error("Invalid block completion.");
-        block.endedAt = new Date().toISOString();
+        block.endedAt ??= new Date().toISOString();
         block.durationSeconds = durationSeconds;
         saveSession(session);
         const measures = calculateBlockMeasures(session, number);

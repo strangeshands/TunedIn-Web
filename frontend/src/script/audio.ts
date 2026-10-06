@@ -46,6 +46,7 @@ export class AudioController {
     private resolveFade: ((completedMs: number) => void) | null = null;
     private settings = defaultSettings;
     private trackEndedHandler: ((trackId: string) => void) | null = null;
+    private playbackAttempt = 0;
 
     configure(settings: PlaybackSettings) {
         this.settings = settings;
@@ -80,6 +81,7 @@ export class AudioController {
     }
 
     async play(track: MusicTrack | null): Promise<PlaybackResult> {
+        const attempt = ++this.playbackAttempt;
         if (!track) {
             this.stop();
             return { status: "silent", reason: "No approved music track is available." };
@@ -110,7 +112,11 @@ export class AudioController {
 
         try {
             await context.resume();
+            if (attempt !== this.playbackAttempt)
+                throw new Error("Playback was stopped before audio started.");
             await element.play();
+            if (attempt !== this.playbackAttempt)
+                throw new Error("Playback was stopped before audio started.");
         } catch (error) {
             element.pause();
             element.removeAttribute("src");
@@ -131,6 +137,7 @@ export class AudioController {
     }
 
     stop() {
+        this.playbackAttempt += 1;
         if (this.fadeFrame !== null) cancelAnimationFrame(this.fadeFrame);
         this.fadeFrame = null;
         this.finishFade(performance.now());

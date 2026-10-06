@@ -94,6 +94,7 @@ export default function App() {
     const endingDuration = useRef<number | null>(null);
     const endingBlockNumber = useRef<number | null>(null);
     const pendingSubmissions = useRef(new Set<Promise<unknown>>());
+    const submitting = useRef(false);
     const queue = useRef<EventQueue | null>(null);
     const audio = useRef(new AudioController());
     const musicCatalogueRef = useRef(musicCatalogue);
@@ -189,7 +190,7 @@ export default function App() {
             interval = window.setInterval(() => {
                 void applyAdaptiveDecision(sessionId, blockIndex + 2);
             }, 30_000);
-        }, 60_000);
+        }, Math.max(0, started + 60_000 - performance.now()));
         return () => {
             window.clearTimeout(firstEvaluation);
             if (interval !== null) window.clearInterval(interval);
@@ -314,6 +315,12 @@ export default function App() {
                 number,
                 performance.now(),
             );
+            if (
+                completing.current ||
+                playbackBlock.current?.sessionId !== activeSessionId ||
+                playbackBlock.current?.blockNumber !== number
+            )
+                return;
             // The backend retains the active track while the selected state is
             // unchanged. Do not restart audio or create a transition row.
             if (decision.previousTrackId === decision.selectedTrackId) return;
@@ -343,7 +350,7 @@ export default function App() {
     }
 
     /**
-     *  Starts the block and then starts the condition's safe music behaviour.
+     *  Attempts initial music before exposing the first record and starting timing.
      */
     async function beginBlock(number: number, nextCondition: Condition) {
         if (!sessionId) return;
@@ -353,27 +360,28 @@ export default function App() {
                 number,
                 nextCondition,
             );
-            setRecord(response.record);
-            setForm(empty);
-            setErrors([]);
-            setSeconds(0);
-            firstKey.current = false;
-            completing.current = false;
-            setStarted(performance.now());
-            setStage(
-                number === 0 ? "practice" : number === 1 ? "baseline" : "task",
-            );
             if (number > 0)
                 await startMusic(
                     nextCondition,
                     response.initialMusicTrackId,
                     number,
                 );
+            const taskStarted = performance.now();
+            setRecord(response.record);
+            setForm(empty);
+            setErrors([]);
+            setSeconds(0);
+            firstKey.current = false;
+            completing.current = false;
+            setStarted(taskStarted);
+            setStage(
+                number === 0 ? "practice" : number === 1 ? "baseline" : "task",
+            );
             await queue.current!.send({
                 blockNumber: number,
                 recordId: response.record.id,
                 eventType: "record_presented",
-                clientTimeMs: performance.now(),
+                clientTimeMs: taskStarted,
             });
         } catch (error) {
             setMessage(String(error));
@@ -424,7 +432,9 @@ export default function App() {
      */
     async function submit(event: FormEvent) {
         event.preventDefault();
-        if (!sessionId || !record) return;
+        if (!sessionId || !record || submitting.current || completing.current)
+            return;
+        submitting.current = true;
         try {
             const number =
                 stage === "practice"
@@ -444,7 +454,11 @@ export default function App() {
                 pendingSubmissions.current.delete(submission),
             );
             setErrors(response.incorrectFields);
-            if (response.accepted && response.nextRecord) {
+            if (
+                response.accepted &&
+                response.nextRecord &&
+                !completing.current
+            ) {
                 setRecord(response.nextRecord);
                 setForm(empty);
                 firstKey.current = false;
@@ -458,6 +472,8 @@ export default function App() {
             }
         } catch (error) {
             setMessage(String(error));
+        } finally {
+            submitting.current = false;
         }
     }
 
