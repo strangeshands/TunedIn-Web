@@ -61,6 +61,24 @@ button {
     min-height: 24px;
     color: #56625c;
 }
+.saving-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    color: #56625c;
+}
+.saving-status i {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #d6e3d9;
+    border-top-color: #284f39;
+    border-radius: 50%;
+    animation: saving-spin 0.8s linear infinite;
+}
+@keyframes saving-spin {
+    to { transform: rotate(360deg); }
+}
 .slider-metric input[type="range"] {
     width: 100%;
     padding: 0;
@@ -218,6 +236,7 @@ kbd {
 .primary.large {
     width: 100%;
     min-height: 56px;
+    margin-top: 5px;
 }
 .primary.submit {
     width: 100%;

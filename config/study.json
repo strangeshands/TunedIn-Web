@@ -7,9 +7,9 @@
     "C": ["Adaptive music", "No music", "Static music"]
   },
   "formativeConditionOrder": ["Adaptive music"],
-  "practiceSeconds": 120,
-  "baselineSeconds": 120,
-  "blockSeconds": 480,
+  "practiceSeconds": 10,
+  "baselineSeconds": 10,
+  "blockSeconds": 30,
   "audioIntegration": "rule-engine",
   "playback": {
     "manifestVersion": "final-playback-bank-v1",

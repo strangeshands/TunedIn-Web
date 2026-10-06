@@ -45,6 +45,7 @@ type Stage =
     | "audio-check"
     | "block-intro"
     | "task"
+    | "saving"
     | "block-results"
     | "handover"
     | "complete";
@@ -86,9 +87,13 @@ export default function App() {
         elevated: [],
     });
     const [audioMessage, setAudioMessage] = useState("");
+    const [savingMessage, setSavingMessage] = useState("");
     const firstKey = useRef(false);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const completing = useRef(false);
+    const endingDuration = useRef<number | null>(null);
+    const endingBlockNumber = useRef<number | null>(null);
+    const pendingSubmissions = useRef(new Set<Promise<unknown>>());
     const queue = useRef<EventQueue | null>(null);
     const audio = useRef(new AudioController());
     const musicCatalogueRef = useRef(musicCatalogue);
@@ -421,12 +426,16 @@ export default function App() {
                     : stage === "baseline"
                       ? 1
                       : blockIndex + 2;
-            const response = await submitRecord(
+            const submission = submitRecord(
                 sessionId,
                 number,
                 record.id,
                 form,
                 performance.now(),
+            );
+            pendingSubmissions.current.add(submission);
+            const response = await submission.finally(() =>
+                pendingSubmissions.current.delete(submission),
             );
             setErrors(response.incorrectFields);
             if (response.accepted && response.nextRecord) {
@@ -449,25 +458,36 @@ export default function App() {
     async function finishBlock(elapsedSeconds: number) {
         if (!sessionId) return;
         try {
-            playbackBlock.current = null;
-            audio.current.stop();
             const number =
-                stage === "practice"
+                endingBlockNumber.current ??
+                (stage === "practice"
                     ? 0
                     : stage === "baseline"
                       ? 1
-                      : blockIndex + 2;
+                      : blockIndex + 2);
+            endingDuration.current = elapsedSeconds;
+            endingBlockNumber.current = number;
+            setStarted(null);
+            setStage("saving");
+            setSavingMessage("Saving task events…");
+            playbackBlock.current = null;
+            audio.current.stop();
+            await Promise.all([...pendingSubmissions.current]);
+            await queue.current?.flush();
+            setSavingMessage("Events saved. Calculating block results…");
             const response = await finishApiBlock(
                 sessionId,
                 number,
                 elapsedSeconds,
             );
             if (number === 0) {
+                endingBlockNumber.current = null;
                 setStarted(null);
                 setStage("baseline-intro");
                 return;
             }
             if (number === 1) {
+                endingBlockNumber.current = null;
                 setCalibration(response.measures);
                 setStarted(null);
                 setStage("calibration-results");
@@ -477,9 +497,13 @@ export default function App() {
                 ...old.filter((item) => item.block !== number),
                 response.measures,
             ]);
+            endingBlockNumber.current = null;
             setStarted(null);
             setStage("block-results");
         } catch (error) {
+            setSavingMessage(
+                "Some task events could not be saved. Check the backend connection, then retry.",
+            );
             setMessage(String(error));
         }
     }
@@ -504,6 +528,10 @@ export default function App() {
             setStage("block-intro");
         }
     }
+    function retrySavingEvents() {
+        if (endingDuration.current !== null)
+            void finishBlock(endingDuration.current);
+    }
     function restart() {
         playbackBlock.current = null;
         audio.current.stop();
@@ -516,6 +544,9 @@ export default function App() {
         setCalibration(null);
         setMessage("");
         setAudioMessage("");
+        setSavingMessage("");
+        endingDuration.current = null;
+        endingBlockNumber.current = null;
     }
     const result = results.find((item) => item.block === blockIndex + 2);
 
@@ -677,6 +708,33 @@ export default function App() {
                 >
                     Audio level is comfortable <span>→</span>
                 </button>
+            </SimpleStage>
+        );
+
+    if (stage === "saving")
+        return (
+            <SimpleStage
+                eyebrow="SAVING SESSION DATA"
+                title="Saving events"
+                description={savingMessage || "Saving task events…"}
+                participantId={participantId}
+            >
+                {savingMessage.startsWith("Some") ? (
+                    <>
+                        <p className="error">{message}</p>
+                        <button
+                            className="primary large"
+                            onClick={retrySavingEvents}
+                        >
+                            Retry saving events <span>↻</span>
+                        </button>
+                    </>
+                ) : (
+                    <div className="saving-status" aria-live="polite">
+                        <i aria-hidden="true" />
+                        <span>Please wait. Do not close this page.</span>
+                    </div>
+                )}
             </SimpleStage>
         );
 
