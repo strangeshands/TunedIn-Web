@@ -218,6 +218,15 @@ h1 span {
 .instructions p:last-child {
     margin-bottom: 0;
 }
+
+.important-note ol {
+    margin: 12px 0 0;
+    padding-left: 22px;
+}
+
+.important-note li + li {
+    margin-top: 8px;
+}
 kbd {
     padding: 2px 6px;
     border: 1px solid #d3dad5;

@@ -118,6 +118,7 @@ export type Session = {
     buildVersion: string;
     taskVersion: string;
     audioIntegration: "rule-engine";
+    comfortVolumePercent: number | null;
     comfortCheckCompletedAt: string | null;
     blocks: Block[];
     events: TaskEvent[];

@@ -219,10 +219,13 @@ export function finishApiBlock(
  * @param sessionId - The current participant session ID.
  * @returns Confirmation from the backend.
  */
-export function confirmComfortCheck(sessionId: string) {
+export function confirmComfortCheck(
+    sessionId: string,
+    comfortVolumePercent: number,
+) {
     return request<{ ok: true }>(
         `/api/sessions/${sessionId}/comfort-check`,
-        {},
+        { comfortVolumePercent },
     );
 }
 

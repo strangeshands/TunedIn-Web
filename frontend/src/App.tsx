@@ -581,7 +581,7 @@ export default function App() {
         try {
             audio.current.stop();
             setTestAudioPlaying(false);
-            await confirmComfortCheck(sessionId);
+            await confirmComfortCheck(sessionId, Math.round(audioVolume * 100));
             setStage("block-intro");
         } catch (error) {
             setMessage(String(error));
@@ -748,16 +748,32 @@ export default function App() {
                 participantId={participantId}
             >
                 <div className="instructions important-note">
-                    <b>Important</b>
-                    <p>
-                        Practice is only for getting familiar with the task. It
-                        is not used for the study measurements.
-                    </p>
-                    <p>
-                        Silent baseline calibration is the critical measured
-                        task. Its results provide your personal reference for
-                        the Adaptive Music condition.
-                    </p>
+                    <b>Session Instructions</b>
+                    <ol>
+                        <li>
+                            <strong>Practice:</strong> Use this stage to get
+                            familiar with copying the records. Practice is not
+                            used for study measurements.
+                        </li>
+                        <li>
+                            <strong>Silent Baseline Calibration: </strong>
+                            Complete the same task without music. <b>This is the
+                            critical measured stage</b> as it creates your personal
+                            reference for the Adaptive Music condition.
+                        </li>
+                        <li>
+                            <strong>Audio Comfort Check:</strong> Listen to a
+                            short sample and choose a comfortable volume before
+                            the music conditions begin.
+                        </li>
+                        <li>
+                            <strong>Timed task blocks:</strong> Complete the
+                            record-copying task under the assigned conditions.
+                            These blocks provide the study data used to compare
+                            performance with no music, static music, and
+                            adaptive music.
+                        </li>
+                    </ol>
                 </div>
                 <div className="instructions">
                     <b>What you will do</b>

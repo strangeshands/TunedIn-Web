@@ -127,6 +127,7 @@ app.post("/api/sessions", (request, response) => {
         buildVersion: config.buildVersion,
         taskVersion: config.taskVersion,
         audioIntegration: "rule-engine",
+        comfortVolumePercent: null,
         comfortCheckCompletedAt: null,
         blocks: [],
         events: [],
@@ -282,6 +283,7 @@ app.post(
 
 app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
     const session = getSession(request.params.sessionId);
+    const comfortVolumePercent = Number(request.body?.comfortVolumePercent);
     if (
         !session.blocks.find(
             (block) => block.number === 1 && block.endedAt !== null,
@@ -290,6 +292,13 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
         throw new Error(
             "Finish silent baseline calibration before the comfort check.",
         );
+    if (
+        !Number.isInteger(comfortVolumePercent) ||
+        comfortVolumePercent < 0 ||
+        comfortVolumePercent > 100
+    )
+        throw new Error("Choose a comfort volume from 0% to 100%.");
+    session.comfortVolumePercent = comfortVolumePercent;
     session.comfortCheckCompletedAt = new Date().toISOString();
     saveSession(session);
     response.json({ ok: true });
