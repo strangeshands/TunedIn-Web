@@ -88,6 +88,8 @@ export default function App() {
         elevated: [],
     });
     const [audioMessage, setAudioMessage] = useState("");
+    const [audioVolume, setAudioVolume] = useState(0.75);
+    const [testAudioPlaying, setTestAudioPlaying] = useState(false);
     const [savingMessage, setSavingMessage] = useState("");
     const firstKey = useRef(false);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
@@ -140,6 +142,10 @@ export default function App() {
 
     // Stop audio if the app is closed or React removes this screen.
     useEffect(() => () => audio.current.stop(), []);
+
+    useEffect(() => {
+        audio.current.setVolume(audioVolume);
+    }, [audioVolume]);
 
     useEffect(() => {
         musicCatalogueRef.current = musicCatalogue;
@@ -266,6 +272,23 @@ export default function App() {
                     : `Audio could not play. The task will continue silently.`,
             );
         return result;
+    }
+
+    async function toggleTestAudio() {
+        if (audio.current.isPlaying()) {
+            audio.current.pause();
+            setTestAudioPlaying(false);
+            return;
+        }
+        if (audio.current.currentTrackId()) {
+            const resumed = await audio.current.resume();
+            setTestAudioPlaying(resumed);
+            if (!resumed)
+                setAudioMessage("Audio could not resume. Try playing it again.");
+            return;
+        }
+        const result = await playTrack(musicCatalogue.baseline[0] ?? null);
+        setTestAudioPlaying(result.status === "playing");
     }
 
     async function startMusic(
@@ -557,6 +580,7 @@ export default function App() {
         if (!sessionId) return;
         try {
             audio.current.stop();
+            setTestAudioPlaying(false);
             await confirmComfortCheck(sessionId);
             setStage("block-intro");
         } catch (error) {
@@ -736,6 +760,20 @@ export default function App() {
                     </p>
                 </div>
                 <div className="instructions">
+                    <b>What you will do</b>
+                    <p>
+                        Copy each source record into three separate entry
+                        fields, then submit it for checking.
+                    </p>
+                    <div className="task-overview" aria-label="Task overview">
+                        <span>1. Read source record</span>
+                        <i aria-hidden="true">→</i>
+                        <span>2. Fill three fields</span>
+                        <i aria-hidden="true">→</i>
+                        <span>3. Submit record</span>
+                    </div>
+                </div>
+                <div className="instructions">
                     <b>Read each character carefully</b>
                     <p>
                         Some characters can look alike, including <code>0</code>{" "}
@@ -768,12 +806,25 @@ export default function App() {
                             <span>Capital letter I</span>
                         </div>
                     </div>
+
+                    <div className="letter-pair">
+                        <div className="letter-card">
+                            <b>6</b>
+                            <span>Number six</span>
+                        </div>
+
+                        <div className="letter-card">
+                            <b className="record-glyph capital-i-glyph">G</b>
+                            <span>Capital letter G</span>
+                        </div>
+                    </div>
                 </div>
                 <div className="instructions">
                     <b>Keyboard shortcuts</b>
                     <p>
-                        Press <kbd>Tab</kbd> to move to the next field. Press{" "}
-                        <kbd>Enter</kbd> to submit a completed record.
+                        Each record has three fields. Press <kbd>Tab</kbd> to
+                        move through Record Code, Batch Code, and Quantity.
+                        Press <kbd>Enter</kbd> to submit a completed record.
                     </p>
                 </div>
                 <button
@@ -802,7 +853,12 @@ export default function App() {
                     <ul>
                         <li>Confirm the headphones fit comfortably.</li>
                         <li>
-                            Do not change that device level during the blocks.
+                            Use the slider and test controls below to choose a
+                            comfortable volume before the timed blocks.
+                        </li>
+                        <li>
+                            The selected volume will be retained during the
+                            music blocks.
                         </li>
                     </ul>
                 </div>
@@ -812,14 +868,28 @@ export default function App() {
                         : "No test track was found. The session can still continue silently."}
                 </div>
                 {musicCatalogue.baseline.length > 0 && (
-                    <button
-                        className="secondary"
-                        onClick={() =>
-                            void playTrack(musicCatalogue.baseline[0])
-                        }
-                    >
-                        Play test audio
-                    </button>
+                    <div className="audio-controls">
+                        <button
+                            className="secondary"
+                            onClick={() => void toggleTestAudio()}
+                        >
+                            {testAudioPlaying
+                                ? "Pause test audio"
+                                : "Play test audio"}
+                        </button>
+                        <label className="volume-control">
+                            <span>Test volume: {Math.round(audioVolume * 100)}%</span>
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={Math.round(audioVolume * 100)}
+                                onChange={(event) =>
+                                    setAudioVolume(Number(event.target.value) / 100)
+                                }
+                            />
+                        </label>
+                    </div>
                 )}
                 {audioMessage && <p className="error">{audioMessage}</p>}
                 <button
@@ -874,11 +944,12 @@ export default function App() {
                     <b>Practice instructions</b>
                     <ul>
                         <li>
-                            Copy the source values into the matching fields.
+                            Copy the source values into the three matching
+                            fields. No music will play during Practice.
                         </li>
                         <li>
-                            Use <kbd>Tab</kbd> between fields and{" "}
-                            <kbd>Enter</kbd> to submit.
+                            Press <kbd>Tab</kbd> to move through the fields,
+                            then <kbd>Enter</kbd> to submit.
                         </li>
                         <li>
                             Type capital and lower-case letters exactly as
@@ -905,7 +976,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="SILENT BASELINE"
                 title="Baseline calibration"
-                description="This is the critical measured task. Complete the same task without music; its results become your personal adaptive-music reference."
+                description="This is the critical measured task. Perform as you normally would. No music will play, and your results become your personal adaptive-music reference."
                 participantId={participantId}
             >
                 <div className="timer-card">
@@ -925,11 +996,18 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow="SILENT BASELINE COMPLETE"
-                title="Calibration results"
-                description="These personal reference values will be used only by the Adaptive Music rule engine."
+                title="Calibration saved"
+                description="Your personal reference has been saved and will be used quietly by the Adaptive Music rule engine."
                 participantId={participantId}
             >
-                <div className="block-results-grid">
+                <div className="calibration-confirmation">
+                    <b>Ready for the next step</b>
+                    <span>
+                        You completed {calibration.validatedRecords} validated
+                        record{calibration.validatedRecords === 1 ? "" : "s"}.
+                    </span>
+                </div>
+                <div className="block-results-grid calibration-details" aria-hidden="true">
                     <Result
                         label="Median IL"
                         value={
@@ -977,7 +1055,7 @@ export default function App() {
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} OF ${conditionOrder.length}`}
                 title={condition}
-                description="Continue entering records until the timer ends."
+                description="The next timed block is ready. Continue entering records until the timer ends."
                 participantId={participantId}
             >
                 <div className="summary single-summary">
@@ -1057,7 +1135,7 @@ export default function App() {
                 </div>
                 <button className="primary large" onClick={nextBlock}>
                     {blockIndex === conditionOrder.length - 1
-                        ? "Finish participant"
+                        ? "Finish Experiment"
                         : `Continue to Block ${blockIndex + 2}`}{" "}
                     <span>→</span>
                 </button>
@@ -1206,20 +1284,20 @@ export default function App() {
                                 inputMode="numeric"
                                 onChange={(value) => update("quantity", value)}
                             />
+                            <button className="primary submit">
+                                Submit Record <span>↵</span>
+                            </button>
                             {errors.length > 0 && (
-                                <div className="error">
+                                <div className="error" role="alert">
                                     <b>
                                         Check the highlighted field
                                         {errors.length > 1 ? "s" : ""}.
                                     </b>
                                     <span>
-                                        Correct the values and submit again.
+                                        Correct the value, then submit again.
                                     </span>
                                 </div>
                             )}
-                            <button className="primary submit">
-                                Submit Record <span>↵</span>
-                            </button>
                         </form>
                     </div>
                 )}

@@ -143,10 +143,17 @@ app.post(
     (request, response) => {
         const session = getSession(request.params.sessionId);
         const number = Number(request.params.blockNumber);
-        const expected = session.blocks.length;
+        const lastBlockNumber = session.blocks.at(-1)?.number;
+        // Practice (block 0) is optional. When it is skipped, Silent Baseline
+        // (block 1) can be the first saved block; every later block still
+        // follows the actual preceding block number.
+        const expected =
+            lastBlockNumber === undefined ? number : lastBlockNumber + 1;
         if (
             !Number.isInteger(number) ||
-            number !== expected ||
+            (lastBlockNumber === undefined
+                ? number !== 0 && number !== 1
+                : number !== expected) ||
             number < 0 ||
             number > session.conditionOrder.length + 1
         )

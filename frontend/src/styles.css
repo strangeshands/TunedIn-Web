@@ -361,8 +361,19 @@ footer {
     color: #6f7a74;
     font-size: 13px;
 }
+.source-row strong,
+.field input,
+.record-glyphs {
+    font-family:
+        "Cascadia Mono",
+        "Cascadia Code",
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+    font-feature-settings: "zero" 1;
+    font-variant-numeric: slashed-zero;
+}
 .source-row strong {
-    font-family: "SFMono-Regular", Consolas, monospace;
     font-size: 20px;
     letter-spacing: 0.08em;
 }
@@ -437,7 +448,6 @@ footer {
     outline: none;
     color: #1d2923;
     background: #fff;
-    font-family: "SFMono-Regular", Consolas, monospace;
     font-size: 16px;
     letter-spacing: 0.08em;
 }
@@ -458,7 +468,7 @@ footer {
 .error {
     display: grid;
     gap: 3px;
-    margin: 4px 0 14px;
+    margin-top: 10px;
     padding: 12px 14px;
     border-radius: 10px;
     background: #fff2f0;
@@ -734,6 +744,58 @@ footer {
     min-height: 56px;
     margin-top: 12px;
 }
+.task-overview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    color: #3e5146;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+.task-overview span {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: white;
+}
+.task-overview i {
+    color: #66816f;
+    font-style: normal;
+}
+.audio-controls {
+    display: grid;
+    gap: 14px;
+    margin: 18px 0;
+}
+.volume-control {
+    display: grid;
+    gap: 8px;
+    color: #536159;
+    font-size: 13px;
+    font-weight: 700;
+}
+.volume-control input {
+    width: 100%;
+    accent-color: #284f39;
+}
+.calibration-confirmation {
+    display: grid;
+    gap: 5px;
+    margin: 26px 0;
+    padding: 20px;
+    border-radius: 14px;
+    background: #edf4ee;
+    color: #375443;
+}
+.calibration-confirmation span {
+    color: #5e6e64;
+    font-size: 13px;
+}
+.calibration-details {
+    display: none;
+}
 @media (max-width: 760px) {
     .block-results-grid,
     .participant-block-stats {
@@ -749,5 +811,8 @@ footer {
     .task-shortcuts {
         flex-wrap: wrap;
         justify-content: flex-end;
+    }
+    .task-overview {
+        flex-wrap: wrap;
     }
 }

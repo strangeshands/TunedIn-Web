@@ -47,6 +47,7 @@ export class AudioController {
     private settings = defaultSettings;
     private trackEndedHandler: ((trackId: string) => void) | null = null;
     private playbackAttempt = 0;
+    private volume = 1;
 
     configure(settings: PlaybackSettings) {
         this.settings = settings;
@@ -63,6 +64,31 @@ export class AudioController {
 
     currentTrackId() {
         return this.active?.trackId ?? null;
+    }
+
+    isPlaying() {
+        return Boolean(this.active && !this.active.element.paused);
+    }
+
+    setVolume(volume: number) {
+        this.volume = Math.max(0, Math.min(1, volume));
+        if (this.active) this.active.element.volume = this.volume;
+        if (this.retiring) this.retiring.element.volume = this.volume;
+    }
+
+    pause() {
+        this.active?.element.pause();
+    }
+
+    async resume() {
+        if (!this.active) return false;
+        try {
+            await this.context?.resume();
+            await this.active.element.play();
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     /** Development helper: jumps to the final seconds so the normal ended event runs. */
@@ -99,6 +125,7 @@ export class AudioController {
         const element = new Audio(urlFor(track));
         element.loop = this.settings.loopTracks;
         element.preload = "auto";
+        element.volume = this.volume;
         const source = context.createMediaElementSource(element);
         const trackGain = context.createGain();
         const fadeGain = context.createGain();

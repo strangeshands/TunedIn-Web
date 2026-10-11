@@ -8,7 +8,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 - Rates are fractions from `0` to `1`; `0.15` means 15%.
 - The interface may display seconds, but exported timing values remain milliseconds.
 - `quantity` remains text so values such as `064` preserve leading zeroes.
-- Blocks: `0` practice, `1` silent baseline calibration, then `2+` configured experimental blocks. The number of experimental blocks depends on the selected study mode.
+- Blocks: `0` practice when completed, `1` silent baseline calibration, then `2+` configured experimental blocks. Practice is optional, so a session may begin with block `1`.
 - `study_mode` is `Formative`, `Pilot`, or `Main`, selected when the session begins.
 - `config_version`, `build_version`, and `task_version` identify the configuration, formative build, and task definition captured when the session began.
 - `configured_practice_seconds`, `configured_baseline_seconds`, and `configured_block_seconds` record the durations locked in when the session began.
