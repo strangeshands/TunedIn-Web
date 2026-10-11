@@ -140,10 +140,10 @@ export function evaluateAdaptiveRule(
 
         const elevated =
             current.medianInitiationLatencyMs <=
-                baseline.medianInitiationLatencyMs * 0.9 &&
+                baseline.medianInitiationLatencyMs * 0.6 &&
             current.medianFirstPassEntryDurationMs <=
-                baseline.medianFirstPassEntryDurationMs * 0.9 &&
-            current.firstPassRecordErrorRate <= 0.05;
+                baseline.medianFirstPassEntryDurationMs * 0.6 &&
+            current.firstPassRecordErrorRate <= 0.03;
 
         if (reduced) {
             selectedState = "reduced";

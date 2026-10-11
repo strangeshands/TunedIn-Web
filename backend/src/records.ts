@@ -10,7 +10,10 @@ export function generateRecord(index: number, set: number): SourceRecord {
         seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
         return Math.floor((seed / 4294967296) * length);
     };
-    const letter = () => letters[pick(letters.length)];
+    const letter = () => {
+        const value = letters[pick(letters.length)];
+        return pick(2) === 0 ? value : value.toLowerCase();
+    };
     const number = (length: number) =>
         Array.from({ length }, () => digits[pick(digits.length)]).join("");
     return {

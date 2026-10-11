@@ -38,6 +38,7 @@ import { fmt } from "./script/format";
 
 type Stage =
     | "participant"
+    | "introduction"
     | "practice"
     | "baseline-intro"
     | "baseline"
@@ -185,12 +186,15 @@ export default function App() {
         )
             return;
         let interval: number | null = null;
-        const firstEvaluation = window.setTimeout(() => {
-            void applyAdaptiveDecision(sessionId, blockIndex + 2);
-            interval = window.setInterval(() => {
+        const firstEvaluation = window.setTimeout(
+            () => {
                 void applyAdaptiveDecision(sessionId, blockIndex + 2);
-            }, 30_000);
-        }, Math.max(0, started + 60_000 - performance.now()));
+                interval = window.setInterval(() => {
+                    void applyAdaptiveDecision(sessionId, blockIndex + 2);
+                }, 30_000);
+            },
+            Math.max(0, started + 60_000 - performance.now()),
+        );
         return () => {
             window.clearTimeout(firstEvaluation);
             if (interval !== null) window.clearInterval(interval);
@@ -217,7 +221,7 @@ export default function App() {
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             localStorage.setItem("tunedIn.participantId", clean);
             setParticipantId(clean);
-            setStage("practice");
+            setStage("introduction");
         } catch (error) {
             setMessage(String(error));
         }
@@ -392,6 +396,9 @@ export default function App() {
     function startPractice() {
         void beginBlock(0, "No music");
     }
+    function skipPractice() {
+        setStage("baseline-intro");
+    }
     function startBaselineCalibration() {
         void beginBlock(1, "No music");
     }
@@ -415,7 +422,8 @@ export default function App() {
                 clientTimeMs: performance.now(),
             });
         }
-        setForm((old) => ({ ...old, [key]: value.toUpperCase() }));
+        // Record codes use mixed case, so preserve the participant's exact input.
+        setForm((old) => ({ ...old, [key]: value }));
         setErrors([]);
     }
 
@@ -448,9 +456,17 @@ export default function App() {
             // send() retains failed events but swallows delivery errors. Validation
             // depends on the presentation being saved, so retry/await the queue
             // first and include that wait in the activity block completion awaits.
-            const submission = queue.current!.flush().then(() =>
-                submitRecord(sessionId, number, record.id, form, submittedAt),
-            );
+            const submission = queue
+                .current!.flush()
+                .then(() =>
+                    submitRecord(
+                        sessionId,
+                        number,
+                        record.id,
+                        form,
+                        submittedAt,
+                    ),
+                );
             pendingSubmissions.current.add(submission);
             const response = await submission.finally(() =>
                 pendingSubmissions.current.delete(submission),
@@ -658,21 +674,23 @@ export default function App() {
                             </label>
                         </div>
                     ) : (
-                    <label className="field">
-                        <span>Counterbalanced Condition Order</span>
-                        <select
-                            value={orderId}
-                            onChange={(event) =>
-                                setOrderId(event.target.value as OrderId)
-                            }
-                        >
-                            {Object.entries(orders).map(([id, conditions]) => (
-                                <option key={id} value={id}>
-                                    {id}: {conditions.join(" → ")}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                        <label className="field">
+                            <span>Counterbalanced Condition Order</span>
+                            <select
+                                value={orderId}
+                                onChange={(event) =>
+                                    setOrderId(event.target.value as OrderId)
+                                }
+                            >
+                                {Object.entries(orders).map(
+                                    ([id, conditions]) => (
+                                        <option key={id} value={id}>
+                                            {id}: {conditions.join(" → ")}
+                                        </option>
+                                    ),
+                                )}
+                            </select>
+                        </label>
                     )}
                     <div className="instructions">
                         <b>Experiment Sequence</b>
@@ -680,14 +698,90 @@ export default function App() {
                             <li>Practice task</li>
                             <li>Silent baseline calibration</li>
                             <li>Audio-comfort check</li>
-                            <li>{conditionOrder.length} timed encoding block{conditionOrder.length === 1 ? "" : "s"}</li>
+                            <li>
+                                {conditionOrder.length} timed encoding block
+                                {conditionOrder.length === 1 ? "" : "s"}
+                            </li>
                         </ol>
                     </div>
-                    <button className="primary large" disabled={!conditionOrder.length}>
+                    <button
+                        className="primary large"
+                        disabled={!conditionOrder.length}
+                    >
                         Save participant & continue <span>→</span>
                     </button>
                 </form>
                 {message && <p className="error">{message}</p>}
+            </SimpleStage>
+        );
+
+    if (stage === "introduction")
+        return (
+            <SimpleStage
+                eyebrow="PARTICIPANT INTRODUCTION"
+                title="Before you begin"
+                description="You will first see a practice task, then complete the silent baseline calibration."
+                participantId={participantId}
+            >
+                <div className="instructions important-note">
+                    <b>Important</b>
+                    <p>
+                        Practice is only for getting familiar with the task. It
+                        is not used for the study measurements.
+                    </p>
+                    <p>
+                        Silent baseline calibration is the critical measured
+                        task. Its results provide your personal reference for
+                        the Adaptive Music condition.
+                    </p>
+                </div>
+                <div className="instructions">
+                    <b>Read each character carefully</b>
+                    <p>
+                        Some characters can look alike, including <code>0</code>{" "}
+                        and <code>O</code>, or <code>1</code> and <code>I</code>
+                        . Record codes may contain both capital and lower-case
+                        letters. Type each value exactly as displayed.
+                    </p>
+                </div>
+                <div className="letters">
+                    <div className="letter-pair">
+                        <div className="letter-card">
+                            <b className="record-glyph zero-glyph">0</b>
+                            <span>Number zero</span>
+                        </div>
+
+                        <div className="letter-card">
+                            <b>O</b>
+                            <span>Letter O</span>
+                        </div>
+                    </div>
+
+                    <div className="letter-pair">
+                        <div className="letter-card">
+                            <b>1</b>
+                            <span>Number one</span>
+                        </div>
+
+                        <div className="letter-card">
+                            <b className="record-glyph capital-i-glyph">I</b>
+                            <span>Capital letter I</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="instructions">
+                    <b>Keyboard shortcuts</b>
+                    <p>
+                        Press <kbd>Tab</kbd> to move to the next field. Press{" "}
+                        <kbd>Enter</kbd> to submit a completed record.
+                    </p>
+                </div>
+                <button
+                    className="primary large"
+                    onClick={() => setStage("practice")}
+                >
+                    Start <span>→</span>
+                </button>
             </SimpleStage>
         );
 
@@ -773,7 +867,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="PRACTICE"
                 title="Practice encoding task"
-                description="Learn the task mechanics. The researcher may clarify instructions during this stage."
+                description="This is only for getting a feel for the task. Practice results are not used as study measurements."
                 participantId={participantId}
             >
                 <div className="instructions">
@@ -786,6 +880,10 @@ export default function App() {
                             Use <kbd>Tab</kbd> between fields and{" "}
                             <kbd>Enter</kbd> to submit.
                         </li>
+                        <li>
+                            Type capital and lower-case letters exactly as
+                            shown. Capitalization is not changed automatically.
+                        </li>
                         <li>Incorrect records must be corrected.</li>
                     </ul>
                 </div>
@@ -796,6 +894,9 @@ export default function App() {
                 <button className="primary large" onClick={startPractice}>
                     Start practice <span>→</span>
                 </button>
+                <button className="secondary large" onClick={skipPractice}>
+                    I am ready — skip practice <span>→</span>
+                </button>
             </SimpleStage>
         );
 
@@ -804,7 +905,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="SILENT BASELINE"
                 title="Baseline calibration"
-                description="Complete the same task without music. These results become your personal adaptive-music reference."
+                description="This is the critical measured task. Complete the same task without music; its results become your personal adaptive-music reference."
                 participantId={participantId}
             >
                 <div className="timer-card">
@@ -1058,6 +1159,17 @@ export default function App() {
                         </div>
                         <h2>Enter the source record</h2>
                     </div>
+                    <div
+                        className="task-shortcuts"
+                        aria-label="Keyboard shortcuts"
+                    >
+                        <b>
+                            <kbd>Tab</kbd> next field
+                        </b>
+                        <b>
+                            <kbd>Enter</kbd> submit
+                        </b>
+                    </div>
                 </div>
                 {record && (
                     <div className="grid">
@@ -1067,6 +1179,10 @@ export default function App() {
                         </section>
                         <form className="panel" onSubmit={submit}>
                             <div className="panel-label">ENTRY FIELDS</div>
+                            <p className="entry-note">
+                                Type upper- and lower-case letters exactly as
+                                displayed. Capitalization is not automatic.
+                            </p>
                             <Field
                                 label="Record Code"
                                 value={form.recordCode}
@@ -1110,7 +1226,11 @@ export default function App() {
                 {audioMessage && !isPractice && (
                     <p className="error">{audioMessage}</p>
                 )}
-                {message && <p className="error" role="alert">{message}</p>}
+                {message && (
+                    <p className="error" role="alert">
+                        {message}
+                    </p>
+                )}
             </section>
         </main>
     );

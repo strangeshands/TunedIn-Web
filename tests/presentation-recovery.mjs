@@ -24,6 +24,7 @@ async function setup() {
     await page.getByRole("button", { name: "Save participant & continue" }).click();
     const { sessionId } = await (await created).json();
     if (process.env.FUF_TEST_SESSION_IDS) appendFileSync(process.env.FUF_TEST_SESSION_IDS, sessionId + "\n");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
     await page.getByRole("button", { name: "Start practice" }).waitFor();
     return { context, page, sessionId };
 }

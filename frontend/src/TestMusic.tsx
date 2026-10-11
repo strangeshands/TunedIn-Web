@@ -66,9 +66,9 @@ export default function TestMusic() {
         medianFped >= TEST_CALIBRATION.medianFpedSeconds * 1.2 ||
         errorRate > 15
             ? "reduced"
-            : medianIl <= TEST_CALIBRATION.medianIlSeconds * 0.9 &&
-                medianFped <= TEST_CALIBRATION.medianFpedSeconds * 0.9 &&
-                errorRate <= 5
+            : medianIl <= TEST_CALIBRATION.medianIlSeconds * 0.6 &&
+                medianFped <= TEST_CALIBRATION.medianFpedSeconds * 0.6 &&
+                errorRate <= 3
               ? "elevated"
               : "baseline";
 
