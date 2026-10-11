@@ -898,7 +898,7 @@ export default function App() {
                             <b>Read each character carefully</b>
                             <p>
                                 Record codes may contain capital and lower-case
-                                letters. Type each value exactly as displayed.
+                                letters. Type each value exactly as displayed, the inputs are case-sensitive.
                             </p>
                             <p>
                                 Refer to the commonly mistaken characters below.
