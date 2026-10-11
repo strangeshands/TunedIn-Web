@@ -91,6 +91,8 @@ export default function App() {
     const [audioVolume, setAudioVolume] = useState(0.75);
     const [testAudioPlaying, setTestAudioPlaying] = useState(false);
     const [savingMessage, setSavingMessage] = useState("");
+    const [introductionStep, setIntroductionStep] = useState(0);
+    const [shortcutMessage, setShortcutMessage] = useState("");
     const firstKey = useRef(false);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const completing = useRef(false);
@@ -227,6 +229,8 @@ export default function App() {
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             localStorage.setItem("tunedIn.participantId", clean);
             setParticipantId(clean);
+            setIntroductionStep(0);
+            setShortcutMessage("");
             setStage("introduction");
         } catch (error) {
             setMessage(String(error));
@@ -284,7 +288,9 @@ export default function App() {
             const resumed = await audio.current.resume();
             setTestAudioPlaying(resumed);
             if (!resumed)
-                setAudioMessage("Audio could not resume. Try playing it again.");
+                setAudioMessage(
+                    "Audio could not resume. Try playing it again.",
+                );
             return;
         }
         const result = await playTrack(musicCatalogue.baseline[0] ?? null);
@@ -742,113 +748,223 @@ export default function App() {
     if (stage === "introduction")
         return (
             <SimpleStage
-                eyebrow="PARTICIPANT INTRODUCTION"
-                title="Before you begin"
-                description="You will first see a practice task, then complete the silent baseline calibration."
+                eyebrow={`PARTICIPANT INTRODUCTION · ${introductionStep + 1} OF 3`}
+                title={
+                    introductionStep === 0
+                        ? "Session flow"
+                        : introductionStep === 1
+                          ? "What you will do & keyboard shortcuts"
+                          : "Reading source codes"
+                }
+                description={
+                    introductionStep === 0
+                        ? "Read through each stage before beginning the task."
+                        : introductionStep === 1
+                          ? "Copy the displayed source values, then try the shortcuts before Practice."
+                          : "Read every character exactly as it appears."
+                }
                 participantId={participantId}
             >
-                <div className="instructions important-note">
-                    <b>Session Instructions</b>
-                    <ol>
-                        <li>
-                            <strong>Practice:</strong> Use this stage to get
-                            familiar with copying the records. Practice is not
-                            used for study measurements.
-                        </li>
-                        <li>
-                            <strong>Silent Baseline Calibration: </strong>
-                            Complete the same task without music. <b>This is the
-                            critical measured stage</b> as it creates your personal
-                            reference for the Adaptive Music condition.
-                        </li>
-                        <li>
-                            <strong>Audio Comfort Check:</strong> Listen to a
-                            short sample and choose a comfortable volume before
-                            the music conditions begin.
-                        </li>
-                        <li>
-                            <strong>Timed task blocks:</strong> Complete the
-                            record-copying task under the assigned conditions.
-                            These blocks provide the study data used to compare
-                            performance with no music, static music, and
-                            adaptive music.
-                        </li>
-                    </ol>
-                </div>
-                <div className="instructions">
-                    <b>What you will do</b>
-                    <p>
-                        Copy each source record into three separate entry
-                        fields, then submit it for checking.
-                    </p>
-                    <div className="task-overview" aria-label="Task overview">
-                        <span>1. Read source record</span>
-                        <i aria-hidden="true">→</i>
-                        <span>2. Fill three fields</span>
-                        <i aria-hidden="true">→</i>
-                        <span>3. Submit record</span>
-                    </div>
-                </div>
-                <div className="instructions">
-                    <b>Read each character carefully</b>
-                    <p>
-                        Some characters can look alike, including <code>0</code>{" "}
-                        and <code>O</code>, or <code>1</code> and <code>I</code>
-                        . Record codes may contain both capital and lower-case
-                        letters. Type each value exactly as displayed.
-                    </p>
-                </div>
-                <div className="letters">
-                    <div className="letter-pair">
-                        <div className="letter-card">
-                            <b className="record-glyph zero-glyph">0</b>
-                            <span>Number zero</span>
+                {introductionStep === 0 && (
+                    <>
+                        <div className="instructions important-note">
+                            <b>Session flow</b>
+                            <ol>
+                                <li>
+                                    <strong>Practice:</strong> Get familiar with
+                                    copying the records. Practice is not used
+                                    for study measurements.
+                                </li>
+                                <li>
+                                    <strong>
+                                        Silent Baseline Calibration:
+                                    </strong>{" "}
+                                    Complete the task without music. This
+                                    critical measured stage creates your
+                                    personal reference for Adaptive Music.
+                                </li>
+                                <li>
+                                    <strong>Audio Comfort Check:</strong> Listen
+                                    to a short sample and choose a comfortable
+                                    volume.
+                                </li>
+                                <li>
+                                    <strong>Timed task blocks:</strong> Complete
+                                    the task under the assigned conditions.
+                                    These blocks provide the study data used to
+                                    compare no music, static music, and adaptive
+                                    music.
+                                </li>
+                            </ol>
                         </div>
+                        <button
+                            className="primary large"
+                            onClick={() => setIntroductionStep(1)}
+                        >
+                            Next <span>→</span>
+                        </button>
+                    </>
+                )}
 
-                        <div className="letter-card">
-                            <b>O</b>
-                            <span>Letter O</span>
+                {introductionStep === 1 && (
+                    <>
+                        <div className="instructions">
+                            <b>Copy one source record at a time</b>
+                            <p>
+                                Read the source record, copy each value into its
+                                matching field, then submit the record for
+                                checking.
+                            </p>
+                            <div
+                                className="task-overview"
+                                aria-label="Task overview"
+                            >
+                                <span>1. Read source record</span>
+                                <i aria-hidden="true">→</i>
+                                <span>2. Fill the matching fields</span>
+                                <i aria-hidden="true">→</i>
+                                <span>3. Submit record</span>
+                            </div>
                         </div>
-                    </div>
+                        <div className="instructions">
+                            <b>Use the keyboard to work faster</b>
+                            <p>
+                                Press <kbd>Tab</kbd> to move to the next field.
+                                Press <kbd>Enter</kbd> to submit a record. Try
+                                it in the example below.
+                            </p>
+                        </div>
+                        <form
+                            className="intro-task-example"
+                            aria-label="Example task screen"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                setShortcutMessage("Enter pressed, submitted.");
+                            }}
+                        >
+                            <div className="panel">
+                                <div className="panel-label">SOURCE RECORD</div>
+                                <Source
+                                    record={{
+                                        id: "example-source",
+                                        recordCode: "a0I-754",
+                                        batchCode: "fE-19",
+                                        quantity: "954",
+                                    }}
+                                />
+                            </div>
+                            <div className="panel">
+                                <div className="panel-label">ENTRY FIELDS</div>
+                                <label className="field">
+                                    <span>Record Code</span>
+                                    <input autoFocus autoComplete="off" />
+                                </label>
+                                <label className="field">
+                                    <span>Batch Code</span>
+                                    <input autoComplete="off" />
+                                </label>
+                                <label className="field">
+                                    <span>Quantity</span>
+                                    <input
+                                        autoComplete="off"
+                                        inputMode="numeric"
+                                    />
+                                </label>
+                                <button className="secondary" type="submit">
+                                    Submit practice record
+                                </button>
+                                {shortcutMessage && (
+                                    <p
+                                        className="shortcut-confirmation"
+                                        role="status"
+                                    >
+                                        {shortcutMessage}
+                                    </p>
+                                )}
+                            </div>
+                        </form>
+                        <button
+                            className="primary large"
+                            onClick={() => setIntroductionStep(2)}
+                        >
+                            Next <span>→</span>
+                        </button>
+                    </>
+                )}
 
-                    <div className="letter-pair">
-                        <div className="letter-card">
-                            <b>1</b>
-                            <span>Number one</span>
+                {introductionStep === 2 && (
+                    <>
+                        <div className="instructions important-note">
+                            <b>Read each character carefully</b>
+                            <p>
+                                Record codes may contain capital and lower-case
+                                letters. Type each value exactly as displayed.
+                            </p>
+                            <p>
+                                Refer to the commonly mistaken characters below.
+                                The number <b>0</b> has a line through its
+                                centre, while <b>O</b> is a letter. The capital
+                                letter <b>I</b> has horizontal bars at the top
+                                and bottom, while <b>1</b> is the number one.
+                                Also compare <b>6</b> carefully with the capital letter{" "} <b>G</b>.
+                            </p>
                         </div>
-
-                        <div className="letter-card">
-                            <b className="record-glyph capital-i-glyph">I</b>
-                            <span>Capital letter I</span>
+                        <div
+                            className="letters"
+                            aria-label="Similar characters guide"
+                        >
+                            <div className="letter-pair">
+                                <div className="letter-card">
+                                    <b>0</b>
+                                    <span>Number zero</span>
+                                </div>
+                                <div className="letter-card">
+                                    <b>O</b>
+                                    <span>Letter O</span>
+                                </div>
+                            </div>
+                            <div className="letter-pair">
+                                <div className="letter-card">
+                                    <b>1</b>
+                                    <span>Number one</span>
+                                </div>
+                                <div className="letter-card">
+                                    <b>I</b>
+                                    <span>Capital letter I</span>
+                                </div>
+                            </div>
+                            <div className="letter-pair">
+                                <div className="letter-card">
+                                    <b>6</b>
+                                    <span>Number six</span>
+                                </div>
+                                <div className="letter-card">
+                                    <b>G</b>
+                                    <span>Capital letter G</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="letter-pair">
-                        <div className="letter-card">
-                            <b>6</b>
-                            <span>Number six</span>
+                        <div className="intro-source-example">
+                            <div className="panel-label">
+                                EXAMPLE SOURCE RECORD
+                            </div>
+                            <Source
+                                record={{
+                                    id: "example-reading",
+                                    recordCode: "O1g-60I",
+                                    batchCode: "bG-06",
+                                    quantity: "106",
+                                }}
+                            />
                         </div>
-
-                        <div className="letter-card">
-                            <b className="record-glyph capital-i-glyph">G</b>
-                            <span>Capital letter G</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="instructions">
-                    <b>Keyboard shortcuts</b>
-                    <p>
-                        Each record has three fields. Press <kbd>Tab</kbd> to
-                        move through Record Code, Batch Code, and Quantity.
-                        Press <kbd>Enter</kbd> to submit a completed record.
-                    </p>
-                </div>
-                <button
-                    className="primary large"
-                    onClick={() => setStage("practice")}
-                >
-                    Start <span>→</span>
-                </button>
+                        <button
+                            className="primary large"
+                            onClick={() => setStage("practice")}
+                        >
+                            Start <span>→</span>
+                        </button>
+                    </>
+                )}
             </SimpleStage>
         );
 
@@ -894,14 +1010,18 @@ export default function App() {
                                 : "Play test audio"}
                         </button>
                         <label className="volume-control">
-                            <span>Test volume: {Math.round(audioVolume * 100)}%</span>
+                            <span>
+                                Test volume: {Math.round(audioVolume * 100)}%
+                            </span>
                             <input
                                 type="range"
                                 min="0"
                                 max="100"
                                 value={Math.round(audioVolume * 100)}
                                 onChange={(event) =>
-                                    setAudioVolume(Number(event.target.value) / 100)
+                                    setAudioVolume(
+                                        Number(event.target.value) / 100,
+                                    )
                                 }
                             />
                         </label>
@@ -1023,7 +1143,10 @@ export default function App() {
                         record{calibration.validatedRecords === 1 ? "" : "s"}.
                     </span>
                 </div>
-                <div className="block-results-grid calibration-details" aria-hidden="true">
+                <div
+                    className="block-results-grid calibration-details"
+                    aria-hidden="false"
+                >
                     <Result
                         label="Median IL"
                         value={

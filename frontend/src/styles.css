@@ -388,7 +388,7 @@ footer {
 }
 .letters {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     margin-top: 14px;
 }
@@ -432,6 +432,88 @@ footer {
     color: #66716b;
     font-size: 11px;
     text-align: center;
+}
+.zero-glyph,
+.capital-i-glyph {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    min-width: 0.75em;
+}
+.zero-glyph::after {
+    position: absolute;
+    width: 0.08em;
+    height: 0.85em;
+    border-radius: 99px;
+    background: currentColor;
+    content: "";
+    transform: rotate(38deg);
+}
+.capital-i-glyph::before,
+.capital-i-glyph::after {
+    position: absolute;
+    width: 0.75em;
+    height: 0.1em;
+    border-radius: 99px;
+    background: currentColor;
+    content: "";
+}
+
+.intro-task-example {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+}
+.intro-task-example .panel {
+    padding: 20px;
+}
+.intro-task-example .source-row {
+    padding: 14px;
+}
+.intro-task-example .field {
+    margin-bottom: 12px;
+}
+.intro-task-example .field:last-child {
+    margin-bottom: 0;
+}
+.intro-source-example {
+    margin: 22px 0;
+    padding: 18px;
+    border: 1px solid #dfe5e0;
+    border-radius: 14px;
+    background: #f4f7f4;
+}
+.intro-source-example .panel-label {
+    margin-bottom: 14px;
+}
+.intro-source-example .source-row {
+    background: white;
+}
+.shortcut-demo {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid #dfe5e0;
+    border-radius: 14px;
+    background: #f4f7f4;
+}
+.shortcut-demo > p {
+    margin: 8px 0 18px;
+    color: #5d6962;
+    font-size: 13px;
+    line-height: 1.55;
+}
+.shortcut-demo .secondary {
+    width: 100%;
+    margin: 0;
+}
+.shortcut-confirmation {
+    margin: 12px 0 0 !important;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #e7f0e9;
+    color: #315b40 !important;
+    font-weight: 750;
 }
 .note {
     color: #8a938e;
@@ -809,6 +891,9 @@ footer {
     .block-results-grid,
     .participant-block-stats {
         grid-template-columns: 1fr 1fr;
+    }
+    .intro-task-example {
+        grid-template-columns: 1fr;
     }
     .download-actions {
         grid-template-columns: 1fr;
