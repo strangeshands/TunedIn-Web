@@ -95,6 +95,8 @@ export default function App() {
     const [shortcutMessage, setShortcutMessage] = useState("");
     const firstKey = useRef(false);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
+    const introPracticeForm = useRef<HTMLFormElement | null>(null);
+    const introRecordCodeInput = useRef<HTMLInputElement | null>(null);
     const completing = useRef(false);
     const endingDuration = useRef<number | null>(null);
     const endingBlockNumber = useRef<number | null>(null);
@@ -835,6 +837,7 @@ export default function App() {
                             </p>
                         </div>
                         <form
+                            ref={introPracticeForm}
                             className="intro-task-example"
                             aria-label="Example task screen"
                             onSubmit={(event) => {
@@ -857,7 +860,11 @@ export default function App() {
                                 <div className="panel-label">ENTRY FIELDS</div>
                                 <label className="field">
                                     <span>Record Code</span>
-                                    <input autoFocus autoComplete="off" />
+                                    <input
+                                        ref={introRecordCodeInput}
+                                        autoFocus
+                                        autoComplete="off"
+                                    />
                                 </label>
                                 <label className="field">
                                     <span>Batch Code</span>
@@ -872,6 +879,17 @@ export default function App() {
                                 </label>
                                 <button className="secondary" type="submit">
                                     Submit practice record
+                                </button>
+                                <button
+                                    className="secondary"
+                                    type="button"
+                                    onClick={() => {
+                                        introPracticeForm.current?.reset();
+                                        setShortcutMessage("");
+                                        introRecordCodeInput.current?.focus();
+                                    }}
+                                >
+                                    Reset practice fields
                                 </button>
                                 {shortcutMessage && (
                                     <p
@@ -899,6 +917,7 @@ export default function App() {
                             <p>
                                 Record codes may contain capital and lower-case
                                 letters. Type each value exactly as displayed, the inputs are case-sensitive.
+                                Use <kbd>Shift</kbd> and/or <kbd>Caps Lock</kbd> when needed.
                             </p>
                             <p>
                                 Refer to the commonly mistaken characters below.
