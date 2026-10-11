@@ -831,7 +831,8 @@ export default function App() {
                         <div className="instructions">
                             <b>Use the keyboard to work faster</b>
                             <p>
-                                Press <kbd>Tab</kbd> to move to the next field.
+                                Press <kbd>Tab</kbd> to move to the next field. You can press tab 3x or
+                                until you reach the "Quantity" field.
                                 Press <kbd>Enter</kbd> to submit a record. Try
                                 it in the example below.
                             </p>
@@ -1131,7 +1132,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="SILENT BASELINE"
                 title="Baseline calibration"
-                description="This is the critical measured task. Perform as you normally would. No music will play, and your results become your personal adaptive-music reference."
+                description="This is the critical measured task. Perform the encoding task as you normally would. No music will play, and your results become your personal adaptive-music reference."
                 participantId={participantId}
             >
                 <div className="timer-card">
