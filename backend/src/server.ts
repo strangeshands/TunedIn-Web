@@ -57,8 +57,73 @@ const getSession = (id: string) => {
     if (!session) throw new Error("Session not found.");
     return session;
 };
+const participantKey = (participantId: string) =>
+    participantId.trim().toLocaleLowerCase();
 const appendEvent = (session: Session, event: Omit<TaskEvent, "sequence">) =>
     session.events.push({ ...event, sequence: session.events.length + 1 });
+type RecoveryStage =
+    | "introduction"
+    | "baseline-intro"
+    | "calibration-results"
+    | "audio-check"
+    | "block-intro"
+    | "complete"
+    | "active-block";
+const recoveryCheckpoint = (session: Session) => {
+    if (session.endedEarlyAt)
+        return {
+            stage: "complete" as RecoveryStage,
+            blockIndex: session.conditionOrder.length,
+            activeBlockNumber: null,
+            calibration: null,
+        };
+    const activeBlock = session.blocks.find((block) => block.endedAt === null);
+    if (activeBlock)
+        return {
+            stage: "active-block" as RecoveryStage,
+            blockIndex: Math.max(0, activeBlock.number - 2),
+            activeBlockNumber: activeBlock.number,
+            calibration: null,
+        };
+    if (!session.blocks.length)
+        return {
+            stage: "introduction" as RecoveryStage,
+            blockIndex: 0,
+            activeBlockNumber: null,
+            calibration: null,
+        };
+    if (!session.blocks.some((block) => block.number === 1))
+        return {
+            stage: "baseline-intro" as RecoveryStage,
+            blockIndex: 0,
+            activeBlockNumber: null,
+            calibration: null,
+        };
+    const calibration = calculateBlockMeasures(session, 1);
+    if (!session.comfortCheckCompletedAt)
+        return {
+            stage: "calibration-results" as RecoveryStage,
+            blockIndex: 0,
+            activeBlockNumber: null,
+            calibration,
+        };
+    const completedExperimentalBlocks = session.blocks.filter(
+        (block) => block.number >= 2 && block.endedAt !== null,
+    ).length;
+    if (completedExperimentalBlocks >= session.conditionOrder.length)
+        return {
+            stage: "complete" as RecoveryStage,
+            blockIndex: session.conditionOrder.length,
+            activeBlockNumber: null,
+            calibration: null,
+        };
+    return {
+        stage: "block-intro" as RecoveryStage,
+        blockIndex: completedExperimentalBlocks,
+        activeBlockNumber: null,
+        calibration: null,
+    };
+};
 
 app.get("/api/health", (_request, response) => {
     const catalogue = loadMusicCatalogue();
@@ -113,6 +178,16 @@ app.post("/api/sessions", (request, response) => {
         !conditionOrder?.length
     )
         throw new Error("Participant ID and order are required.");
+    if (
+        [...sessions.values()].some(
+            (session) =>
+                session.studyMode === studyMode &&
+                participantKey(session.participantId) === participantKey(participantId),
+        )
+    )
+        throw new Error(
+            "This participant already has a saved session in this mode. Use Recover saved session instead.",
+        );
     const now = new Date().toISOString();
     const musicCatalogue = loadMusicCatalogue();
     const session: Session = {
@@ -130,6 +205,7 @@ app.post("/api/sessions", (request, response) => {
         audioIntegration: "rule-engine",
         comfortVolumePercent: null,
         comfortCheckCompletedAt: null,
+        endedEarlyAt: null,
         blocks: [],
         events: [],
         musicTracks: Object.values(musicCatalogue).flat(),
@@ -138,6 +214,28 @@ app.post("/api/sessions", (request, response) => {
     };
     saveSession(session);
     response.status(201).json({ sessionId: session.id });
+});
+
+app.get("/api/sessions/recover/:participantId", (request, response) => {
+    const participantId = String(request.params.participantId ?? "").trim();
+    const studyMode = request.query.studyMode as StudyMode;
+    if (!['Formative', 'Pilot', 'Main'].includes(studyMode))
+        return response.status(400).json({ error: "Choose a valid study mode." });
+    const session = [...sessions.values()].find(
+        (item) =>
+            item.studyMode === studyMode &&
+            participantKey(item.participantId) === participantKey(participantId),
+    );
+    if (!session) return response.status(404).json({ error: "No saved session was found." });
+    response.json({ session, checkpoint: recoveryCheckpoint(session) });
+});
+
+app.post("/api/sessions/:sessionId/recovery/end", (request, response) => {
+    const session = getSession(request.params.sessionId);
+    session.endedEarlyAt ??= new Date().toISOString();
+    saveSession(session);
+    writeExports(session);
+    response.json({ ok: true });
 });
 
 app.post(

@@ -5,6 +5,7 @@ import type {
     MusicDecision,
     MusicTransition,
     OrderId,
+    Session,
     SourceRecord,
     StudyMode,
     StudyTiming,
@@ -108,6 +109,32 @@ export function createSession(data: {
     conditionOrder: Condition[];
 }) {
     return request<{ sessionId: string }>("/api/sessions", data);
+}
+
+export type RecoveryCheckpoint = {
+    stage:
+        | "introduction"
+        | "baseline-intro"
+        | "calibration-results"
+        | "audio-check"
+        | "block-intro"
+        | "complete"
+        | "active-block";
+    blockIndex: number;
+    activeBlockNumber: number | null;
+    calibration: BlockMeasures | null;
+};
+
+/** Finds the one saved session assigned to a participant ID. */
+export function recoverSession(participantId: string, studyMode: StudyMode) {
+    return request<{ session: Session; checkpoint: RecoveryCheckpoint }>(
+        `/api/sessions/recover/${encodeURIComponent(participantId)}?studyMode=${encodeURIComponent(studyMode)}`,
+    );
+}
+
+/** Records that the researcher ended a session after an interrupted block. */
+export function endRecoveredSession(sessionId: string) {
+    return request<{ ok: true }>(`/api/sessions/${sessionId}/recovery/end`, {});
 }
 
 /**

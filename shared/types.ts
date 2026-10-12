@@ -120,6 +120,7 @@ export type Session = {
     audioIntegration: "rule-engine";
     comfortVolumePercent: number | null;
     comfortCheckCompletedAt: string | null;
+    endedEarlyAt: string | null;
     blocks: Block[];
     events: TaskEvent[];
     musicTracks: MusicTrack[];

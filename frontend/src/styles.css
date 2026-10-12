@@ -507,6 +507,12 @@ footer {
     width: 100%;
     margin: 0;
 }
+.download-zip {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+}
 .shortcut-confirmation {
     margin: 12px 0 0 !important;
     padding: 10px 12px;

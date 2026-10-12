@@ -20,6 +20,7 @@ import type {
 import {
     confirmComfortCheck,
     createSession,
+    endRecoveredSession,
     evaluateAdaptiveMusic,
     exportUrl,
     finishApiBlock,
@@ -28,6 +29,7 @@ import {
     getPlaybackConfig,
     getStudySetup,
     recordMusicTransition,
+    recoverSession,
     sendTaskEvent,
     startApiBlock,
     submitRecord,
@@ -47,11 +49,13 @@ type Stage =
     | "block-intro"
     | "task"
     | "saving"
+    | "recovery"
     | "block-results"
     | "handover"
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
 const empty: FormValues = { recordCode: "", batchCode: "", quantity: "" };
+const activeSessionStorageKey = "tunedIn.activeSessionId";
 
 const fallbackTiming: StudyTiming = {
     practiceSeconds: 60 * 2,
@@ -73,6 +77,12 @@ export default function App() {
     const [formativeTiming, setFormativeTiming] =
         useState<StudyTiming>(fallbackTiming);
     const [sessionId, setSessionId] = useState<string | null>(null);
+    const [sessionConditionOrder, setSessionConditionOrder] = useState<
+        Condition[] | null
+    >(null);
+    const [recoveryActiveBlock, setRecoveryActiveBlock] = useState<number | null>(
+        null,
+    );
     const [blockIndex, setBlockIndex] = useState(0);
     const [record, setRecord] = useState<SourceRecord | null>(null);
     const [form, setForm] = useState<FormValues>(empty);
@@ -110,7 +120,8 @@ export default function App() {
         blockNumber: number;
     } | null>(null);
     const conditionOrder =
-        studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []);
+        sessionConditionOrder ??
+        (studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []));
     const condition = conditionOrder[blockIndex] ?? "No music";
     const showConditionToParticipant = studyMode === "Formative";
     const blockLabel = `Block ${blockIndex + 1} of ${conditionOrder.length}`;
@@ -229,13 +240,58 @@ export default function App() {
                 timing,
             });
             setSessionId(response.sessionId);
+            setSessionConditionOrder(conditionOrder);
             queue.current = new EventQueue(response.sessionId);
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             localStorage.setItem("tunedIn.participantId", clean);
+            localStorage.setItem(activeSessionStorageKey, response.sessionId);
             setParticipantId(clean);
             setIntroductionStep(0);
             setShortcutMessage("");
             setStage("introduction");
+        } catch (error) {
+            setMessage(String(error));
+        }
+    }
+
+    async function recoverSavedParticipant() {
+        const clean = participantId.trim();
+        if (!clean) return;
+        try {
+            const { session, checkpoint } = await recoverSession(
+                clean,
+                studyMode,
+            );
+            setSessionId(session.id);
+            setSessionConditionOrder(session.conditionOrder);
+            setParticipantId(session.participantId);
+            setStudyMode(session.studyMode);
+            setOrderId(session.orderId);
+            setConfiguredTiming(session.timing);
+            setFormativeTiming(session.timing);
+            setBlockIndex(checkpoint.blockIndex);
+            setCalibration(checkpoint.calibration);
+            setRecoveryActiveBlock(checkpoint.activeBlockNumber);
+            queue.current = new EventQueue(session.id);
+            localStorage.setItem("tunedIn.participantId", session.participantId);
+            localStorage.setItem(activeSessionStorageKey, session.id);
+            await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
+            if (checkpoint.stage === "active-block") setStage("recovery");
+            else {
+                setIntroductionStep(0);
+                setStage(checkpoint.stage);
+            }
+        } catch (error) {
+            setMessage(String(error));
+        }
+    }
+
+    async function endInterruptedSession() {
+        if (!sessionId) return;
+        try {
+            await endRecoveredSession(sessionId);
+            setRecoveryActiveBlock(null);
+            setStage("complete");
         } catch (error) {
             setMessage(String(error));
         }
@@ -613,6 +669,8 @@ export default function App() {
         audio.current.stop();
         setStage("participant");
         setSessionId(null);
+        setSessionConditionOrder(null);
+        setRecoveryActiveBlock(null);
         setBlockIndex(0);
         setRecord(null);
         setForm(empty);
@@ -744,7 +802,45 @@ export default function App() {
                     >
                         Save participant & continue <span>→</span>
                     </button>
+                    <button
+                        className="secondary large"
+                        type="button"
+                        disabled={!participantId.trim()}
+                        onClick={() => void recoverSavedParticipant()}
+                    >
+                        Recover saved session
+                    </button>
                 </form>
+                {message && <p className="error">{message}</p>}
+            </SimpleStage>
+        );
+
+    if (stage === "recovery")
+        return (
+            <SimpleStage
+                eyebrow="RESEARCHER RECOVERY"
+                title="Timed block was interrupted"
+                description="The participant’s saved events and completed blocks are preserved. Do not resume this timed block because its timing is no longer valid."
+                participantId={participantId}
+            >
+                <div className="instructions important-note">
+                    <b>Session safely preserved</b>
+                    <p>
+                        {recoveryActiveBlock === 0
+                            ? "Practice was interrupted."
+                            : recoveryActiveBlock === 1
+                              ? "Silent Baseline Calibration was interrupted."
+                              : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}
+                        {" "}End the session to keep its saved data and download
+                        the available results.
+                    </p>
+                </div>
+                <button
+                    className="primary large"
+                    onClick={() => void endInterruptedSession()}
+                >
+                    End session and open downloads <span>→</span>
+                </button>
                 {message && <p className="error">{message}</p>}
             </SimpleStage>
         );
@@ -1313,10 +1409,10 @@ export default function App() {
                 description={`Participant ${participantId} has completed all ${conditionOrder.length} configured conditions.`}
                 participantId={participantId}
             >
-                <div className="download-actions">
+                <div>
                     {sessionId && (
                         <a
-                            className="secondary"
+                            className="secondary download-zip"
                             href={exportUrl(sessionId, "results.zip")}
                         >
                             Download results ZIP

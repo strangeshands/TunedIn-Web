@@ -13,6 +13,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 - `config_version`, `build_version`, and `task_version` identify the configuration, formative build, and task definition captured when the session began.
 - `configured_practice_seconds`, `configured_baseline_seconds`, and `configured_block_seconds` record the durations locked in when the session began.
 - `comfort_volume_percent` is the 0–100 browser playback volume confirmed during the Audio Comfort Check.
+- Participant IDs are unique within each study mode. The same ID may be used once in Formative, once in Pilot, and once in Main; a duplicate ID within the selected mode must use the researcher recovery flow.
 
 ## Export files
 
@@ -107,4 +108,4 @@ This file records the browser outcome after an adaptive decision. It can be empt
 
 ## `session.json`
 
-The complete saved session: participant and order data, configuration/build/task versions, selected comfort volume and comfort-check timestamp, blocks, raw events, captured music catalogue, adaptive decisions, playback transitions, and calculated block measures.
+The complete saved session: participant and order data, configuration/build/task versions, selected comfort volume and comfort-check timestamp, blocks, raw events, captured music catalogue, adaptive decisions, playback transitions, calculated block measures, and `endedEarlyAt` when a researcher closes an interrupted session through recovery.
