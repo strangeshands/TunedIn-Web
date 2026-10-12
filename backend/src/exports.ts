@@ -44,6 +44,10 @@ export function exportFiles(session: Session) {
         }
         records.set(key, row);
     }
+    const interruptedBlocks = session.interruptedBlocks ?? [];
+    const blockCompletion = new Map(
+        session.blocks.map((block) => [block.number, block.endedAt !== null]),
+    );
     const blockCsv = csv(
         [
             "participant_id",
@@ -57,6 +61,7 @@ export function exportFiles(session: Session) {
             "configured_baseline_seconds",
             "configured_block_seconds",
             "block",
+            "attempt_status",
             "condition",
             "duration_seconds",
             "records_presented",
@@ -70,7 +75,35 @@ export function exportFiles(session: Session) {
             "correction_cycles",
             "correction_cycles_per_validated_record",
         ],
-        measures.map((item) => [
+        [
+            ...interruptedBlocks.map((item) => [
+                session.participantId,
+                session.id,
+                session.studyMode,
+                session.configVersion,
+                session.buildVersion,
+                session.taskVersion,
+                session.comfortVolumePercent,
+                session.timing.practiceSeconds,
+                session.timing.baselineSeconds,
+                session.timing.blockSeconds,
+                item.number,
+                "interrupted_restart",
+                item.condition,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ]),
+            ...measures.map((item) => [
             session.participantId,
             session.id,
             session.studyMode,
@@ -82,6 +115,7 @@ export function exportFiles(session: Session) {
             session.timing.baselineSeconds,
             session.timing.blockSeconds,
             item.block,
+            blockCompletion.get(item.block) ? "completed" : "in_progress",
             item.condition,
             item.durationSeconds,
             item.recordsPresented,
@@ -94,7 +128,8 @@ export function exportFiles(session: Session) {
             item.medianTimeToSuccessfulValidationMs,
             item.correctionCycles,
             item.correctionCyclesPerValidatedRecord,
-        ]),
+            ]),
+        ],
     );
     const recordCsv = csv(
         [

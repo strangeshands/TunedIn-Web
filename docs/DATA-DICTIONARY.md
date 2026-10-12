@@ -23,7 +23,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 | `session.json` | One session snapshot | Complete local audit record. |
 | `events.jsonl` | One event per line | Raw evidence for measures. |
 | `records.csv` | One row per record | Record-level timing and validation data. |
-| `blocks.csv` | One row per block | Block-level measures. |
+| `blocks.csv` | One row per completed or restarted block attempt | Block-level measures and interrupted-attempt markers. |
 | `decisions.csv` | One adaptive evaluation | Rule input, selected state, and track. |
 | `transitions.csv` | One adaptive playback attempt | Browser playback outcome. |
 | `tracks.csv` | One approved music file | Frozen session playback catalogue. |
@@ -37,6 +37,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 | `comfort_volume_percent` | Playback volume selected during the Audio Comfort Check, from 0 to 100. |
 | `configured_practice_seconds`, `configured_baseline_seconds`, `configured_block_seconds` | Timing snapshot used for this session. |
 | `block` | `0` practice, `1` calibration, `2`–`4` experimental. |
+| `attempt_status` | `completed` for a finished timed attempt; `in_progress` while a running block has not yet ended. `interrupted_restart` is an intentionally empty row written when an unexpected interruption caused that block to restart from 0:00. |
 | `condition` | `No music`, `Static music`, or `Adaptive music`; practice and calibration are always `No music`. |
 | `duration_seconds` | Duration supplied when the block ended. |
 | `records_presented`, `validated_records` | Records shown and eventually accepted. |

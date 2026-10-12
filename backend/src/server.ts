@@ -206,6 +206,7 @@ app.post("/api/sessions", (request, response) => {
         comfortVolumePercent: null,
         comfortCheckCompletedAt: null,
         endedEarlyAt: null,
+        interruptedBlocks: [],
         blocks: [],
         events: [],
         musicTracks: Object.values(musicCatalogue).flat(),
@@ -236,6 +237,57 @@ app.post("/api/sessions/:sessionId/recovery/end", (request, response) => {
     saveSession(session);
     writeExports(session);
     response.json({ ok: true });
+});
+
+function createStartedBlock(session: Session, number: number, condition: Condition) {
+    const initialMusicTrack = selectInitialTrack(
+        session.id,
+        number,
+        condition,
+        loadMusicCatalogue(),
+    );
+    const block: Block = {
+        number,
+        condition,
+        startedAt: new Date().toISOString(),
+        endedAt: null,
+        durationSeconds: null,
+        initialMusicTrackId: initialMusicTrack?.id ?? null,
+    };
+    session.blocks.push(block);
+    return {
+        record: generateRecord(0, number),
+        initialMusicTrackId: block.initialMusicTrackId,
+    };
+}
+
+/** Restarts an interrupted timed attempt from 0 while retaining an empty export row. */
+app.post("/api/sessions/:sessionId/recovery/restart-block", (request, response) => {
+    const session = getSession(request.params.sessionId);
+    const activeBlock = session.blocks.find((block) => block.endedAt === null);
+    if (!activeBlock) throw new Error("There is no interrupted block to restart.");
+
+    const number = activeBlock.number;
+    session.interruptedBlocks ??= [];
+    session.interruptedBlocks.push({
+        number,
+        condition: activeBlock.condition,
+        startedAt: activeBlock.startedAt,
+        interruptedAt: new Date().toISOString(),
+    });
+    session.blocks = session.blocks.filter((block) => block !== activeBlock);
+    session.events = session.events.filter((event) => event.blockNumber !== number);
+    session.musicDecisions = session.musicDecisions.filter(
+        (decision) => decision.blockNumber !== number,
+    );
+    session.musicTransitions = session.musicTransitions.filter(
+        (transition) => transition.blockNumber !== number,
+    );
+
+    const started = createStartedBlock(session, number, activeBlock.condition);
+    saveSession(session);
+    writeExports(session);
+    response.json({ ...started, blockNumber: number, condition: activeBlock.condition });
 });
 
 app.post(
@@ -271,26 +323,9 @@ app.post(
             condition !== assignedCondition
         )
             throw new Error("Invalid condition.");
-        const initialMusicTrack = selectInitialTrack(
-            session.id,
-            number,
-            condition,
-            loadMusicCatalogue(),
-        );
-        const block: Block = {
-            number,
-            condition,
-            startedAt: new Date().toISOString(),
-            endedAt: null,
-            durationSeconds: null,
-            initialMusicTrackId: initialMusicTrack?.id ?? null,
-        };
-        session.blocks.push(block);
+        const started = createStartedBlock(session, number, condition);
         saveSession(session);
-        response.json({
-            record: generateRecord(0, number),
-            initialMusicTrackId: block.initialMusicTrackId,
-        });
+        response.json(started);
     },
 );
 

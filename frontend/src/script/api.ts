@@ -137,6 +137,16 @@ export function endRecoveredSession(sessionId: string) {
     return request<{ ok: true }>(`/api/sessions/${sessionId}/recovery/end`, {});
 }
 
+/** Restarts an interrupted timed block from zero and returns its first record. */
+export function restartRecoveredBlock(sessionId: string) {
+    return request<{
+        record: SourceRecord;
+        initialMusicTrackId: string | null;
+        blockNumber: number;
+        condition: Condition;
+    }>(`/api/sessions/${sessionId}/recovery/restart-block`, {});
+}
+
 /**
  * Starts a practice or experimental block in the backend.
  *

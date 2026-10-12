@@ -30,6 +30,7 @@ import {
     getStudySetup,
     recordMusicTransition,
     recoverSession,
+    restartRecoveredBlock,
     sendTaskEvent,
     startApiBlock,
     submitRecord,
@@ -297,6 +298,25 @@ export default function App() {
         }
     }
 
+    async function restartInterruptedBlock() {
+        if (!sessionId) return;
+        try {
+            setMessage("");
+            audio.current.stop();
+            const response = await restartRecoveredBlock(sessionId);
+            queue.current = new EventQueue(sessionId);
+            setRecoveryActiveBlock(null);
+            setBlockIndex(Math.max(0, response.blockNumber - 2));
+            await activateStartedBlock(
+                response.blockNumber,
+                response.condition,
+                response,
+            );
+        } catch (error) {
+            setMessage(String(error));
+        }
+    }
+
     async function loadMusicCatalogue() {
         try {
             setMusicCatalogue(await getMusicCatalogue());
@@ -454,32 +474,34 @@ export default function App() {
                 number,
                 nextCondition,
             );
-            if (number > 0)
-                await startMusic(
-                    nextCondition,
-                    response.initialMusicTrackId,
-                    number,
-                );
-            const taskStarted = performance.now();
-            setRecord(response.record);
-            setForm(empty);
-            setErrors([]);
-            setSeconds(0);
-            firstKey.current = false;
-            completing.current = false;
-            setStarted(taskStarted);
-            setStage(
-                number === 0 ? "practice" : number === 1 ? "baseline" : "task",
-            );
-            await queue.current!.send({
-                blockNumber: number,
-                recordId: response.record.id,
-                eventType: "record_presented",
-                clientTimeMs: taskStarted,
-            });
+            await activateStartedBlock(number, nextCondition, response);
         } catch (error) {
             setMessage(String(error));
         }
+    }
+
+    async function activateStartedBlock(
+        number: number,
+        nextCondition: Condition,
+        response: { record: SourceRecord; initialMusicTrackId: string | null },
+    ) {
+        if (number > 0)
+            await startMusic(nextCondition, response.initialMusicTrackId, number);
+        const taskStarted = performance.now();
+        setRecord(response.record);
+        setForm(empty);
+        setErrors([]);
+        setSeconds(0);
+        firstKey.current = false;
+        completing.current = false;
+        setStarted(taskStarted);
+        setStage(number === 0 ? "practice" : number === 1 ? "baseline" : "task");
+        await queue.current!.send({
+            blockNumber: number,
+            recordId: response.record.id,
+            eventType: "record_presented",
+            clientTimeMs: taskStarted,
+        });
     }
 
     function startPractice() {
@@ -820,7 +842,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="RESEARCHER RECOVERY"
                 title="Timed block was interrupted"
-                description="The participant’s saved events and completed blocks are preserved. Do not resume this timed block because its timing is no longer valid."
+                description="Completed blocks are preserved. Restarting begins the interrupted timed block again from 0:00."
                 participantId={participantId}
             >
                 <div className="instructions important-note">
@@ -831,12 +853,18 @@ export default function App() {
                             : recoveryActiveBlock === 1
                               ? "Silent Baseline Calibration was interrupted."
                               : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}
-                        {" "}End the session to keep its saved data and download
-                        the available results.
+                        {" "}You may restart this block from 0:00. The interrupted
+                        attempt will appear as an empty row in the block export.
                     </p>
                 </div>
                 <button
                     className="primary large"
+                    onClick={() => void restartInterruptedBlock()}
+                >
+                    Restart this block from 0:00 <span>→</span>
+                </button>
+                <button
+                    className="secondary large"
                     onClick={() => void endInterruptedSession()}
                 >
                     End session and open downloads <span>→</span>

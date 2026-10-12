@@ -121,6 +121,8 @@ export type Session = {
     comfortVolumePercent: number | null;
     comfortCheckCompletedAt: string | null;
     endedEarlyAt: string | null;
+    /** Attempts abandoned after an unexpected interruption. They export as empty rows. */
+    interruptedBlocks: InterruptedBlock[];
     blocks: Block[];
     events: TaskEvent[];
     musicTracks: MusicTrack[];
@@ -134,4 +136,10 @@ export type Block = {
     endedAt: string | null;
     durationSeconds: number | null;
     initialMusicTrackId: string | null;
+};
+export type InterruptedBlock = {
+    number: number;
+    condition: Condition;
+    startedAt: string;
+    interruptedAt: string;
 };
