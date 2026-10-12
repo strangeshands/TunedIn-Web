@@ -140,7 +140,7 @@ export function evaluateAdaptiveRule(
 
         const elevated =
             current.medianInitiationLatencyMs <=
-                baseline.medianInitiationLatencyMs * 0.98 &&
+                baseline.medianInitiationLatencyMs * 0.95 &&
             current.medianFirstPassEntryDurationMs <=
                 baseline.medianFirstPassEntryDurationMs * 0.95 &&
             current.firstPassRecordErrorRate <= 0.5;
