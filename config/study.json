@@ -3,11 +3,25 @@
   "buildVersion": "fuf-iteration-1.0.1",
   "taskVersion": "fictional-records",
   "conditionOrders": {
-    "A": ["No music", "Static music", "Adaptive music"],
-    "B": ["Static music", "Adaptive music", "No music"],
-    "C": ["Adaptive music", "No music", "Static music"]
+    "A": [
+      "No music",
+      "Static music",
+      "Adaptive music"
+    ],
+    "B": [
+      "Static music",
+      "Adaptive music",
+      "No music"
+    ],
+    "C": [
+      "Adaptive music",
+      "No music",
+      "Static music"
+    ]
   },
-  "formativeConditionOrder": ["Adaptive music"],
+  "formativeConditionOrder": [
+    "Adaptive music"
+  ],
   "practiceSeconds": 120,
   "baselineSeconds": 120,
   "blockSeconds": 480,
@@ -27,8 +41,11 @@
     "rollingWindowSeconds": 60,
     "evaluationIntervalSeconds": 30,
     "minimumRecordCount": 3,
-    "slowerThanBaselinePercent": 0.15,
-    "fasterThanBaselinePercent": 0.15,
-    "errorRateIncrease": 0.1
+    "reducedIlMultiplier": 1.2,
+    "reducedFpedMultiplier": 1.2,
+    "reducedErrorRate": 0.15,
+    "elevatedIlMultiplier": 0.95,
+    "elevatedFpedMultiplier": 0.95,
+    "elevatedErrorRate": 0.05
   }
 }

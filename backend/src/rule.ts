@@ -114,11 +114,10 @@ export function evaluateAdaptiveRule(
     const previousState: AdaptiveState = previous?.selectedState ?? "baseline";
     // Adaptive blocks begin on the baseline track. Treat it as active before
     // the first decision, so a baseline result does not cause a false change.
-    const initialTrackId = session.blocks.find(
-        (block) => block.number === blockNumber,
-    )?.initialMusicTrackId ?? null;
-    const previousTrackId =
-        previous?.selectedTrackId ?? initialTrackId;
+    const initialTrackId =
+        session.blocks.find((block) => block.number === blockNumber)
+            ?.initialMusicTrackId ?? null;
+    const previousTrackId = previous?.selectedTrackId ?? initialTrackId;
     let selectedState: AdaptiveState = previousState;
     let reason =
         "Kept the previous state while waiting for enough recent records.";
@@ -131,19 +130,25 @@ export function evaluateAdaptiveRule(
         current.medianFirstPassEntryDurationMs !== null &&
         current.firstPassRecordErrorRate !== null
     ) {
+        const rules = config.adaptiveRules;
+
         const reduced =
             current.medianInitiationLatencyMs >=
-                baseline.medianInitiationLatencyMs * 1.2 ||
+                baseline.medianInitiationLatencyMs *
+                    rules.reducedIlMultiplier ||
             current.medianFirstPassEntryDurationMs >=
-                baseline.medianFirstPassEntryDurationMs * 1.2 ||
-            current.firstPassRecordErrorRate > 0.15;
+                baseline.medianFirstPassEntryDurationMs *
+                    rules.reducedFpedMultiplier ||
+            current.firstPassRecordErrorRate > rules.reducedErrorRate;
 
         const elevated =
             current.medianInitiationLatencyMs <=
-                baseline.medianInitiationLatencyMs * 0.95 &&
+                baseline.medianInitiationLatencyMs *
+                    rules.elevatedIlMultiplier &&
             current.medianFirstPassEntryDurationMs <=
-                baseline.medianFirstPassEntryDurationMs * 0.95 &&
-            current.firstPassRecordErrorRate <= 0.05;
+                baseline.medianFirstPassEntryDurationMs *
+                    rules.elevatedFpedMultiplier &&
+            current.firstPassRecordErrorRate <= rules.elevatedErrorRate;
 
         if (reduced) {
             selectedState = "reduced";

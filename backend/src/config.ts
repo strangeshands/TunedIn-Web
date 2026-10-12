@@ -30,8 +30,11 @@ export const config = JSON.parse(
         rollingWindowSeconds: number;
         evaluationIntervalSeconds: number;
         minimumRecordCount: number;
-        slowerThanBaselinePercent: number;
-        fasterThanBaselinePercent: number;
-        errorRateIncrease: number;
+        reducedIlMultiplier: number;
+        reducedFpedMultiplier: number;
+        reducedErrorRate: number;
+        elevatedIlMultiplier: number;
+        elevatedFpedMultiplier: number;
+        elevatedErrorRate: number;
     };
 };
