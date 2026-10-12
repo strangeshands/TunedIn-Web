@@ -142,7 +142,7 @@ export function evaluateAdaptiveRule(
             current.medianInitiationLatencyMs <=
                 baseline.medianInitiationLatencyMs * 0.98 &&
             current.medianFirstPassEntryDurationMs <=
-                baseline.medianFirstPassEntryDurationMs * 0.98 &&
+                baseline.medianFirstPassEntryDurationMs * 0.95 &&
             current.firstPassRecordErrorRate <= 0.5;
 
         if (reduced) {
