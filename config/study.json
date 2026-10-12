@@ -26,7 +26,7 @@
   "adaptiveRules": {
     "rollingWindowSeconds": 60,
     "evaluationIntervalSeconds": 30,
-    "minimumRecordCount": 5,
+    "minimumRecordCount": 3,
     "slowerThanBaselinePercent": 0.15,
     "fasterThanBaselinePercent": 0.15,
     "errorRateIncrease": 0.1

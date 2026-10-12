@@ -81,9 +81,9 @@ export default function App() {
     const [sessionConditionOrder, setSessionConditionOrder] = useState<
         Condition[] | null
     >(null);
-    const [recoveryActiveBlock, setRecoveryActiveBlock] = useState<number | null>(
-        null,
-    );
+    const [recoveryActiveBlock, setRecoveryActiveBlock] = useState<
+        number | null
+    >(null);
     const [blockIndex, setBlockIndex] = useState(0);
     const [record, setRecord] = useState<SourceRecord | null>(null);
     const [form, setForm] = useState<FormValues>(empty);
@@ -274,7 +274,10 @@ export default function App() {
             setCalibration(checkpoint.calibration);
             setRecoveryActiveBlock(checkpoint.activeBlockNumber);
             queue.current = new EventQueue(session.id);
-            localStorage.setItem("tunedIn.participantId", session.participantId);
+            localStorage.setItem(
+                "tunedIn.participantId",
+                session.participantId,
+            );
             localStorage.setItem(activeSessionStorageKey, session.id);
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             if (checkpoint.stage === "active-block") setStage("recovery");
@@ -486,7 +489,11 @@ export default function App() {
         response: { record: SourceRecord; initialMusicTrackId: string | null },
     ) {
         if (number > 0)
-            await startMusic(nextCondition, response.initialMusicTrackId, number);
+            await startMusic(
+                nextCondition,
+                response.initialMusicTrackId,
+                number,
+            );
         const taskStarted = performance.now();
         setRecord(response.record);
         setForm(empty);
@@ -495,7 +502,9 @@ export default function App() {
         firstKey.current = false;
         completing.current = false;
         setStarted(taskStarted);
-        setStage(number === 0 ? "practice" : number === 1 ? "baseline" : "task");
+        setStage(
+            number === 0 ? "practice" : number === 1 ? "baseline" : "task",
+        );
         await queue.current!.send({
             blockNumber: number,
             recordId: response.record.id,
@@ -852,8 +861,8 @@ export default function App() {
                             ? "Practice was interrupted."
                             : recoveryActiveBlock === 1
                               ? "Silent Baseline Calibration was interrupted."
-                              : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}
-                        {" "}You may restart this block from 0:00. The interrupted
+                              : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}{" "}
+                        You may restart this block from 0:00. The interrupted
                         attempt will appear as an empty row in the block export.
                     </p>
                 </div>
@@ -957,77 +966,92 @@ export default function App() {
                         <div className="instructions">
                             <b>Use the keyboard to work faster</b>
                             <p>
-                                Press <kbd>Tab</kbd> to move to the next field. You can press tab 3x or
-                                until you reach the "Quantity" field.
-                                Press <kbd>Enter</kbd> to submit a record. Try
-                                it in the example below.
+                                Press <kbd>Tab</kbd> to move to the next field.
+                                You can press tab 3x or until you reach the
+                                "Quantity" field. Press <kbd>Enter</kbd> to
+                                submit a record. Try it in the example below.
                             </p>
                         </div>
-                        <form
-                            ref={introPracticeForm}
-                            className="intro-task-example"
-                            aria-label="Example task screen"
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                setShortcutMessage("Enter pressed, submitted.");
-                            }}
-                        >
-                            <div className="panel">
-                                <div className="panel-label">SOURCE RECORD</div>
-                                <Source
-                                    record={{
-                                        id: "example-source",
-                                        recordCode: "a0I-754",
-                                        batchCode: "fE-19",
-                                        quantity: "954",
-                                    }}
-                                />
-                            </div>
-                            <div className="panel">
-                                <div className="panel-label">ENTRY FIELDS</div>
-                                <label className="field">
-                                    <span>Record Code</span>
-                                    <input
-                                        ref={introRecordCodeInput}
-                                        autoFocus
-                                        autoComplete="off"
+                        <div className="intro-practice-box">
+                            <form
+                                ref={introPracticeForm}
+                                className="intro-task-example"
+                                aria-label="Example task screen"
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    setShortcutMessage(
+                                        "Enter pressed, submitted.",
+                                    );
+                                }}
+                            >
+                                <div className="panel">
+                                    <div className="panel-label">
+                                        SOURCE RECORD
+                                    </div>
+                                    <Source
+                                        record={{
+                                            id: "example-source",
+                                            recordCode: "a0I-754",
+                                            batchCode: "fE-19",
+                                            quantity: "954",
+                                        }}
                                     />
-                                </label>
-                                <label className="field">
-                                    <span>Batch Code</span>
-                                    <input autoComplete="off" />
-                                </label>
-                                <label className="field">
-                                    <span>Quantity</span>
-                                    <input
-                                        autoComplete="off"
-                                        inputMode="numeric"
-                                    />
-                                </label>
-                                <button className="secondary" type="submit">
-                                    Submit practice record
-                                </button>
-                                <button
-                                    className="secondary"
-                                    type="button"
-                                    onClick={() => {
-                                        introPracticeForm.current?.reset();
-                                        setShortcutMessage("");
-                                        introRecordCodeInput.current?.focus();
-                                    }}
-                                >
-                                    Reset practice fields
-                                </button>
-                                {shortcutMessage && (
-                                    <p
-                                        className="shortcut-confirmation"
-                                        role="status"
-                                    >
-                                        {shortcutMessage}
-                                    </p>
-                                )}
-                            </div>
-                        </form>
+                                </div>
+
+                                <div className="panel">
+                                    <div className="panel-label">
+                                        ENTRY FIELDS
+                                    </div>
+
+                                    <label className="field">
+                                        <span>Record Code</span>
+                                        <input
+                                            ref={introRecordCodeInput}
+                                            autoFocus
+                                            autoComplete="off"
+                                        />
+                                    </label>
+
+                                    <label className="field">
+                                        <span>Batch Code</span>
+                                        <input autoComplete="off" />
+                                    </label>
+
+                                    <label className="field">
+                                        <span>Quantity</span>
+                                        <input
+                                            autoComplete="off"
+                                            inputMode="numeric"
+                                        />
+                                    </label>
+
+                                    <button className="test-submit" type="submit">
+                                        Submit
+                                    </button>
+
+                                    {shortcutMessage && (
+                                        <p
+                                            className="shortcut-confirmation"
+                                            role="status"
+                                        >
+                                            {shortcutMessage}
+                                        </p>
+                                    )}
+                                </div>
+                            </form>
+
+                            <button
+                                className="secondary intro-reset-button"
+                                type="button"
+                                onClick={() => {
+                                    introPracticeForm.current?.reset();
+                                    setShortcutMessage("");
+                                    introRecordCodeInput.current?.focus();
+                                }}
+                            >
+                                Reset practice fields
+                            </button>
+                        </div>
                         <button
                             className="primary large"
                             onClick={() => setIntroductionStep(2)}
@@ -1043,8 +1067,10 @@ export default function App() {
                             <b>Read each character carefully</b>
                             <p>
                                 Record codes may contain capital and lower-case
-                                letters. Type each value exactly as displayed, the inputs are case-sensitive.
-                                Use <kbd>Shift</kbd> and/or <kbd>Caps Lock</kbd> when needed.
+                                letters. Type each value exactly as displayed,
+                                the inputs are case-sensitive. Use{" "}
+                                <kbd>Shift</kbd> and/or <kbd>Caps Lock</kbd>{" "}
+                                when needed.
                             </p>
                             <p>
                                 Refer to the commonly mistaken characters below.
@@ -1052,7 +1078,8 @@ export default function App() {
                                 centre, while <b>O</b> is a letter. The capital
                                 letter <b>I</b> has horizontal bars at the top
                                 and bottom, while <b>1</b> is the number one.
-                                Also compare <b>6</b> carefully with the capital letter{" "} <b>G</b>.
+                                Also compare <b>6</b> carefully with the capital
+                                letter <b>G</b>.
                             </p>
                         </div>
                         <div
@@ -1339,9 +1366,7 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} OF ${conditionOrder.length}`}
-                title={
-                    showConditionToParticipant ? condition : blockLabel
-                }
+                title={showConditionToParticipant ? condition : blockLabel}
                 description="The next timed block is ready. Continue entering records until the timer ends."
                 participantId={participantId}
             >
