@@ -143,7 +143,7 @@ export function evaluateAdaptiveRule(
                 baseline.medianInitiationLatencyMs * 0.95 &&
             current.medianFirstPassEntryDurationMs <=
                 baseline.medianFirstPassEntryDurationMs * 0.95 &&
-            current.firstPassRecordErrorRate <= 0.5;
+            current.firstPassRecordErrorRate <= 0.05;
 
         if (reduced) {
             selectedState = "reduced";
