@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import * as archiver from "archiver";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type {
@@ -436,6 +437,19 @@ app.post(
         response.json({ measures });
     },
 );
+
+app.get("/api/sessions/:sessionId/export/results.zip", (request, response) => {
+    const session = getSession(request.params.sessionId);
+    const files = exportFiles(session);
+    const archive = new archiver.ZipArchive({ zlib: { level: 9 } });
+
+    response.attachment(`tuned-in-${session.id}-results.zip`);
+    archive.on("error", (error: Error) => response.destroy(error));
+    archive.pipe(response);
+    for (const [name, contents] of Object.entries(files))
+        archive.append(contents, { name });
+    void archive.finalize();
+});
 
 app.get("/api/sessions/:sessionId/export/:file", (request, response) => {
     const files = exportFiles(getSession(request.params.sessionId));

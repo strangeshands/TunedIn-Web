@@ -112,6 +112,8 @@ export default function App() {
     const conditionOrder =
         studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []);
     const condition = conditionOrder[blockIndex] ?? "No music";
+    const showConditionToParticipant = studyMode === "Formative";
+    const blockLabel = `Block ${blockIndex + 1} of ${conditionOrder.length}`;
     const timing =
         studyMode === "Formative" ? formativeTiming : configuredTiming;
     const duration =
@@ -1213,21 +1215,21 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} OF ${conditionOrder.length}`}
-                title={condition}
+                title={
+                    showConditionToParticipant ? condition : blockLabel
+                }
                 description="The next timed block is ready. Continue entering records until the timer ends."
                 participantId={participantId}
             >
                 <div className="summary single-summary">
+                    {showConditionToParticipant && (
+                        <div>
+                            <span>Assigned condition</span>
+                            <b>{condition}</b>
+                        </div>
+                    )}
                     <div>
-                        <span>Assigned condition</span>
-                        <b>{condition}</b>
-                    </div>
-                    <div>
-                        <span>Study duration</span>
-                        <b>08:00</b>
-                    </div>
-                    <div>
-                        <span>Current duration</span>
+                        <span>Block duration</span>
                         <b>{fmt(timing.blockSeconds)}</b>
                     </div>
                 </div>
@@ -1250,7 +1252,9 @@ export default function App() {
                 participantId={participantId}
             >
                 <div className="block-results-grid">
-                    <Result label="Condition" value={result.condition} />
+                    {showConditionToParticipant && (
+                        <Result label="Condition" value={result.condition} />
+                    )}
                     <Result
                         label="Validated records"
                         value={String(result.validatedRecords)}
@@ -1311,20 +1315,12 @@ export default function App() {
             >
                 <div className="download-actions">
                     {sessionId && (
-                        <>
-                            <a
-                                className="primary"
-                                href={exportUrl(sessionId, "blocks.csv")}
-                            >
-                                Download block CSV
-                            </a>
-                            <a
-                                className="secondary"
-                                href={exportUrl(sessionId, "records.csv")}
-                            >
-                                Download record CSV
-                            </a>
-                        </>
+                        <a
+                            className="secondary"
+                            href={exportUrl(sessionId, "results.zip")}
+                        >
+                            Download results ZIP
+                        </a>
                     )}
                 </div>
                 <button className="primary large" onClick={restart}>
@@ -1372,7 +1368,11 @@ export default function App() {
                               : `Block ${blockIndex + 1} / ${conditionOrder.length}`}
                     </span>
                     <span className="pill">
-                        {isPractice ? "No music" : condition}
+                        {isPractice
+                            ? "No music"
+                            : showConditionToParticipant
+                              ? condition
+                              : "Timed task"}
                     </span>
                     <span>{fmt(remaining)} remaining</span>
                 </div>

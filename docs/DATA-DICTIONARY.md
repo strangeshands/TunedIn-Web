@@ -18,6 +18,7 @@ The backend writes all exports to `backend/data/exports/<session-id>/`. Blank CS
 
 | File | Rows | Purpose |
 | --- | --- | --- |
+| `results.zip` | One archive | Downloadable archive containing every export listed below. |
 | `session.json` | One session snapshot | Complete local audit record. |
 | `events.jsonl` | One event per line | Raw evidence for measures. |
 | `records.csv` | One row per record | Record-level timing and validation data. |
