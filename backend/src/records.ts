@@ -3,9 +3,24 @@ import type { SourceRecord } from "../../shared/types.js";
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const digits = "0123456789";
 
+function seedFromText(value: string) {
+    let hash = 0;
+    for (const character of value)
+        hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
+    return hash >>> 0;
+}
+
 // Deterministic fictional records: backend owns the answer key and generation.
-export function generateRecord(index: number, set: number): SourceRecord {
-    let seed = (((index + 1) * 2654435761) ^ ((set + 17) * 1597334677)) >>> 0;
+export function generateRecord(
+    index: number,
+    set: number,
+    randomizationSeed = "",
+): SourceRecord {
+    let seed =
+        (((index + 1) * 2654435761) ^
+            ((set + 17) * 1597334677) ^
+            seedFromText(randomizationSeed)) >>>
+        0;
     const pick = (length: number) => {
         seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
         return Math.floor((seed / 4294967296) * length);

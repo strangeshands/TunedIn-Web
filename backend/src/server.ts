@@ -201,6 +201,7 @@ app.post("/api/sessions", (request, response) => {
         updatedAt: now,
         configVersion: config.version,
         buildVersion: config.buildVersion,
+        randomizationSeed: config.randomizationSeed,
         taskVersion: config.taskVersion,
         audioIntegration: "rule-engine",
         comfortVolumePercent: null,
@@ -256,7 +257,7 @@ function createStartedBlock(session: Session, number: number, condition: Conditi
     };
     session.blocks.push(block);
     return {
-        record: generateRecord(0, number),
+        record: generateRecord(0, number, session.randomizationSeed),
         initialMusicTrackId: block.initialMusicTrackId,
     };
 }
@@ -387,7 +388,11 @@ app.post(
                 event.eventType === "record_presented",
         );
         const index = previousPresentations.length - 1;
-        const answer = generateRecord(index, number);
+        const answer = generateRecord(
+            index,
+            number,
+            session.randomizationSeed,
+        );
         if (answer.id !== recordId)
             throw new Error("Submission does not match the current record.");
         const incorrectFields = wrongFields(answer, values);
@@ -410,7 +415,9 @@ app.post(
         response.json({
             accepted,
             incorrectFields,
-            nextRecord: accepted ? generateRecord(index + 1, number) : null,
+            nextRecord: accepted
+                ? generateRecord(index + 1, number, session.randomizationSeed)
+                : null,
         });
     },
 );

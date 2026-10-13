@@ -1,6 +1,7 @@
 {
   "version": "formative-feedback",
-  "buildVersion": "fuf-iteration-2.0.0",
+  "buildVersion": "fuf-iteration-2.0.1",
+  "randomizationSeed": "fuf2.0.1",
   "taskVersion": "fictional-records",
   "conditionOrders": {
     "A": [
@@ -46,6 +47,6 @@
     "reducedErrorRate": 0.15,
     "elevatedIlMultiplier": 0.95,
     "elevatedFpedMultiplier": 0.95,
-    "elevatedErrorRate": 0.05
+    "elevatedErrorRate": 0.1
   }
 }

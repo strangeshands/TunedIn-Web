@@ -8,6 +8,7 @@ export const config = JSON.parse(
 ) as {
     version: string;
     buildVersion: string;
+    randomizationSeed: string;
     taskVersion: string;
     conditionOrders: Record<string, Condition[]>;
     formativeConditionOrder: Condition[];
