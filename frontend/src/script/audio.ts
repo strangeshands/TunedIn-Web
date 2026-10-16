@@ -40,6 +40,7 @@ const urlFor = (track: MusicTrack) =>
 export class AudioController {
     private context: AudioContext | null = null;
     private masterGain: GainNode | null = null;
+    private participantVolumeGain: GainNode | null = null;
     private active: ActiveAudio | null = null;
     private retiring: ActiveAudio | null = null;
     private fadeFrame: number | null = null;
@@ -72,8 +73,11 @@ export class AudioController {
 
     setVolume(volume: number) {
         this.volume = Math.max(0, Math.min(1, volume));
-        if (this.active) this.active.element.volume = this.volume;
-        if (this.retiring) this.retiring.element.volume = this.volume;
+        if (this.context && this.participantVolumeGain)
+            this.participantVolumeGain.gain.setValueAtTime(
+                this.volume,
+                this.context.currentTime,
+            );
     }
 
     pause() {
@@ -121,17 +125,22 @@ export class AudioController {
 
         const previous =
             this.active && !this.active.element.paused ? this.active : null;
-        const { context, masterGain } = this.ensureGraph();
+        const { context } = this.ensureGraph();
         const element = new Audio(urlFor(track));
         element.loop = this.settings.loopTracks;
         element.preload = "auto";
-        element.volume = this.volume;
+        // Participant volume is applied by participantVolumeGain so it works
+        // consistently after this element enters the Web Audio graph.
+        element.volume = 1;
         const source = context.createMediaElementSource(element);
         const trackGain = context.createGain();
         const fadeGain = context.createGain();
         trackGain.gain.value = dbToGain(track.playbackGainDb);
         fadeGain.gain.value = previous ? 0 : 1;
-        source.connect(trackGain).connect(fadeGain).connect(masterGain);
+        source
+            .connect(trackGain)
+            .connect(fadeGain)
+            .connect(this.participantVolumeGain!);
         element.addEventListener("ended", () => {
             if (this.active?.element === element)
                 this.trackEndedHandler?.(track.id);
@@ -177,9 +186,15 @@ export class AudioController {
     private ensureGraph() {
         if (!this.context) {
             this.context = new AudioContext();
+            this.participantVolumeGain = this.context.createGain();
             this.masterGain = this.context.createGain();
+            this.participantVolumeGain.connect(this.masterGain);
             this.masterGain.connect(this.context.destination);
         }
+        this.participantVolumeGain!.gain.setValueAtTime(
+            this.volume,
+            this.context.currentTime,
+        );
         this.masterGain!.gain.setValueAtTime(
             dbToGain(this.settings.masterHeadroomDb),
             this.context.currentTime,
