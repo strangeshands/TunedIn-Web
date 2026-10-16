@@ -54,6 +54,13 @@ type Stage =
     | "handover"
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
+type BrowserStage = "participant" | "introduction" | "practice" | "baseline-intro";
+type BrowserNavigationState = {
+    tunedIn: true;
+    stage: BrowserStage;
+    introductionStep: number;
+};
+
 const empty: FormValues = { recordCode: "", batchCode: "", quantity: "" };
 const activeSessionStorageKey = "tunedIn.activeSessionId";
 
@@ -101,6 +108,7 @@ export default function App() {
     const [savingMessage, setSavingMessage] = useState("");
     const [introductionStep, setIntroductionStep] = useState(0);
     const [shortcutMessage, setShortcutMessage] = useState("");
+    const [navigationLocked, setNavigationLocked] = useState(false);
     const firstKey = useRef(false);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const introPracticeForm = useRef<HTMLFormElement | null>(null);
@@ -117,6 +125,9 @@ export default function App() {
         sessionId: string;
         blockNumber: number;
     } | null>(null);
+    const navigationLockedRef = useRef(false);
+    const browserHistoryReady = useRef(false);
+    const restoringBrowserHistory = useRef(false);
     const conditionOrder =
         sessionConditionOrder ??
         (studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []));
@@ -135,6 +146,76 @@ export default function App() {
         () => Math.max(0, duration - seconds),
         [duration, seconds],
     );
+
+    function historyState(): BrowserNavigationState {
+        return {
+            tunedIn: true,
+            stage: stage as BrowserStage,
+            introductionStep,
+        };
+    }
+
+    function lockNavigation() {
+        navigationLockedRef.current = true;
+        setNavigationLocked(true);
+    }
+
+    function unlockNavigation() {
+        navigationLockedRef.current = false;
+        setNavigationLocked(false);
+    }
+
+    function goBack() {
+        if (!navigationLockedRef.current) window.history.back();
+    }
+
+    // Before a timed block starts, browser Back follows the participant screens.
+    // After a timed block starts, Back stays on the current study screen so a
+    // participant cannot leave or revisit an earlier stage mid-session.
+    useEffect(() => {
+        const state = historyState();
+        if (!browserHistoryReady.current) {
+            window.history.replaceState(state, "", window.location.href);
+            browserHistoryReady.current = true;
+            return;
+        }
+        if (restoringBrowserHistory.current) {
+            restoringBrowserHistory.current = false;
+            return;
+        }
+        if (navigationLockedRef.current)
+            window.history.replaceState(state, "", window.location.href);
+        else window.history.pushState(state, "", window.location.href);
+    }, [stage, introductionStep]);
+
+    useEffect(() => {
+        const onPopState = (event: PopStateEvent) => {
+            if (navigationLockedRef.current) {
+                window.history.pushState(
+                    historyState(),
+                    "",
+                    window.location.href,
+                );
+                return;
+            }
+
+            const saved = event.state as Partial<BrowserNavigationState> | null;
+            if (
+                !saved?.tunedIn ||
+                !saved.stage ||
+                !["participant", "introduction", "practice", "baseline-intro"].includes(
+                    saved.stage,
+                )
+            )
+                return;
+
+            restoringBrowserHistory.current = true;
+            setStage(saved.stage);
+            setIntroductionStep(saved.introductionStep ?? 0);
+        };
+        window.addEventListener("popstate", onPopState);
+        return () => window.removeEventListener("popstate", onPopState);
+    }, [stage, introductionStep]);
 
     useEffect(() => {
         if (
@@ -238,6 +319,7 @@ export default function App() {
         const clean = participantId.trim();
         if (!clean || !conditionOrder.length) return;
         setMessage("");
+        unlockNavigation();
         try {
             const response = await createSession({
                 participantId: clean,
@@ -286,8 +368,15 @@ export default function App() {
             );
             localStorage.setItem(activeSessionStorageKey, session.id);
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
-            if (checkpoint.stage === "active-block") setStage("recovery");
-            else {
+            if (checkpoint.stage === "active-block") {
+                lockNavigation();
+                setStage("recovery");
+            } else {
+                const canNavigateBack =
+                    checkpoint.stage === "introduction" ||
+                    checkpoint.stage === "baseline-intro";
+                if (canNavigateBack) unlockNavigation();
+                else lockNavigation();
                 setIntroductionStep(0);
                 setStage(checkpoint.stage);
             }
@@ -520,15 +609,18 @@ export default function App() {
     }
 
     function startPractice() {
+        lockNavigation();
         void beginBlock(0, "No music");
     }
     function skipPractice() {
         setStage("baseline-intro");
     }
     function startBaselineCalibration() {
+        lockNavigation();
         void beginBlock(1, "No music");
     }
     function startBlock() {
+        lockNavigation();
         void beginBlock(blockIndex + 2, condition);
     }
 
@@ -693,6 +785,7 @@ export default function App() {
             void finishBlock(endingDuration.current);
     }
     function restart() {
+        unlockNavigation();
         playbackBlock.current = null;
         audio.current.stop();
         setStage("participant");
@@ -915,12 +1008,20 @@ export default function App() {
                                 </li>
                             </ol>
                         </div>
-                        <button
-                            className="primary large"
-                            onClick={() => setIntroductionStep(1)}
-                        >
-                            Next <span>→</span>
-                        </button>
+                        <div className="stage-actions">
+                            <button
+                                className="secondary large"
+                                onClick={goBack}
+                            >
+                                ← Back to participant setup
+                            </button>
+                            <button
+                                className="primary large"
+                                onClick={() => setIntroductionStep(1)}
+                            >
+                                Next <span>→</span>
+                            </button>
+                        </div>
                     </>
                 )}
 
@@ -1049,12 +1150,20 @@ export default function App() {
                                 Reset demo fields
                             </button>
                         </div>
-                        <button
-                            className="primary large"
-                            onClick={() => setIntroductionStep(2)}
-                        >
-                            Next <span>→</span>
-                        </button>
+                        <div className="stage-actions">
+                            <button
+                                className="secondary large"
+                                onClick={goBack}
+                            >
+                                ← Back
+                            </button>
+                            <button
+                                className="primary large"
+                                onClick={() => setIntroductionStep(2)}
+                            >
+                                Next <span>→</span>
+                            </button>
+                        </div>
                     </>
                 )}
 
@@ -1138,12 +1247,20 @@ export default function App() {
                                 }}
                             />
                         </div>
-                        <button
-                            className="primary large"
-                            onClick={() => setStage("practice")}
-                        >
-                            I have understood the instructions
-                        </button>
+                        <div className="stage-actions">
+                            <button
+                                className="secondary large"
+                                onClick={goBack}
+                            >
+                                ← Back
+                            </button>
+                            <button
+                                className="primary large"
+                                onClick={() => setStage("practice")}
+                            >
+                                I have understood the instructions
+                            </button>
+                        </div>
                     </>
                 )}
             </SimpleStage>
@@ -1282,9 +1399,16 @@ export default function App() {
                 <button className="primary large" onClick={startPractice}>
                     Start Practice Block <span>→</span>
                 </button>
-                <button className="secondary large" onClick={skipPractice}>
-                    I am ready, skip Practice Block
-                </button>
+                <div className="practice-options">
+                    {!navigationLocked && (
+                        <button className="secondary large" onClick={goBack}>
+                            ← Back to instructions
+                        </button>
+                    )}
+                    <button className="secondary large" onClick={skipPractice}>
+                        I am ready, skip Practice Block
+                    </button>
+                </div>
             </SimpleStage>
         );
 
@@ -1300,6 +1424,11 @@ export default function App() {
                     <span>Calibration duration</span>
                     <strong>{fmt(timing.baselineSeconds)}</strong>
                 </div>
+                {!navigationLocked && (
+                    <button className="secondary large" onClick={goBack}>
+                        ← Back to Practice
+                    </button>
+                )}
                 <button
                     className="primary large"
                     onClick={startBaselineCalibration}
