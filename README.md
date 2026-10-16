@@ -2,7 +2,7 @@
 
 This branch is the version for the group's first iterative-feedback session. It is a local browser prototype of the Chapter Six fictional digital-encoding task.
 
-The current build identifier is `fuf-iteration-3.0.0`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
+The current build identifier is `fuf-iteration-3.0.1`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
 
 ```text
 Participant setup → Participant introduction → Practice → Silent baseline calibration
