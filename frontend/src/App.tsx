@@ -643,11 +643,7 @@ export default function App() {
             await Promise.all([...pendingSubmissions.current]);
             await queue.current?.flush();
             setSavingMessage("Events saved. Saving block progress…");
-            await finishApiBlock(
-                sessionId,
-                number,
-                elapsedSeconds,
-            );
+            await finishApiBlock(sessionId, number, elapsedSeconds);
             if (number === 0) {
                 endingBlockNumber.current = null;
                 setStarted(null);
@@ -720,7 +716,7 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow="SESSION SETUP"
-                title="Participant setup."
+                title="Participant setup"
                 description="Enter the participant ID before beginning."
                 participantId=""
             >
@@ -812,23 +808,11 @@ export default function App() {
                             </select>
                         </label>
                     )}
-                    <div className="instructions">
-                        <b>Experiment Sequence</b>
-                        <ol>
-                            <li>Practice task</li>
-                            <li>Silent baseline calibration</li>
-                            <li>Audio-comfort check</li>
-                            <li>
-                                {conditionOrder.length} timed encoding block
-                                {conditionOrder.length === 1 ? "" : "s"}
-                            </li>
-                        </ol>
-                    </div>
                     <button
                         className="primary large"
                         disabled={!conditionOrder.length}
                     >
-                        Save participant & continue <span>→</span>
+                        Save participant & continue
                     </button>
                     <button
                         className="secondary large"
@@ -882,7 +866,7 @@ export default function App() {
     if (stage === "introduction")
         return (
             <SimpleStage
-                eyebrow={`PARTICIPANT INTRODUCTION · ${introductionStep + 1} OF 3`}
+                eyebrow={`PARTICIPANT INSTRUCTIONS · ${introductionStep + 1} OF 3`}
                 title={
                     introductionStep === 0
                         ? "Session flow"
@@ -894,7 +878,7 @@ export default function App() {
                     introductionStep === 0
                         ? "Read through each stage before beginning the task."
                         : introductionStep === 1
-                          ? "Copy the displayed source values, then try the shortcuts before Practice."
+                          ? "Read how the task works, then try the keyboard shortcuts below. Practice Block has not started yet."
                           : "Read every character exactly as it appears."
                 }
                 participantId={participantId}
@@ -902,16 +886,16 @@ export default function App() {
                 {introductionStep === 0 && (
                     <>
                         <div className="instructions important-note">
-                            <b>Session flow</b>
+                            <b>Session Flow</b>
                             <ol>
                                 <li>
-                                    <strong>Practice:</strong> Get familiar with
-                                    copying the records. Practice is not used
-                                    for study measurements.
+                                    <strong>Practice Block:</strong> Get
+                                    familiar with copying the records. Practice
+                                    Block is not used for study measurements.
                                 </li>
                                 <li>
                                     <strong>
-                                        Silent Baseline Calibration:
+                                        Silent Baseline Calibration Block:
                                     </strong>{" "}
                                     Complete the task without music. This
                                     critical measured stage creates your
@@ -923,7 +907,7 @@ export default function App() {
                                     volume.
                                 </li>
                                 <li>
-                                    <strong>Timed task blocks:</strong> Complete
+                                    <strong>Timed Task Blocks:</strong> Complete
                                     the task under the assigned conditions.
                                     These blocks provide the study data used to
                                     compare no music, static music, and adaptive
@@ -943,7 +927,9 @@ export default function App() {
                 {introductionStep === 1 && (
                     <>
                         <div className="instructions">
-                            <b>Instructions — please read before starting</b>
+                            <div className="intro-demo-heading">
+                                <b>General Instructions</b>
+                            </div>
                             <p>
                                 Read the source record, copy each value into its
                                 matching field, then submit the record for
@@ -961,7 +947,9 @@ export default function App() {
                             </div>
                         </div>
                         <div className="instructions">
-                            <b>Use the keyboard to work faster</b>
+                            <div className="intro-demo-heading">
+                                <b>Use the keyboard to work faster</b>
+                            </div>
                             <p>
                                 Press <kbd>Tab</kbd> to move to the next field.
                                 You can press tab 3x or until you reach the
@@ -971,11 +959,13 @@ export default function App() {
                         </div>
                         <div className="intro-practice-box">
                             <div className="intro-demo-heading">
-                                <b>Keyboard shortcut demo — not Practice</b>
+                                <b>Keyboard shortcut demo</b>
                                 <p>
-                                    This is only a short area to try Tab and
-                                    Enter. It does not start Practice, save any
-                                    data, or affect your session.
+                                    This is only a short area to try{" "}
+                                    <kbd>Tab</kbd> and
+                                    <kbd>Enter</kbd>. It does not start Practice
+                                    Block, save any data, or affect your
+                                    session.
                                 </p>
                             </div>
                             <form
@@ -1029,7 +1019,10 @@ export default function App() {
                                         />
                                     </label>
 
-                                    <button className="test-submit" type="submit">
+                                    <button
+                                        className="test-submit"
+                                        type="submit"
+                                    >
                                         Submit
                                     </button>
 
@@ -1053,7 +1046,7 @@ export default function App() {
                                     introRecordCodeInput.current?.focus();
                                 }}
                             >
-                                Reset practice fields
+                                Reset demo fields
                             </button>
                         </div>
                         <button
@@ -1083,9 +1076,8 @@ export default function App() {
                                 letter <b>I</b> has horizontal bars at the top
                                 and bottom, while <b>1</b> is the number one.
                                 The lower-case letter <b>l</b> can also look
-                                similar to <b>1</b>.
-                                Also compare <b>6</b> carefully with the capital
-                                letter <b>G</b>.
+                                similar to <b>1</b>. Also compare <b>6</b>{" "}
+                                carefully with the capital letter <b>G</b>.
                             </p>
                         </div>
                         <div
@@ -1150,7 +1142,7 @@ export default function App() {
                             className="primary large"
                             onClick={() => setStage("practice")}
                         >
-                            Start Practice <span>→</span>
+                            I have understood the instructions
                         </button>
                     </>
                 )}
@@ -1261,7 +1253,7 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow="PRACTICE"
-                title="Practice encoding task"
+                title="Practice Block"
                 description="This is only for getting a feel for the task. Practice results are not used as study measurements."
                 participantId={participantId}
             >
@@ -1288,10 +1280,10 @@ export default function App() {
                     <strong>{fmt(timing.practiceSeconds)}</strong>
                 </div>
                 <button className="primary large" onClick={startPractice}>
-                    Start practice <span>→</span>
+                    Start Practice Block <span>→</span>
                 </button>
                 <button className="secondary large" onClick={skipPractice}>
-                    I am ready — skip practice <span>→</span>
+                    I am ready, skip Practice Block
                 </button>
             </SimpleStage>
         );
@@ -1300,7 +1292,7 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow="SILENT BASELINE"
-                title="Baseline calibration"
+                title="Baseline Calibration Block"
                 description="This is the critical measured task. Perform the encoding task as you normally would. No music will play, and your results become your personal adaptive-music reference."
                 participantId={participantId}
             >
@@ -1312,7 +1304,7 @@ export default function App() {
                     className="primary large"
                     onClick={startBaselineCalibration}
                 >
-                    Start silent calibration <span>→</span>
+                    Start Calibration Block <span>→</span>
                 </button>
             </SimpleStage>
         );
@@ -1374,7 +1366,7 @@ export default function App() {
             >
                 <button className="primary large" onClick={nextBlock}>
                     {blockIndex === conditionOrder.length - 1
-                        ? "Finish Experiment"
+                        ? "Finish experiment"
                         : `Continue to Block ${blockIndex + 2}`}{" "}
                     <span>→</span>
                 </button>
@@ -1444,11 +1436,7 @@ export default function App() {
                               : `Block ${blockIndex + 1} / ${conditionOrder.length}`}
                     </span>
                     <span className="pill">
-                        {isPractice
-                            ? "No music"
-                            : showConditionToParticipant
-                              ? condition
-                              : "Timed task"}
+                        Timed Task
                     </span>
                     <span>{fmt(remaining)} remaining</span>
                 </div>
