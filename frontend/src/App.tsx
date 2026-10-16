@@ -196,6 +196,14 @@ export default function App() {
             );
     }, []);
 
+    // Each introduction page begins at its heading. The keyboard demo is lower
+    // on page two, so it should never be the first content a participant sees.
+    useEffect(() => {
+        if (stage !== "introduction") return;
+        const frame = requestAnimationFrame(() => window.scrollTo(0, 0));
+        return () => cancelAnimationFrame(frame);
+    }, [stage, introductionStep]);
+
     // The first 60 seconds establish the initial rolling window. After that,
     // the backend evaluates the rule every 30 seconds.
     useEffect(() => {
@@ -933,7 +941,7 @@ export default function App() {
                 {introductionStep === 1 && (
                     <>
                         <div className="instructions">
-                            <b>Copy one source record at a time</b>
+                            <b>Instructions — please read before starting</b>
                             <p>
                                 Read the source record, copy each value into its
                                 matching field, then submit the record for
@@ -960,6 +968,14 @@ export default function App() {
                             </p>
                         </div>
                         <div className="intro-practice-box">
+                            <div className="intro-demo-heading">
+                                <b>Keyboard shortcut demo — not Practice</b>
+                                <p>
+                                    This is only a short area to try Tab and
+                                    Enter. It does not start Practice, save any
+                                    data, or affect your session.
+                                </p>
+                            </div>
                             <form
                                 ref={introPracticeForm}
                                 className="intro-task-example"
@@ -994,7 +1010,6 @@ export default function App() {
                                         <span>Record Code</span>
                                         <input
                                             ref={introRecordCodeInput}
-                                            autoFocus
                                             autoComplete="off"
                                         />
                                     </label>
@@ -1121,7 +1136,7 @@ export default function App() {
                             className="primary large"
                             onClick={() => setStage("practice")}
                         >
-                            Start <span>→</span>
+                            Start Practice <span>→</span>
                         </button>
                     </>
                 )}

@@ -520,6 +520,21 @@ footer {
     background: #f8faf8;
     margin-bottom: 15px;
 }
+.intro-demo-heading {
+    margin: 2px 2px 0;
+}
+.intro-demo-heading b {
+    color: #284f39;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+.intro-demo-heading p {
+    margin: 7px 0 0;
+    color: #5d6962;
+    font-size: 14px;
+    line-height: 1.5;
+}
 
 .intro-reset-button {
     width: 100%;
