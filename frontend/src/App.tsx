@@ -1704,7 +1704,7 @@ function SimpleStage(props: {
                 {props.children}
             </section>
             <footer>
-                Version 2: Second Iteration of Formative User Feedback
+                Version 3: Third Iteration of Formative User Feedback
             </footer>
         </main>
     );

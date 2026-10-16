@@ -1,7 +1,7 @@
 {
   "version": "formative-feedback",
-  "buildVersion": "fuf-iteration-2.0.1",
-  "randomizationSeed": "fuf2.0.1",
+  "buildVersion": "fuf-iteration-3.0.0",
+  "randomizationSeed": "fuf3.0.0",
   "taskVersion": "fictional-records",
   "conditionOrders": {
     "A": [
