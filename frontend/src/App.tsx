@@ -8,7 +8,6 @@ import {
     type RefObject,
 } from "react";
 import type {
-    BlockMeasures,
     Condition,
     MusicCatalogue,
     MusicTrack,
@@ -90,8 +89,6 @@ export default function App() {
     const [errors, setErrors] = useState<string[]>([]);
     const [seconds, setSeconds] = useState(0);
     const [started, setStarted] = useState<number | null>(null);
-    const [results, setResults] = useState<BlockMeasures[]>([]);
-    const [calibration, setCalibration] = useState<BlockMeasures | null>(null);
     const [message, setMessage] = useState("");
     const [musicCatalogue, setMusicCatalogue] = useState<MusicCatalogue>({
         baseline: [],
@@ -271,7 +268,6 @@ export default function App() {
             setConfiguredTiming(session.timing);
             setFormativeTiming(session.timing);
             setBlockIndex(checkpoint.blockIndex);
-            setCalibration(checkpoint.calibration);
             setRecoveryActiveBlock(checkpoint.activeBlockNumber);
             queue.current = new EventQueue(session.id);
             localStorage.setItem(
@@ -636,8 +632,8 @@ export default function App() {
             audio.current.stop();
             await Promise.all([...pendingSubmissions.current]);
             await queue.current?.flush();
-            setSavingMessage("Events saved. Calculating block results…");
-            const response = await finishApiBlock(
+            setSavingMessage("Events saved. Saving block progress…");
+            await finishApiBlock(
                 sessionId,
                 number,
                 elapsedSeconds,
@@ -650,15 +646,10 @@ export default function App() {
             }
             if (number === 1) {
                 endingBlockNumber.current = null;
-                setCalibration(response.measures);
                 setStarted(null);
                 setStage("calibration-results");
                 return;
             }
-            setResults((old) => [
-                ...old.filter((item) => item.block !== number),
-                response.measures,
-            ]);
             endingBlockNumber.current = null;
             setStarted(null);
             setStage("block-results");
@@ -705,16 +696,12 @@ export default function App() {
         setBlockIndex(0);
         setRecord(null);
         setForm(empty);
-        setResults([]);
-        setCalibration(null);
         setMessage("");
         setAudioMessage("");
         setSavingMessage("");
         endingDuration.current = null;
         endingBlockNumber.current = null;
     }
-    const result = results.find((item) => item.block === blockIndex + 2);
-
     /**
      *  First Stage: Participant
      *      * Saves the participant ID, creates a session.
@@ -1301,54 +1288,14 @@ export default function App() {
             </SimpleStage>
         );
 
-    if (stage === "calibration-results" && calibration)
+    if (stage === "calibration-results")
         return (
             <SimpleStage
                 eyebrow="SILENT BASELINE COMPLETE"
-                title="Calibration saved"
-                description="Your personal reference has been saved and will be used quietly by the Adaptive Music rule engine."
+                title="Silent Baseline complete."
+                description="Your progress has been saved. Your personal reference will be used quietly during the Adaptive Music block."
                 participantId={participantId}
             >
-                <div className="calibration-confirmation">
-                    <b>Ready for the next step</b>
-                    <span>
-                        You completed {calibration.validatedRecords} validated
-                        record{calibration.validatedRecords === 1 ? "" : "s"}.
-                    </span>
-                </div>
-                <div
-                    className="block-results-grid calibration-details"
-                    aria-hidden="false"
-                >
-                    <Result
-                        label="Median IL"
-                        value={
-                            calibration.medianInitiationLatencyMs === null
-                                ? "—"
-                                : `${(calibration.medianInitiationLatencyMs / 1000).toFixed(2)} s`
-                        }
-                    />
-                    <Result
-                        label="Median FPED"
-                        value={
-                            calibration.medianFirstPassEntryDurationMs === null
-                                ? "—"
-                                : `${(calibration.medianFirstPassEntryDurationMs / 1000).toFixed(2)} s`
-                        }
-                    />
-                    <Result
-                        label="First-pass error"
-                        value={
-                            calibration.firstPassRecordErrorRate === null
-                                ? "—"
-                                : `${(calibration.firstPassRecordErrorRate * 100).toFixed(1)}%`
-                        }
-                    />
-                    <Result
-                        label="Validated records"
-                        value={String(calibration.validatedRecords)}
-                    />
-                </div>
                 <button
                     className="primary large"
                     onClick={() => setStage("audio-check")}
@@ -1388,63 +1335,14 @@ export default function App() {
             </SimpleStage>
         );
 
-    /**
-     *  Stage: Block results
-     *      * Shows the results of the current block.
-     */
-    if (stage === "block-results" && result)
+    if (stage === "block-results")
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
-                title="Block results"
-                description="Processed task measures for the completed block."
+                title={`Block ${blockIndex + 1} complete.`}
+                description="Your progress has been saved."
                 participantId={participantId}
             >
-                <div className="block-results-grid">
-                    {showConditionToParticipant && (
-                        <Result label="Condition" value={result.condition} />
-                    )}
-                    <Result
-                        label="Validated records"
-                        value={String(result.validatedRecords)}
-                    />
-                    <Result
-                        label="Throughput"
-                        value={result.validatedRecordThroughput.toFixed(2)}
-                    />
-                    <Result
-                        label="Median IL"
-                        value={
-                            result.medianInitiationLatencyMs === null
-                                ? "—"
-                                : `${Math.round(result.medianInitiationLatencyMs / 1000).toFixed(2)} s`
-                        }
-                    />
-                    <Result
-                        label="Median FPED"
-                        value={
-                            result.medianFirstPassEntryDurationMs === null
-                                ? "—"
-                                : `${Math.round(result.medianFirstPassEntryDurationMs / 1000).toFixed(2)} s`
-                        }
-                    />
-                    <Result
-                        label="First-pass error"
-                        value={
-                            result.firstPassRecordErrorRate === null
-                                ? "—"
-                                : `${(result.firstPassRecordErrorRate * 100).toFixed(1)}%`
-                        }
-                    />
-                    <Result
-                        label="Median TTSV"
-                        value={
-                            result.medianTimeToSuccessfulValidationMs === null
-                                ? "—"
-                                : `${Math.round(result.medianTimeToSuccessfulValidationMs / 1000).toFixed(2)} s`
-                        }
-                    />
-                </div>
                 <button className="primary large" onClick={nextBlock}>
                     {blockIndex === conditionOrder.length - 1
                         ? "Finish Experiment"
@@ -1635,14 +1533,6 @@ function Source({ record }: { record: SourceRecord }) {
                     <strong>{value}</strong>
                 </div>
             ))}
-        </div>
-    );
-}
-function Result({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="result-card">
-            <span>{label}</span>
-            <strong>{value}</strong>
         </div>
     );
 }
