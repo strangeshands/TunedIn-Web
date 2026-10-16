@@ -237,6 +237,7 @@ export default function App() {
         event.preventDefault();
         const clean = participantId.trim();
         if (!clean || !conditionOrder.length) return;
+        setMessage("");
         try {
             const response = await createSession({
                 participantId: clean,
@@ -263,6 +264,7 @@ export default function App() {
     async function recoverSavedParticipant() {
         const clean = participantId.trim();
         if (!clean) return;
+        setMessage("");
         try {
             const { session, checkpoint } = await recoverSession(
                 clean,
@@ -1080,6 +1082,8 @@ export default function App() {
                                 centre, while <b>O</b> is a letter. The capital
                                 letter <b>I</b> has horizontal bars at the top
                                 and bottom, while <b>1</b> is the number one.
+                                The lower-case letter <b>l</b> can also look
+                                similar to <b>1</b>.
                                 Also compare <b>6</b> carefully with the capital
                                 letter <b>G</b>.
                             </p>
@@ -1106,6 +1110,16 @@ export default function App() {
                                 <div className="letter-card">
                                     <b>I</b>
                                     <span>Capital letter I</span>
+                                </div>
+                            </div>
+                            <div className="letter-pair">
+                                <div className="letter-card">
+                                    <b>1</b>
+                                    <span>Number one</span>
+                                </div>
+                                <div className="letter-card">
+                                    <b>l</b>
+                                    <span>Lower-case letter l</span>
                                 </div>
                             </div>
                             <div className="letter-pair">
