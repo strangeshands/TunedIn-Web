@@ -932,12 +932,11 @@ export default function App() {
                     <b>Session safely preserved</b>
                     <p>
                         {recoveryActiveBlock === 0
-                            ? "Practice was interrupted."
+                            ? "Practice Block was interrupted."
                             : recoveryActiveBlock === 1
-                              ? "Silent Baseline Calibration was interrupted."
+                              ? "Silent Baseline Calibration Block was interrupted."
                               : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}{" "}
-                        You may restart this block from 0:00. The interrupted
-                        attempt will appear as an empty row in the block export.
+                        You may restart this block from 0:00.
                     </p>
                 </div>
                 <button
@@ -971,7 +970,7 @@ export default function App() {
                     introductionStep === 0
                         ? "Read through each stage before beginning the task."
                         : introductionStep === 1
-                          ? "Read how the task works, then try the keyboard shortcuts below. Practice Block has not started yet."
+                          ? "Read how the task works, then try the keyboard shortcuts below. Note: this is NOT yet the practice block."
                           : "Read every character exactly as it appears."
                 }
                 participantId={participantId}
@@ -1424,17 +1423,17 @@ export default function App() {
                     <span>Calibration duration</span>
                     <strong>{fmt(timing.baselineSeconds)}</strong>
                 </div>
-                {!navigationLocked && (
-                    <button className="secondary large" onClick={goBack}>
-                        ← Back to Practice
-                    </button>
-                )}
                 <button
                     className="primary large"
                     onClick={startBaselineCalibration}
                 >
                     Start Calibration Block <span>→</span>
                 </button>
+                {!navigationLocked && (
+                    <button className="secondary large" onClick={goBack}>
+                        ← Back to Practice
+                    </button>
+                )}
             </SimpleStage>
         );
 
@@ -1463,17 +1462,11 @@ export default function App() {
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} OF ${conditionOrder.length}`}
-                title={showConditionToParticipant ? condition : blockLabel}
+                title={`BLOCK ${blockIndex + 1} - Timed Task`}
                 description="The next timed block is ready. Continue entering records until the timer ends."
                 participantId={participantId}
             >
                 <div className="summary single-summary">
-                    {showConditionToParticipant && (
-                        <div>
-                            <span>Assigned condition</span>
-                            <b>{condition}</b>
-                        </div>
-                    )}
                     <div>
                         <span>Block duration</span>
                         <b>{fmt(timing.blockSeconds)}</b>
