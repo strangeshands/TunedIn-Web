@@ -54,7 +54,11 @@ type Stage =
     | "handover"
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
-type BrowserStage = "participant" | "introduction" | "practice" | "baseline-intro";
+type BrowserStage =
+    | "participant"
+    | "introduction"
+    | "practice"
+    | "baseline-intro";
 type BrowserNavigationState = {
     tunedIn: true;
     stage: BrowserStage;
@@ -203,9 +207,12 @@ export default function App() {
             if (
                 !saved?.tunedIn ||
                 !saved.stage ||
-                !["participant", "introduction", "practice", "baseline-intro"].includes(
-                    saved.stage,
-                )
+                ![
+                    "participant",
+                    "introduction",
+                    "practice",
+                    "baseline-intro",
+                ].includes(saved.stage)
             )
                 return;
 
@@ -1513,6 +1520,9 @@ export default function App() {
                         </a>
                     )}
                 </div>
+                <div className="completion-divider">
+                    <span>OR</span>
+                </div>
                 <button className="primary large" onClick={restart}>
                     Start another participant
                 </button>
@@ -1557,9 +1567,7 @@ export default function App() {
                               ? "Practice"
                               : `Block ${blockIndex + 1} / ${conditionOrder.length}`}
                     </span>
-                    <span className="pill">
-                        Timed Task
-                    </span>
+                    <span className="pill">Timed Task</span>
                     <span>{fmt(remaining)} remaining</span>
                 </div>
             </header>

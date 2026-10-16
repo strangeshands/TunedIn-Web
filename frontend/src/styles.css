@@ -994,3 +994,22 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+
+.completion-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0;
+    color: #89928d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.completion-divider::before,
+.completion-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #d7ded9;
+}
