@@ -48,6 +48,7 @@ export function getStudySetup() {
         conditionOrders: Record<OrderId, Condition[]>;
         formativeConditionOrder: Condition[];
         timing: StudyTiming;
+        restSeconds: number;
         configVersion: string;
     }>("/api/study-setup");
 }

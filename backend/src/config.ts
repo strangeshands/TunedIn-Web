@@ -15,6 +15,7 @@ export const config = JSON.parse(
     practiceSeconds: number;
     baselineSeconds: number;
     blockSeconds: number;
+    restSeconds: number;
     audioIntegration: "rule-engine";
     playback: {
         manifestVersion: string;

@@ -8,6 +8,7 @@ import {
     type RefObject,
 } from "react";
 import type {
+    BlockMeasures,
     Condition,
     MusicCatalogue,
     MusicTrack,
@@ -87,6 +88,10 @@ export default function App() {
         useState<StudyTiming>(fallbackTiming);
     const [formativeTiming, setFormativeTiming] =
         useState<StudyTiming>(fallbackTiming);
+    const [restSeconds, setRestSeconds] = useState(120);
+    const [restRemaining, setRestRemaining] = useState(120);
+    const [finishedBlockMeasures, setFinishedBlockMeasures] =
+        useState<BlockMeasures | null>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [sessionConditionOrder, setSessionConditionOrder] = useState<
         Condition[] | null
@@ -118,6 +123,7 @@ export default function App() {
     const introPracticeForm = useRef<HTMLFormElement | null>(null);
     const introRecordCodeInput = useRef<HTMLInputElement | null>(null);
     const completing = useRef(false);
+    const restTransitioning = useRef(false);
     const endingDuration = useRef<number | null>(null);
     const endingBlockNumber = useRef<number | null>(null);
     const pendingSubmissions = useRef(new Set<Promise<unknown>>());
@@ -243,6 +249,22 @@ export default function App() {
         return () => window.clearInterval(timer);
     }, [stage, started, duration]);
 
+    // The rest countdown is client-only: it does not create backend task events or exports.
+    useEffect(() => {
+        const hasNextBlock = blockIndex < conditionOrder.length - 1;
+        if (stage !== "block-results" || !hasNextBlock) return;
+        const restStartedAt = performance.now();
+        const tick = () => {
+            const elapsed = Math.floor((performance.now() - restStartedAt) / 1000);
+            const remainingSeconds = Math.max(0, restSeconds - elapsed);
+            setRestRemaining(remainingSeconds);
+            if (remainingSeconds === 0) continueFromRest();
+        };
+        tick();
+        const timer = window.setInterval(tick, 250);
+        return () => window.clearInterval(timer);
+    }, [stage, blockIndex, conditionOrder.length, restSeconds]);
+
     // Stop audio if the app is closed or React removes this screen.
     useEffect(() => () => audio.current.stop(), []);
 
@@ -269,12 +291,13 @@ export default function App() {
 
     useEffect(() => {
         void getStudySetup()
-            .then(({ conditionOrders, formativeConditionOrder, timing }) => {
+            .then(({ conditionOrders, formativeConditionOrder, timing, restSeconds }) => {
                 const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
                 setOrders(conditionOrders);
                 setFormativeOrder(formativeConditionOrder);
                 setConfiguredTiming(timing);
                 setFormativeTiming(timing);
+                setRestSeconds(restSeconds);
                 setOrderId((current) =>
                     conditionOrders[current] ? current : firstOrderId,
                 );
@@ -742,7 +765,11 @@ export default function App() {
             await Promise.all([...pendingSubmissions.current]);
             await queue.current?.flush();
             setSavingMessage("Events saved. Saving block progress…");
-            await finishApiBlock(sessionId, number, elapsedSeconds);
+            const { measures } = await finishApiBlock(
+                sessionId,
+                number,
+                elapsedSeconds,
+            );
             if (number === 0) {
                 endingBlockNumber.current = null;
                 setStarted(null);
@@ -757,6 +784,9 @@ export default function App() {
             }
             endingBlockNumber.current = null;
             setStarted(null);
+            setFinishedBlockMeasures(measures);
+            restTransitioning.current = false;
+            setRestRemaining(restSeconds);
             setStage("block-results");
         } catch (error) {
             setSavingMessage(
@@ -780,12 +810,15 @@ export default function App() {
             setMessage(String(error));
         }
     }
+    function continueFromRest() {
+        if (restTransitioning.current) return;
+        restTransitioning.current = true;
+        setBlockIndex((old) => old + 1);
+        setStage("block-intro");
+    }
     function nextBlock() {
         if (blockIndex === conditionOrder.length - 1) setStage("handover");
-        else {
-            setBlockIndex((old) => old + 1);
-            setStage("block-intro");
-        }
+        else continueFromRest();
     }
     function retrySavingEvents() {
         if (endingDuration.current !== null)
@@ -891,7 +924,7 @@ export default function App() {
                         </div>
                     ) : (
                         <label className="field">
-                            <span>Counterbalanced Condition Order</span>
+                            <span>Counterbalanced Order</span>
                             <select
                                 value={orderId}
                                 onChange={(event) =>
@@ -899,9 +932,9 @@ export default function App() {
                                 }
                             >
                                 {Object.entries(orders).map(
-                                    ([id, conditions]) => (
+                                    ([id], index) => (
                                         <option key={id} value={id}>
-                                            {id}: {conditions.join(" → ")}
+                                            Order {index + 1}
                                         </option>
                                     ),
                                 )}
@@ -1485,22 +1518,38 @@ export default function App() {
             </SimpleStage>
         );
 
-    if (stage === "block-results")
+    if (stage === "block-results") {
+        const isFinalBlock = blockIndex === conditionOrder.length - 1;
+        const validatedRecords = finishedBlockMeasures?.validatedRecords ?? 0;
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
-                title={`Block ${blockIndex + 1} complete.`}
-                description="Your progress has been saved."
+                title={`Congratulations! Block ${blockIndex + 1} complete.`}
+                description={`You completed ${validatedRecords} validated ${validatedRecords === 1 ? "record" : "records"}. Your progress has been saved.`}
                 participantId={participantId}
             >
-                <button className="primary large" onClick={nextBlock}>
-                    {blockIndex === conditionOrder.length - 1
-                        ? "Finish experiment"
-                        : `Continue to Block ${blockIndex + 2}`}{" "}
-                    <span>→</span>
-                </button>
+                {isFinalBlock ? (
+                    <button className="primary large" onClick={nextBlock}>
+                        Finish experiment <span>→</span>
+                    </button>
+                ) : (
+                    <>
+                        <div className="timer-card">
+                            <span>Rest time remaining</span>
+                            <strong>{fmt(restRemaining)}</strong>
+                        </div>
+                        <button
+                            className="primary large"
+                            onClick={continueFromRest}
+                        >
+                            Skip rest and proceed to Block {blockIndex + 2}{" "}
+                            <span>→</span>
+                        </button>
+                    </>
+                )}
             </SimpleStage>
         );
+    }
 
     if (stage === "complete")
         return (

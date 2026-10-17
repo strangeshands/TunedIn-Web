@@ -26,6 +26,7 @@
   "practiceSeconds": 120,
   "baselineSeconds": 120,
   "blockSeconds": 480,
+  "restSeconds": 120,
   "audioIntegration": "rule-engine",
   "playback": {
     "manifestVersion": "final-playback-bank",

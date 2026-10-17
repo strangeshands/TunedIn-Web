@@ -161,6 +161,7 @@ app.get("/api/study-setup", (_request, response) =>
         conditionOrders: orders,
         formativeConditionOrder: config.formativeConditionOrder,
         timing: defaultTiming,
+        restSeconds: config.restSeconds,
         configVersion: config.version,
     }),
 );
