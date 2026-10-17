@@ -104,7 +104,7 @@ This file records the browser outcome after an adaptive decision. It can be empt
 | `relative_file_path` | Path relative to the project music folder. |
 | `composer`, `composition_id`, `rotation_index` | Metadata used to document deterministic bank rotation and avoid immediate composer/composition repeats. |
 | `classification_method`, `classification_version` | `frozen_manifest` and its manifest version. |
-| `integrated_loudness_lufs`, `true_peak_dbtp`, `playback_gain_db` | Source measurements and the backend-calculated fixed gain for that track. |
+| `integrated_loudness_lufs`, `true_peak_dbtp` | Source loudness and true-peak measurements retained from the approved playback manifest. |
 | `file_sha256` | Source-file SHA-256 expected by the frozen manifest. Files with another hash are not played. |
 
 ## `session.json`

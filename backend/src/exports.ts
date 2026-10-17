@@ -300,7 +300,6 @@ export function exportFiles(session: Session) {
             "classification_version",
             "integrated_loudness_lufs",
             "true_peak_dbtp",
-            "playback_gain_db",
             "file_sha256",
         ],
         session.musicTracks.map((track) => [
@@ -311,8 +310,7 @@ export function exportFiles(session: Session) {
             session.timing.blockSeconds, track.id, track.musicClass,
             track.relativeFilePath, track.composer, track.compositionId,
             track.rotationIndex, "frozen_manifest", config.playback.manifestVersion,
-            track.integratedLoudnessLufs, track.truePeakDbtp, track.playbackGainDb,
-            track.sourceSha256,
+            track.integratedLoudnessLufs, track.truePeakDbtp, track.sourceSha256,
         ]),
     );
     return {

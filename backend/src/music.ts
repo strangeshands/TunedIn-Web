@@ -8,8 +8,7 @@ import type {
 } from "../../shared/types.js";
 import { config, root } from "./config.js";
 
-type ManifestTrack = Omit<MusicTrack, "playbackGainDb">;
-type PlaybackManifest = { version: string; tracks: ManifestTrack[] };
+type PlaybackManifest = { version: string; tracks: MusicTrack[] };
 
 const musicClasses: MusicClass[] = ["baseline", "reduced", "elevated"];
 const manifestPath = join(root, "config", "playback-bank.json");
@@ -20,14 +19,6 @@ const hashes = new Map<
 
 function readManifest(): PlaybackManifest {
     return JSON.parse(readFileSync(manifestPath, "utf8")) as PlaybackManifest;
-}
-
-function playbackGainDb(track: ManifestTrack) {
-    const loudnessGain =
-        config.playback.loudnessTargetLufs - track.integratedLoudnessLufs;
-    const peakLimitedGain =
-        config.playback.maximumTrackTruePeakDbtp - track.truePeakDbtp;
-    return Math.round(Math.min(loudnessGain, peakLimitedGain) * 1000) / 1000;
 }
 
 function fileSha256(filePath: string) {
@@ -43,7 +34,7 @@ function fileSha256(filePath: string) {
     return sha256;
 }
 
-function safeTrackPath(track: ManifestTrack) {
+function safeTrackPath(track: MusicTrack) {
     // Manifests use portable `/` separators; accept `\` too when running on Windows.
     const portablePath = track.relativeFilePath.replaceAll("\\", "/");
     if (!portablePath.startsWith(`music/${track.musicClass}/`))
@@ -88,12 +79,7 @@ export function loadMusicCatalogue(): MusicCatalogue {
             continue;
         }
 
-        catalogue[track.musicClass].push({
-            ...track,
-            playbackGainDb: config.playback.applyPerTrackGain
-                ? playbackGainDb(track)
-                : 0,
-        });
+        catalogue[track.musicClass].push(track);
     }
 
     for (const musicClass of musicClasses)

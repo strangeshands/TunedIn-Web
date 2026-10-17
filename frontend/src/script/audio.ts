@@ -133,14 +133,9 @@ export class AudioController {
         // consistently after this element enters the Web Audio graph.
         element.volume = 1;
         const source = context.createMediaElementSource(element);
-        const trackGain = context.createGain();
         const fadeGain = context.createGain();
-        trackGain.gain.value = dbToGain(track.playbackGainDb);
         fadeGain.gain.value = previous ? 0 : 1;
-        source
-            .connect(trackGain)
-            .connect(fadeGain)
-            .connect(this.participantVolumeGain!);
+        source.connect(fadeGain).connect(this.participantVolumeGain!);
         element.addEventListener("ended", () => {
             if (this.active?.element === element)
                 this.trackEndedHandler?.(track.id);

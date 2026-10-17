@@ -20,11 +20,7 @@ export const config = JSON.parse(
     playback: {
         manifestVersion: string;
         crossfadeMs: number;
-        crossfadeCurve: "equal-power";
         masterHeadroomDb: number;
-        loudnessTargetLufs: number;
-        applyPerTrackGain: boolean;
-        maximumTrackTruePeakDbtp: number;
         avoidImmediateComposerRepeat: boolean;
         loopTracks: boolean;
     };

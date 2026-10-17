@@ -149,7 +149,6 @@ app.get("/api/music/catalogue", (_request, response) =>
 app.get("/api/music/playback-config", (_request, response) =>
     response.json({
         crossfadeMs: config.playback.crossfadeMs,
-        crossfadeCurve: config.playback.crossfadeCurve,
         masterHeadroomDb: config.playback.masterHeadroomDb,
         loopTracks: config.playback.loopTracks,
     }),

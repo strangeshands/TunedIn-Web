@@ -31,7 +31,6 @@ export type MusicTrack = {
     sourceSha256: string;
     integratedLoudnessLufs: number;
     truePeakDbtp: number;
-    playbackGainDb: number;
 };
 
 export type MusicCatalogue = Record<MusicClass, MusicTrack[]>;

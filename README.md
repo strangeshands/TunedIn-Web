@@ -1,8 +1,8 @@
-# Tuned In — Iterative Feedback #3
+# Tuned In — Pilot Study
 
 This branch is the version for the group's first iterative-feedback session. It is a local browser prototype of the Chapter Six fictional digital-encoding task.
 
-The current build identifier is `fuf-iteration-3.0.1`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
+The current build identifier is `pilot-1.0.0`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
 
 ```text
 Participant setup → Participant introduction → Practice → Silent baseline calibration
@@ -18,8 +18,8 @@ Participants copy fictional Record Code, Batch Code, and Quantity values into ma
 - Participant introduction, optional practice, and silent baseline calibration, with calibration results shown before audio setup.
 - Backend-only calculation of IL, FPED, FPRER, TTSV, throughput, and correction cycles.
 - Adaptive decisions from a 60-second rolling window, evaluated every 30 seconds.
-- Frozen playback-bank metadata, fixed per-track gain, and browser playback with backend exports.
-- Configurable equal-power crossfades and `/test-music` development screen.
+- Frozen playback-bank metadata and browser playback with backend exports.
+- Configurable five-second crossfades and `/test-music` development screen.
 
 ## Choose the study mode
 
