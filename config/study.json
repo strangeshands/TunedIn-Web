@@ -23,7 +23,7 @@
   "formativeConditionOrder": [
     "Adaptive music"
   ],
-  "practiceSeconds": 120,
+  "practiceSeconds": 60,
   "baselineSeconds": 120,
   "blockSeconds": 480,
   "restSeconds": 120,
