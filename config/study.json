@@ -33,7 +33,8 @@
     "crossfadeMs": 5000,
     "masterHeadroomDb": -3,
     "avoidImmediateComposerRepeat": true,
-    "loopTracks": false
+    "loopTracks": false,
+    "staticTrackId": "baseline/B02.wav"
   },
   "adaptiveRules": {
     "rollingWindowSeconds": 60,

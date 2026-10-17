@@ -8,7 +8,6 @@ import {
     type RefObject,
 } from "react";
 import type {
-    BlockMeasures,
     Condition,
     MusicCatalogue,
     MusicTrack,
@@ -51,6 +50,7 @@ type Stage =
     | "task"
     | "saving"
     | "recovery"
+    | "pfs"
     | "block-results"
     | "handover"
     | "complete";
@@ -90,8 +90,6 @@ export default function App() {
         useState<StudyTiming>(fallbackTiming);
     const [restSeconds, setRestSeconds] = useState(120);
     const [restRemaining, setRestRemaining] = useState(120);
-    const [finishedBlockMeasures, setFinishedBlockMeasures] =
-        useState<BlockMeasures | null>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [sessionConditionOrder, setSessionConditionOrder] = useState<
         Condition[] | null
@@ -765,7 +763,7 @@ export default function App() {
             await Promise.all([...pendingSubmissions.current]);
             await queue.current?.flush();
             setSavingMessage("Events saved. Saving block progress…");
-            const { measures } = await finishApiBlock(
+            await finishApiBlock(
                 sessionId,
                 number,
                 elapsedSeconds,
@@ -784,10 +782,9 @@ export default function App() {
             }
             endingBlockNumber.current = null;
             setStarted(null);
-            setFinishedBlockMeasures(measures);
             restTransitioning.current = false;
             setRestRemaining(restSeconds);
-            setStage("block-results");
+            setStage("pfs");
         } catch (error) {
             setSavingMessage(
                 "Some task events could not be saved. Check the backend connection, then retry.",
@@ -816,9 +813,9 @@ export default function App() {
         setBlockIndex((old) => old + 1);
         setStage("block-intro");
     }
-    function nextBlock() {
+    function continueAfterPfs() {
         if (blockIndex === conditionOrder.length - 1) setStage("handover");
-        else continueFromRest();
+        else setStage("block-results");
     }
     function retrySavingEvents() {
         if (endingDuration.current !== null)
@@ -1518,35 +1515,40 @@ export default function App() {
             </SimpleStage>
         );
 
-    if (stage === "block-results") {
+    if (stage === "pfs") {
         const isFinalBlock = blockIndex === conditionOrder.length - 1;
-        const validatedRecords = finishedBlockMeasures?.validatedRecords ?? 0;
+        return (
+            <SimpleStage
+                eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
+                title="Short questionnaire"
+                description="Your progress has been saved. Please complete the PFS questionnaire before continuing."
+                participantId={participantId}
+            >
+                <button className="primary large" onClick={continueAfterPfs}>
+                    {isFinalBlock
+                        ? "I have completed the questionnaire. Finish experiment"
+                        : "I have completed the questionnaire. Continue to rest"}{" "}
+                    <span>→</span>
+                </button>
+            </SimpleStage>
+        );
+    }
+
+    if (stage === "block-results") {
         return (
             <SimpleStage
                 eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
                 title={`Congratulations! Block ${blockIndex + 1} complete.`}
-                description={`You completed ${validatedRecords} validated ${validatedRecords === 1 ? "record" : "records"}. Your progress has been saved.`}
+                description="Your progress has been saved."
                 participantId={participantId}
             >
-                {isFinalBlock ? (
-                    <button className="primary large" onClick={nextBlock}>
-                        Finish experiment <span>→</span>
-                    </button>
-                ) : (
-                    <>
-                        <div className="timer-card">
-                            <span>Rest time remaining</span>
-                            <strong>{fmt(restRemaining)}</strong>
-                        </div>
-                        <button
-                            className="primary large"
-                            onClick={continueFromRest}
-                        >
-                            Skip rest and proceed to Block {blockIndex + 2}{" "}
-                            <span>→</span>
-                        </button>
-                    </>
-                )}
+                <div className="timer-card">
+                    <span>Rest time remaining</span>
+                    <strong>{fmt(restRemaining)}</strong>
+                </div>
+                <button className="primary large" onClick={continueFromRest}>
+                    Skip rest and proceed to Block {blockIndex + 2} <span>→</span>
+                </button>
             </SimpleStage>
         );
     }

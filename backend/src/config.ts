@@ -23,6 +23,7 @@ export const config = JSON.parse(
         masterHeadroomDb: number;
         avoidImmediateComposerRepeat: boolean;
         loopTracks: boolean;
+        staticTrackId: string;
     };
     adaptiveRules: {
         rollingWindowSeconds: number;

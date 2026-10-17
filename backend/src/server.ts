@@ -16,7 +16,11 @@ import { config, root } from "./config.js";
 import { exportFiles, writeExports } from "./exports.js";
 import { calculateBlockMeasures } from "./measures.js";
 import { hasAnyMusic, loadMusicCatalogue } from "./music.js";
-import { selectInitialTrack, selectNextTrackInState } from "./playbackPolicy.js";
+import {
+    selectInitialTrack,
+    selectNextTrackInState,
+    selectStaticTrack,
+} from "./playbackPolicy.js";
 import { generateRecord, wrongFields } from "./records.js";
 import { evaluateAdaptiveRule } from "./rule.js";
 import { saveSession, sessions } from "./store.js";
@@ -499,12 +503,15 @@ app.post(
         )
             throw new Error("Invalid next-track request.");
 
+        if (block.condition === "Static music")
+            return response.json({
+                trackId: selectStaticTrack(loadMusicCatalogue())?.id ?? null,
+            });
+
         const state =
-            block.condition === "Static music"
-                ? "baseline"
-                : (session.musicDecisions
-                      .filter((item) => item.blockNumber === blockNumber)
-                      .at(-1)?.selectedState ?? "baseline");
+            session.musicDecisions
+                .filter((item) => item.blockNumber === blockNumber)
+                .at(-1)?.selectedState ?? "baseline";
         if (state === "silent") return response.json({ trackId: null });
 
         const track = selectNextTrackInState(

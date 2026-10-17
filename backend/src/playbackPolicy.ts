@@ -52,12 +52,21 @@ function trackFor(catalogue: MusicCatalogue, id: string | null) {
         : null;
 }
 
+/** Static Music is intentionally fixed to one approved baseline recording. */
+export function selectStaticTrack(catalogue: MusicCatalogue) {
+    const track = catalogue.baseline.find(
+        (item) => item.id === config.playback.staticTrackId,
+    );
+    return track ?? null;
+}
+
 export function selectInitialTrack(
     sessionId: string,
     blockNumber: number,
     condition: Condition,
     catalogue: MusicCatalogue,
 ) {
+    if (condition === "Static music") return selectStaticTrack(catalogue);
     const state = stateFor(condition);
     return state
         ? choose(
