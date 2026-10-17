@@ -59,6 +59,11 @@ const getSession = (id: string) => {
 };
 const participantKey = (participantId: string) =>
     participantId.trim().toLocaleLowerCase();
+const exportFilenamePart = (value: string) =>
+    value
+        .trim()
+        .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+        .replace(/^-+|-+$/g, "") || "participant";
 const appendEvent = (session: Session, event: Omit<TaskEvent, "sequence">) =>
     session.events.push({ ...event, sequence: session.events.length + 1 });
 type RecoveryStage =
@@ -583,7 +588,9 @@ app.get("/api/sessions/:sessionId/export/results.zip", (request, response) => {
     const files = exportFiles(session);
     const archive = new archiver.ZipArchive({ zlib: { level: 9 } });
 
-    response.attachment(`tuned-in-${session.id}-results.zip`);
+    response.attachment(
+        `${exportFilenamePart(session.participantId)}-${session.id}-results.zip`,
+    );
     archive.on("error", (error: Error) => response.destroy(error));
     archive.pipe(response);
     for (const [name, contents] of Object.entries(files))
