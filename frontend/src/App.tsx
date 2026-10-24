@@ -1747,7 +1747,7 @@ export default function App() {
                         </div>
                         {streak > 0 && (
                             <div className="streak" aria-live="polite">
-                                🔥 Current streak: {streak}
+                                🔥 Current Streak: {streak} 🔥
                             </div>
                         )}
                     </div>
