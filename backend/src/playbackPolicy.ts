@@ -24,7 +24,12 @@ function choices(
     seed: string,
     entry: number,
 ) {
-    const bank = catalogue[state];
+    // B02 is reserved for the Static Music condition and is never selected
+    // while Adaptive Music is in its baseline playback state.
+    const bank = catalogue[state].filter(
+        (track) =>
+            state !== "baseline" || track.id !== config.playback.staticTrackId,
+    );
     if (!bank.length) return [];
     const start = (offset(seed, bank.length) + entry) % bank.length;
     return bank.map((_, index) => bank[(start + index) % bank.length]);
@@ -115,7 +120,10 @@ export function selectNextTrackInState(
     state: MusicClass,
     currentTrackId: string,
 ) {
-    const bank = catalogue[state];
+    const bank = catalogue[state].filter(
+        (track) =>
+            state !== "baseline" || track.id !== config.playback.staticTrackId,
+    );
     const current = trackFor(catalogue, currentTrackId);
     const currentIndex = bank.findIndex((track) => track.id === currentTrackId);
     if (!bank.length || currentIndex < 0) return null;

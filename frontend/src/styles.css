@@ -149,6 +149,44 @@ button {
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 24px 70px rgba(32, 46, 39, 0.08);
 }
+.landing {
+    position: relative;
+    overflow: hidden;
+}
+.completion-confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.completion-confetti-piece {
+    position: absolute;
+    top: 28px;
+    width: 9px;
+    height: 15px;
+    border-radius: 2px;
+    opacity: 0;
+    animation-name: completion-confetti-fall;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+    animation-fill-mode: both;
+}
+@keyframes completion-confetti-fall {
+    0% {
+        opacity: 0;
+        transform: translateY(-18px) rotate(0deg);
+    }
+    12% { opacity: 0.95; }
+    100% {
+        opacity: 0;
+        transform: translateY(250px) rotate(420deg);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .completion-confetti-piece {
+        animation: none;
+        opacity: 0.55;
+    }
+}
 .eyebrow,
 .panel-label,
 .label {
@@ -334,6 +372,26 @@ footer {
     display: inline-flex;
     align-items: center;
     gap: 5px;
+}
+.streak-area {
+    position: relative;
+    isolation: isolate;
+}
+.streak-area::before {
+    position: absolute;
+    inset: -12px;
+    z-index: -1;
+    border: 2px solid transparent;
+    border-radius: 28px;
+    background: transparent;
+    box-shadow: none;
+    content: "";
+    transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+.streak-area.streak-frame::before {
+    border-color: var(--streak-border);
+    background: var(--streak-background);
+    box-shadow: 0 0 0 3px var(--streak-ring), 0 0 var(--streak-glow) var(--streak-glow-color);
 }
 .grid {
     display: grid;
@@ -586,6 +644,73 @@ footer {
 .field.bad input {
     border-color: #b85f55;
     background: #fff8f7;
+    box-shadow: 0 0 0 3px rgba(184, 95, 85, 0.12);
+}
+.submission-incorrect .field.bad {
+    animation: field-shake 0.32s ease-in-out;
+}
+.submission-correct {
+    outline: 3px solid #5b9a6d;
+    outline-offset: -3px;
+}
+.streak {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 42px;
+    margin-top: 14px;
+    padding: 0 22px;
+    border-top: 1px solid var(--streak-border);
+    color: var(--streak-text);
+    font-size: 13px;
+    font-weight: 800;
+    transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+.streak-1 {
+    --streak-border: #d69b54;
+    --streak-background: #fffaf0;
+    --streak-ring: rgba(214, 155, 84, 0.1);
+    --streak-glow: 0px;
+    --streak-glow-color: transparent;
+    --streak-text: #9d6c3a;
+}
+.streak-2 {
+    --streak-border: #e09a35;
+    --streak-background: linear-gradient(120deg, #fff9db, #fff4e7);
+    --streak-ring: rgba(224, 154, 53, 0.16);
+    --streak-glow: 6px;
+    --streak-glow-color: rgba(224, 154, 53, 0.15);
+    --streak-text: #a76320;
+}
+.streak-3 {
+    --streak-border: #ed852b;
+    --streak-background: linear-gradient(120deg, #fff3b8, #ffe8d4);
+    --streak-ring: rgba(237, 133, 43, 0.2);
+    --streak-glow: 9px;
+    --streak-glow-color: rgba(237, 133, 43, 0.2);
+    --streak-text: #a7461f;
+}
+.streak-4 {
+    --streak-border: #e96327;
+    --streak-background: linear-gradient(120deg, #ffe78c, #ffd8c3);
+    --streak-ring: rgba(233, 99, 39, 0.25);
+    --streak-glow: 12px;
+    --streak-glow-color: rgba(233, 99, 39, 0.25);
+    --streak-text: #963518;
+}
+.streak-5 {
+    --streak-border: #dc3e22;
+    --streak-background: linear-gradient(120deg, #ffd94d, #ffbc73, #ffc6b7);
+    --streak-ring: rgba(220, 62, 34, 0.3);
+    --streak-glow: 16px;
+    --streak-glow-color: rgba(220, 62, 34, 0.3);
+    --streak-text: #842617;
+}
+@keyframes field-shake {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(-5px); }
+    70% { transform: translateX(5px); }
 }
 .field small {
     display: block;

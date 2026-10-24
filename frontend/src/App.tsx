@@ -55,6 +55,7 @@ type Stage =
     | "handover"
     | "complete";
 type FormValues = { recordCode: string; batchCode: string; quantity: string };
+type SubmissionFeedback = "correct" | "incorrect" | null;
 type BrowserStage =
     | "participant"
     | "introduction"
@@ -101,6 +102,9 @@ export default function App() {
     const [record, setRecord] = useState<SourceRecord | null>(null);
     const [form, setForm] = useState<FormValues>(empty);
     const [errors, setErrors] = useState<string[]>([]);
+    const [streak, setStreak] = useState(0);
+    const [submissionFeedback, setSubmissionFeedback] =
+        useState<SubmissionFeedback>(null);
     const [seconds, setSeconds] = useState(0);
     const [started, setStarted] = useState<number | null>(null);
     const [message, setMessage] = useState("");
@@ -117,6 +121,7 @@ export default function App() {
     const [shortcutMessage, setShortcutMessage] = useState("");
     const [navigationLocked, setNavigationLocked] = useState(false);
     const firstKey = useRef(false);
+    const feedbackTimer = useRef<number | null>(null);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const introPracticeForm = useRef<HTMLFormElement | null>(null);
     const introRecordCodeInput = useRef<HTMLInputElement | null>(null);
@@ -175,6 +180,23 @@ export default function App() {
 
     function goBack() {
         if (!navigationLockedRef.current) window.history.back();
+    }
+
+    function clearSubmissionFeedback() {
+        if (feedbackTimer.current !== null) {
+            window.clearTimeout(feedbackTimer.current);
+            feedbackTimer.current = null;
+        }
+        setSubmissionFeedback(null);
+    }
+
+    function showSubmissionFeedback(value: Exclude<SubmissionFeedback, null>) {
+        clearSubmissionFeedback();
+        setSubmissionFeedback(value);
+        feedbackTimer.current = window.setTimeout(() => {
+            setSubmissionFeedback(null);
+            feedbackTimer.current = null;
+        }, 900);
     }
 
     // Before a timed block starts, browser Back follows the participant screens.
@@ -621,6 +643,8 @@ export default function App() {
         setRecord(response.record);
         setForm(empty);
         setErrors([]);
+        setStreak(0);
+        clearSubmissionFeedback();
         setSeconds(0);
         firstKey.current = false;
         completing.current = false;
@@ -671,6 +695,7 @@ export default function App() {
         // Record codes use mixed case, so preserve the participant's exact input.
         setForm((old) => ({ ...old, [key]: value }));
         setErrors([]);
+        clearSubmissionFeedback();
     }
 
     function updateFormativeTiming(key: keyof StudyTiming, value: string) {
@@ -718,6 +743,13 @@ export default function App() {
                 pendingSubmissions.current.delete(submission),
             );
             setErrors(response.incorrectFields);
+            if (response.accepted) {
+                setStreak((current) => current + 1);
+                showSubmissionFeedback("correct");
+            } else {
+                setStreak(0);
+                showSubmissionFeedback("incorrect");
+            }
             if (
                 response.accepted &&
                 response.nextRecord &&
@@ -832,6 +864,8 @@ export default function App() {
         setBlockIndex(0);
         setRecord(null);
         setForm(empty);
+        setStreak(0);
+        clearSubmissionFeedback();
         setMessage("");
         setAudioMessage("");
         setSavingMessage("");
@@ -1519,7 +1553,7 @@ export default function App() {
         const isFinalBlock = blockIndex === conditionOrder.length - 1;
         return (
             <SimpleStage
-                eyebrow={`BLOCK ${blockIndex + 1} COMPLETE`}
+                eyebrow={`You are almost there!`}
                 title="Short questionnaire"
                 description="Your progress has been saved. Please complete the PFS questionnaire before continuing."
                 participantId={participantId}
@@ -1542,6 +1576,7 @@ export default function App() {
                 description="Your progress has been saved."
                 participantId={participantId}
             >
+                <CompletionConfetti />
                 <div className="timer-card">
                     <span>Rest time remaining</span>
                     <strong>{fmt(restRemaining)}</strong>
@@ -1654,55 +1689,67 @@ export default function App() {
                     </div>
                 </div>
                 {record && (
-                    <div className="grid">
-                        <section className="panel">
-                            <div className="panel-label">SOURCE RECORD</div>
-                            <Source record={record} />
-                        </section>
-                        <form className="panel" onSubmit={submit}>
-                            <div className="panel-label">ENTRY FIELDS</div>
-                            <p className="entry-note">
-                                Type upper- and lower-case letters exactly as
-                                displayed. Capitalization is not automatic.
-                            </p>
-                            <Field
-                                label="Record Code"
-                                value={form.recordCode}
-                                error={errors.includes("recordCode")}
-                                autoFocus
-                                inputRef={recordCodeInput}
-                                onChange={(value) =>
-                                    update("recordCode", value)
-                                }
-                            />
-                            <Field
-                                label="Batch Code"
-                                value={form.batchCode}
-                                error={errors.includes("batchCode")}
-                                onChange={(value) => update("batchCode", value)}
-                            />
-                            <Field
-                                label="Quantity"
-                                value={form.quantity}
-                                error={errors.includes("quantity")}
-                                inputMode="numeric"
-                                onChange={(value) => update("quantity", value)}
-                            />
-                            <button className="primary submit">
-                                Submit Record <span>↵</span>
-                            </button>
-                            {errors.length > 0 && (
-                                <div className="error" role="alert">
-                                    <b>
-                                        Check the highlighted field
-                                        {errors.length > 1 ? "s" : ""}.
-                                    </b>
-                                    <span>
-                                        Correct the value, then submit again.
-                                    </span>
-                                </div>
-                            )}
-                        </form>
+                    <div
+                        className={`streak-area${streak > 0 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}`}
+                    >
+                        <div className="grid">
+                            <section className="panel">
+                                <div className="panel-label">SOURCE RECORD</div>
+                                <Source record={record} />
+                            </section>
+                            <form
+                                className={`panel${submissionFeedback ? ` submission-${submissionFeedback}` : ""}`}
+                                onSubmit={submit}
+                            >
+                                <div className="panel-label">ENTRY FIELDS</div>
+                                <p className="entry-note">
+                                    Type upper- and lower-case letters exactly as
+                                    displayed. Capitalization is not automatic.
+                                </p>
+                                <Field
+                                    label="Record Code"
+                                    value={form.recordCode}
+                                    error={errors.includes("recordCode")}
+                                    autoFocus
+                                    inputRef={recordCodeInput}
+                                    onChange={(value) =>
+                                        update("recordCode", value)
+                                    }
+                                />
+                                <Field
+                                    label="Batch Code"
+                                    value={form.batchCode}
+                                    error={errors.includes("batchCode")}
+                                    onChange={(value) => update("batchCode", value)}
+                                />
+                                <Field
+                                    label="Quantity"
+                                    value={form.quantity}
+                                    error={errors.includes("quantity")}
+                                    inputMode="numeric"
+                                    onChange={(value) => update("quantity", value)}
+                                />
+                                <button className="primary submit">
+                                    Submit Record <span>↵</span>
+                                </button>
+                                {errors.length > 0 && (
+                                    <div className="error" role="alert">
+                                        <b>
+                                            Check the highlighted field
+                                            {errors.length > 1 ? "s" : ""}.
+                                        </b>
+                                        <span>
+                                            Correct the value, then submit again.
+                                        </span>
+                                    </div>
+                                )}
+                            </form>
+                        </div>
+                        {streak > 0 && (
+                            <div className="streak" aria-live="polite">
+                                🔥 Current streak: {streak}
+                            </div>
+                        )}
                     </div>
                 )}
                 {audioMessage && !isPractice && (
@@ -1730,6 +1777,25 @@ function Source({ record }: { record: SourceRecord }) {
                     <span>{label}</span>
                     <strong>{value}</strong>
                 </div>
+            ))}
+        </div>
+    );
+}
+function CompletionConfetti() {
+    const colors = ["#f2b84b", "#e56a35", "#d94545", "#5b9a6d", "#5b87b6"];
+    return (
+        <div className="completion-confetti" aria-hidden="true">
+            {Array.from({ length: 20 }, (_, index) => (
+                <i
+                    key={index}
+                    className="completion-confetti-piece"
+                    style={{
+                        left: `${5 + ((index * 37) % 90)}%`,
+                        backgroundColor: colors[index % colors.length],
+                        animationDelay: `${(index % 7) * 0.08}s`,
+                        animationDuration: `${1.6 + (index % 4) * 0.15}s`,
+                    }}
+                />
             ))}
         </div>
     );
