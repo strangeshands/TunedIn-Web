@@ -275,7 +275,9 @@ export default function App() {
         if (stage !== "block-results" || !hasNextBlock) return;
         const restStartedAt = performance.now();
         const tick = () => {
-            const elapsed = Math.floor((performance.now() - restStartedAt) / 1000);
+            const elapsed = Math.floor(
+                (performance.now() - restStartedAt) / 1000,
+            );
             const remainingSeconds = Math.max(0, restSeconds - elapsed);
             setRestRemaining(remainingSeconds);
             if (remainingSeconds === 0) continueFromRest();
@@ -311,17 +313,24 @@ export default function App() {
 
     useEffect(() => {
         void getStudySetup()
-            .then(({ conditionOrders, formativeConditionOrder, timing, restSeconds }) => {
-                const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
-                setOrders(conditionOrders);
-                setFormativeOrder(formativeConditionOrder);
-                setConfiguredTiming(timing);
-                setFormativeTiming(timing);
-                setRestSeconds(restSeconds);
-                setOrderId((current) =>
-                    conditionOrders[current] ? current : firstOrderId,
-                );
-            })
+            .then(
+                ({
+                    conditionOrders,
+                    formativeConditionOrder,
+                    timing,
+                    restSeconds,
+                }) => {
+                    const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
+                    setOrders(conditionOrders);
+                    setFormativeOrder(formativeConditionOrder);
+                    setConfiguredTiming(timing);
+                    setFormativeTiming(timing);
+                    setRestSeconds(restSeconds);
+                    setOrderId((current) =>
+                        conditionOrders[current] ? current : firstOrderId,
+                    );
+                },
+            )
             .catch(() =>
                 setMessage("Could not load the configured study setup."),
             );
@@ -795,11 +804,7 @@ export default function App() {
             await Promise.all([...pendingSubmissions.current]);
             await queue.current?.flush();
             setSavingMessage("Events saved. Saving block progress…");
-            await finishApiBlock(
-                sessionId,
-                number,
-                elapsedSeconds,
-            );
+            await finishApiBlock(sessionId, number, elapsedSeconds);
             if (number === 0) {
                 endingBlockNumber.current = null;
                 setStarted(null);
@@ -962,13 +967,11 @@ export default function App() {
                                     setOrderId(event.target.value as OrderId)
                                 }
                             >
-                                {Object.entries(orders).map(
-                                    ([id], index) => (
-                                        <option key={id} value={id}>
-                                            Order {index + 1}
-                                        </option>
-                                    ),
-                                )}
+                                {Object.entries(orders).map(([id], index) => (
+                                    <option key={id} value={id}>
+                                        Order {index + 1}
+                                    </option>
+                                ))}
                             </select>
                         </label>
                     )}
@@ -1582,7 +1585,8 @@ export default function App() {
                     <strong>{fmt(restRemaining)}</strong>
                 </div>
                 <button className="primary large" onClick={continueFromRest}>
-                    Skip rest and proceed to Block {blockIndex + 2} <span>→</span>
+                    Skip rest and proceed to Block {blockIndex + 2}{" "}
+                    <span>→</span>
                 </button>
             </SimpleStage>
         );
@@ -1703,8 +1707,9 @@ export default function App() {
                             >
                                 <div className="panel-label">ENTRY FIELDS</div>
                                 <p className="entry-note">
-                                    Type upper- and lower-case letters exactly as
-                                    displayed. Capitalization is not automatic.
+                                    Type upper- and lower-case letters exactly
+                                    as displayed. Capitalization is not
+                                    automatic.
                                 </p>
                                 <Field
                                     label="Record Code"
@@ -1720,14 +1725,18 @@ export default function App() {
                                     label="Batch Code"
                                     value={form.batchCode}
                                     error={errors.includes("batchCode")}
-                                    onChange={(value) => update("batchCode", value)}
+                                    onChange={(value) =>
+                                        update("batchCode", value)
+                                    }
                                 />
                                 <Field
                                     label="Quantity"
                                     value={form.quantity}
                                     error={errors.includes("quantity")}
                                     inputMode="numeric"
-                                    onChange={(value) => update("quantity", value)}
+                                    onChange={(value) =>
+                                        update("quantity", value)
+                                    }
                                 />
                                 <button className="primary submit">
                                     Submit Record <span>↵</span>
@@ -1739,7 +1748,8 @@ export default function App() {
                                             {errors.length > 1 ? "s" : ""}.
                                         </b>
                                         <span>
-                                            Correct the value, then submit again.
+                                            Correct the value, then submit
+                                            again.
                                         </span>
                                     </div>
                                 )}
@@ -1847,6 +1857,8 @@ function Field(props: {
                 autoComplete="off"
                 spellCheck={false}
                 aria-invalid={props.error}
+                onPaste={(event) => event.preventDefault()}
+                onDrop={(event) => event.preventDefault()}
                 onChange={(event) => props.onChange(event.target.value)}
             />
             {props.error && <small>Does not match the source value.</small>}
