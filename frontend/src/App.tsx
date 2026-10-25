@@ -676,6 +676,11 @@ export default function App() {
     function skipPractice() {
         setStage("baseline-intro");
     }
+    function skipPracticeInProgress() {
+        if (!sessionId || stage !== "practice" || started === null) return;
+        completing.current = true;
+        void finishBlock(seconds);
+    }
     function startBaselineCalibration() {
         lockNavigation();
         void beginBlock(1, "No music");
@@ -1057,7 +1062,9 @@ export default function App() {
                                 <li>
                                     <strong>Practice Block:</strong> Get
                                     familiar with copying the records. Practice
-                                    Block is not used for study measurements.
+                                    data are exported for reference but are not
+                                    included in the final study analysis. It may
+                                    be skipped before or during the task.
                                 </li>
                                 <li>
                                     <strong>
@@ -1444,7 +1451,7 @@ export default function App() {
             <SimpleStage
                 eyebrow="PRACTICE"
                 title="Practice Block"
-                description="This is only for getting a feel for the task. Practice results are not used as study measurements."
+                description="This is only for getting a feel for the task. Practice data are exported for reference but are not included in the final study analysis."
                 participantId={participantId}
             >
                 <div className="instructions">
@@ -1463,6 +1470,10 @@ export default function App() {
                             shown. Capitalization is not changed automatically.
                         </li>
                         <li>Incorrect records must be corrected.</li>
+                        <li>
+                            You may end Practice at any time and continue to
+                            Silent Baseline Calibration.
+                        </li>
                     </ul>
                 </div>
                 <div className="timer-card">
@@ -1761,6 +1772,14 @@ export default function App() {
                             </div>
                         )}
                     </div>
+                )}
+                {stage === "practice" && (
+                    <button
+                        className="practice-skip-during"
+                        onClick={() => void skipPracticeInProgress()}
+                    >
+                        End Practice Block <span>→</span>
+                    </button>
                 )}
                 {audioMessage && !isPractice && (
                     <p className="error">{audioMessage}</p>
