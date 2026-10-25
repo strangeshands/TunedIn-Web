@@ -1705,7 +1705,7 @@ export default function App() {
                 </div>
                 {record && (
                     <div
-                        className={`streak-area${streak > 0 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}`}
+                        className={`streak-area${streak > 1 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}`}
                     >
                         <div className="grid">
                             <section className="panel">
@@ -1766,7 +1766,7 @@ export default function App() {
                                 )}
                             </form>
                         </div>
-                        {streak > 0 && (
+                        {streak > 1 && (
                             <div className="streak" aria-live="polite">
                                 🔥 Current Streak: {streak} 🔥
                             </div>
