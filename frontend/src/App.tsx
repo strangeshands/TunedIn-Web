@@ -103,6 +103,7 @@ export default function App() {
     const [form, setForm] = useState<FormValues>(empty);
     const [errors, setErrors] = useState<string[]>([]);
     const [streak, setStreak] = useState(0);
+    const [highestStreak, setHighestStreak] = useState(0);
     const [submissionFeedback, setSubmissionFeedback] =
         useState<SubmissionFeedback>(null);
     const [seconds, setSeconds] = useState(0);
@@ -196,7 +197,7 @@ export default function App() {
         feedbackTimer.current = window.setTimeout(() => {
             setSubmissionFeedback(null);
             feedbackTimer.current = null;
-        }, 900);
+        }, value === "correct" ? 1_200 : 900);
     }
 
     // Before a timed block starts, browser Back follows the participant screens.
@@ -394,6 +395,7 @@ export default function App() {
             localStorage.setItem("tunedIn.participantId", clean);
             localStorage.setItem(activeSessionStorageKey, response.sessionId);
             setParticipantId(clean);
+            setHighestStreak(0);
             setIntroductionStep(0);
             setShortcutMessage("");
             setStage("introduction");
@@ -758,7 +760,11 @@ export default function App() {
             );
             setErrors(response.incorrectFields);
             if (response.accepted) {
-                setStreak((current) => current + 1);
+                setStreak((current) => {
+                    const next = current + 1;
+                    setHighestStreak((highest) => Math.max(highest, next));
+                    return next;
+                });
                 showSubmissionFeedback("correct");
             } else {
                 setStreak(0);
@@ -875,6 +881,7 @@ export default function App() {
         setRecord(null);
         setForm(empty);
         setStreak(0);
+        setHighestStreak(0);
         clearSubmissionFeedback();
         setMessage("");
         setAudioMessage("");
@@ -1611,6 +1618,13 @@ export default function App() {
                 description={`Participant ${participantId} has completed all ${conditionOrder.length} configured conditions.`}
                 participantId={participantId}
             >
+                <div
+                    className={`highest-streak${highestStreak > 0 ? ` streak-${Math.min(highestStreak, 5)}` : ""}`}
+                >
+                    <span>Your highest streak was</span>
+                    <strong>{highestStreak}</strong>
+                    <span>consecutive correct records</span>
+                </div>
                 <div>
                     {sessionId && (
                         <a
@@ -1705,7 +1719,7 @@ export default function App() {
                 </div>
                 {record && (
                     <div
-                        className={`streak-area${streak > 1 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}`}
+                        className={`streak-area${streak > 1 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}${submissionFeedback === "correct" && streak > 1 ? ` streak-celebrate streak-celebrate-${Math.min(streak, 5)}` : ""}`}
                     >
                         <div className="grid">
                             <section className="panel">
