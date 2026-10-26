@@ -427,7 +427,7 @@ export function useStudyController() {
             setErrors(response.incorrectFields);
             if (number === 1 && response.validatedRecords !== undefined) setBaselineCompletedRecords(response.validatedRecords);
             if (response.accepted) {
-                if (number >= 2 && !recordWasRejected.current) {
+                if (number >= 1 && !recordWasRejected.current) {
                     setStreak((current) => {
                         const next = current + 1;
                         setBlockHighestStreak((highest) => Math.max(highest, next));
