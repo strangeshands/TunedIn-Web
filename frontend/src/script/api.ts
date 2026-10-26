@@ -144,6 +144,7 @@ export function restartRecoveredBlock(sessionId: string) {
         record: SourceRecord;
         initialMusicTrackId: string | null;
         blockNumber: number;
+        attemptId: string;
         condition: Condition;
     }>(`/api/sessions/${sessionId}/recovery/restart-block`, {});
 }
@@ -165,7 +166,7 @@ export function startApiBlock(
     blockNumber: number,
     condition: Condition,
 ) {
-    return request<{ record: SourceRecord; initialMusicTrackId: string | null }>(
+    return request<{ record: SourceRecord; initialMusicTrackId: string | null; attemptId: string }>(
         `/api/sessions/${sessionId}/blocks/${blockNumber}/start`,
         { condition },
     );
@@ -187,7 +188,7 @@ export function sendTaskEvent(
     sessionId: string,
     event: Omit<TaskEvent, "sequence">,
 ) {
-    return request<{ saved: number }>(`/api/sessions/${sessionId}/events`, {
+    return request<{ saved: number; acknowledgedEventIds: string[] }>(`/api/sessions/${sessionId}/events`, {
         events: [event],
     });
 }
@@ -214,8 +215,11 @@ export function submitRecord(
     recordId: string,
     values: Record<string, string>,
     clientTimeMs: number,
+    requestId: string,
+    attemptId: string,
 ) {
     return request<{
+        requestId: string;
         accepted: boolean;
         incorrectFields: string[];
         nextRecord: SourceRecord | null;
@@ -223,6 +227,8 @@ export function submitRecord(
         recordId,
         values,
         clientTimeMs,
+        requestId,
+        attemptId,
     });
 }
 

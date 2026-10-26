@@ -21,7 +21,6 @@ import {
     recoverSession,
     restartRecoveredBlock,
     startApiBlock,
-    submitRecord
 } from "../../script/api";
 import { EventQueue } from "../../script/eventQueue";
 import type { FormValues, Stage, SubmissionFeedback } from "../types";
@@ -88,6 +87,7 @@ export function useStudyController() {
     const pendingSubmissions = useRef(new Set<Promise<unknown>>());
     const submitting = useRef(false);
     const queue = useRef<EventQueue | null>(null);
+    const activeAttemptId = useRef<string>("");
     const conditionOrder =
         sessionConditionOrder ??
         (studyMode === "Formative" ? formativeOrder : (orders[orderId] ?? []));
@@ -168,9 +168,12 @@ export function useStudyController() {
         return () => cancelAnimationFrame(frame);
     }, [stage, introductionStep]);
 
-    /**
-     *  Calls createSession
-     */
+    function createEventQueue(id: string) {
+        return new EventQueue(id, error => setMessage(
+            `Some task data have not been saved. Keep this tab open and check browser storage and the backend connection. ${String(error)}`,
+        ));
+    }
+
     async function saveParticipant(event: FormEvent) {
         event.preventDefault();
         const clean = participantId.trim();
@@ -187,7 +190,7 @@ export function useStudyController() {
             });
             setSessionId(response.sessionId);
             setSessionConditionOrder(conditionOrder);
-            queue.current = new EventQueue(response.sessionId);
+            queue.current = createEventQueue(response.sessionId);
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
             localStorage.setItem("tunedIn.participantId", clean);
             localStorage.setItem(activeSessionStorageKey, response.sessionId);
@@ -219,7 +222,8 @@ export function useStudyController() {
             setFormativeTiming(session.timing);
             setBlockIndex(checkpoint.blockIndex);
             setRecoveryActiveBlock(checkpoint.activeBlockNumber);
-            queue.current = new EventQueue(session.id);
+            queue.current = createEventQueue(session.id);
+            await queue.current.flush();
             localStorage.setItem(
                 "tunedIn.participantId",
                 session.participantId,
@@ -246,6 +250,7 @@ export function useStudyController() {
     async function endInterruptedSession() {
         if (!sessionId) return;
         try {
+            await queue.current?.flush();
             await endRecoveredSession(sessionId);
             setRecoveryActiveBlock(null);
             setStage("complete");
@@ -259,8 +264,9 @@ export function useStudyController() {
         try {
             setMessage("");
             audio.current.stop();
+            await queue.current?.flush();
             const response = await restartRecoveredBlock(sessionId);
-            queue.current = new EventQueue(sessionId);
+            queue.current = createEventQueue(sessionId);
             setRecoveryActiveBlock(null);
             setBlockIndex(Math.max(0, response.blockNumber - 2));
             await activateStartedBlock(
@@ -294,7 +300,7 @@ export function useStudyController() {
     async function activateStartedBlock(
         number: number,
         nextCondition: Condition,
-        response: { record: SourceRecord; initialMusicTrackId: string | null },
+        response: { record: SourceRecord; initialMusicTrackId: string | null; attemptId: string },
     ) {
         if (number > 0)
             await startMusic(
@@ -302,6 +308,7 @@ export function useStudyController() {
                 response.initialMusicTrackId,
                 number,
             );
+        activeAttemptId.current = response.attemptId;
         const taskStarted = performance.now();
         setRecord(response.record);
         setForm(empty);
@@ -319,6 +326,7 @@ export function useStudyController() {
             blockNumber: number,
             recordId: response.record.id,
             eventType: "record_presented",
+            attemptId: activeAttemptId.current,
             clientTimeMs: taskStarted,
         });
     }
@@ -357,6 +365,7 @@ export function useStudyController() {
                             : blockIndex + 2,
                 recordId: record.id,
                 eventType: "first_key",
+                attemptId: activeAttemptId.current,
                 clientTimeMs: performance.now(),
             });
         }
@@ -392,20 +401,11 @@ export function useStudyController() {
                         ? 1
                         : blockIndex + 2;
             const submittedAt = performance.now();
-            // send() retains failed events but swallows delivery errors. Validation
-            // depends on the presentation being saved, so retry/await the queue
-            // first and include that wait in the activity block completion awaits.
-            const submission = queue
-                .current!.flush()
-                .then(() =>
-                    submitRecord(
-                        sessionId,
-                        number,
-                        record.id,
-                        form,
-                        submittedAt,
-                    ),
-                );
+            // Persist the submission before transmission; replay the same request ID after a failure.
+            const submission = queue.current!.submit({
+                blockNumber: number, recordId: record.id, values: { ...form },
+                clientTimeMs: submittedAt, attemptId: activeAttemptId.current,
+            });
             pendingSubmissions.current.add(submission);
             const response = await submission.finally(() =>
                 pendingSubmissions.current.delete(submission),
@@ -435,12 +435,13 @@ export function useStudyController() {
                     blockNumber: number,
                     recordId: response.nextRecord.id,
                     eventType: "record_presented",
+                    attemptId: activeAttemptId.current,
                     clientTimeMs: performance.now(),
                 });
             }
         } catch (error) {
             setMessage(
-                `Could not save this record. Check the backend connection and submit again. ${String(error)}`,
+                `Could not save this record. Keep this tab open, check browser storage and the backend connection, then submit again. ${String(error)}`,
             );
         } finally {
             submitting.current = false;
@@ -487,7 +488,7 @@ export function useStudyController() {
             setStage("pfs");
         } catch (error) {
             setSavingMessage(
-                "Some task events could not be saved. Check the backend connection, then retry.",
+                "Some task data could not be saved. Keep this tab open, check browser storage and the backend connection, then retry.",
             );
             setMessage(String(error));
         }

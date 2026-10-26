@@ -30,13 +30,28 @@ The participant setup screen records one of three modes with every session:
 
 Change these arrays and default timings in `config/study.json` to configure the study without editing application code. Formative timing values are saved as an immutable session snapshot in `session.json`, `events.jsonl`, and every CSV export.
 
-It uses local JSON storage. Session writes are asynchronous and queued in order per session; the API confirms a save after the file has been written and renamed into place. SQLite is documented for later work and is not active.
+It uses local SQLite storage with transactional event persistence. Events and submissions are retained in a browser IndexedDB outbox until the backend commits and acknowledges their IDs. Recover a session on the same browser profile and origin to replay pending commands after an interruption.
 
-At startup, malformed or structurally invalid session files are skipped and preserved for recovery. The backend terminal reports the affected filenames and validation errors, and `/api/health` lists `skippedSessionFiles`. Valid sessions still load. Correct or restore affected files from a backup, then restart the backend to load them; do not replace them with empty sessions.
+On first startup, existing JSON session files are imported into `backend/data/study.sqlite`; originals remain unchanged as migration backups. Malformed legacy files are preserved and reported in the backend terminal and `/api/health` (`skippedSessionFiles`). See [storage and recovery](docs/SQLITE-NEXT.md) for durability, backup, and recovery details.
+
+## Storage and analysis
+
+**SQLite saves study data during collection; the exported CSV files will still be used for analysis in Jupyter (`.ipynb`) notebooks.** Researchers do not need to query SQLite to perform the planned analysis.
+
+SQLite is retained so the app can commit events and submissions together, prevent duplicate saves on retry, and recover committed data after an interruption. The participant results ZIP is generated from this saved data. It is an export, so it does not replace the storage needed before a researcher downloads it. SQLite also provides a source from which exports can be generated again.
+
+For each participant:
+
+1. Download **results ZIP** after the session and keep a backup of the original ZIP.
+2. Extract the CSV files and load them into the analysis notebook, for example with `pandas.read_csv()`.
+3. Apply the study's inclusion rules: distinguish study modes and exclude practice, calibration, interrupted attempts, and incomplete experimental blocks from the main condition comparisons.
+4. Join the separately collected PFS questionnaire responses using the participant and condition identifiers, retaining session IDs to distinguish repeated sessions.
+
+Keep the SQLite database as the saved source and recovery record. Use the CSV exports as the notebook inputs, following the [data dictionary](docs/DATA-DICTIONARY.md) for field definitions and units. For optional data inspection, see the [basic SQLite query guide](docs/SQLITE-QUERIES.md).
 
 ## Set up
 
-Install **Node.js 20.19 or newer**:
+Install **Node.js 22.13 or newer**:
 
 ```bash
 node --version
@@ -122,7 +137,8 @@ backend/data/exports/<session-id>/
 | --- | --- |
 | `blocks.csv` | One row per practice, calibration, or experimental block. |
 | `records.csv` | One row per presented record and its measures. |
-| `events.jsonl` | Raw presentation, key, submission, and validation events. |
+| `events.jsonl` | Raw presentation, key, submission, and validation events for current block attempts. |
+| `all-events.jsonl` | All raw events, including interrupted attempts, with inclusion flags. |
 | `decisions.csv` | Adaptive windows and resulting state/track decisions. |
 | `transitions.csv` | Playback outcome after each adaptive decision. |
 | `tracks.csv` | Music files discovered when the session began. |
@@ -156,11 +172,14 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 
 ## Current limitations
 
-- Local JSON storage only; SQLite remains pending.
+- Browser outbox recovery requires the same origin and browser profile. Clearing site data can remove unsent commands.
+- Back up the SQLite database as described in [storage and recovery](docs/SQLITE-NEXT.md).
 - The frozen manifest must be regenerated when an approved audio source file changes.
 
 ## Frontend regression checks
 
-Run `npm run build` from the repository root to compile the frontend and type-check the backend. Run `npm run test:storage` to verify safe loading, nested-field validation, legacy defaults, ordered snapshots, write-failure recovery, and independent session writes. Storage tests use temporary directories and do not modify saved study data.
+Run `npm run build` from the repository root to compile the frontend and type-check the backend. Run `npm run test:storage` to verify SQLite migration, atomic events and receipts, rollback, interrupted-attempt audit, and recovery after forced backend termination. Storage tests use temporary directories and do not modify saved study data.
 
-With both development servers running and Playwright available, run `node tests/presentation-recovery.mjs` to check event retries, lost acknowledgements, duplicate-submit prevention, and block completion while an event is pending. The checks create new Formative sessions and export files; use a disposable backend data directory when validating against study data. Set `PLAYWRIGHT_MODULE` to an installed Playwright module URL if needed, and `PLAYWRIGHT_EXECUTABLE_PATH` to a Chromium browser executable when Google Chrome is unavailable.
+With both development servers running and Playwright available, run `node tests/presentation-recovery.mjs` to check event retries, lost acknowledgements, duplicate-submit prevention, and block completion while an event is pending. The checks create new Formative sessions and export files; start the backend with `TUNED_IN_DATA_DIR` pointing to a disposable directory, and set the same variable for the test script. Set `PLAYWRIGHT_MODULE` to an installed Playwright module URL if needed, and `PLAYWRIGHT_EXECUTABLE_PATH` to a Chromium browser executable when Google Chrome is unavailable.
+
+Run `node tests/durable-recovery.mjs` against disposable dev servers to test event and submission replay after forced browser termination. It uses a temporary browser profile. Set `TEST_ORIGIN` when the frontend runs on a port other than 5173.

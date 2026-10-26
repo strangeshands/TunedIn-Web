@@ -5,10 +5,11 @@ import assert from "node:assert/strict";
 import { appendFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { DatabaseSync } from "node:sqlite";
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
-const origin = "http://127.0.0.1:5173";
+const origin = process.env.TEST_ORIGIN ?? "http://127.0.0.1:5173";
 const browser = await chromium.launch({
     ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH
         ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
@@ -60,9 +61,13 @@ async function submit(page) {
 async function finishAndCheck(page, id) {
     await page.clock.fastForward(30_000);
     await page.getByRole("button", { name: "Start Calibration Block" }).waitFor();
-    const saved = JSON.parse(readFileSync(join(root, "backend/data", id + ".json"), "utf8"));
     const exported = await (await page.request.get(`${origin}/api/sessions/${id}/export/session.json`)).json();
     const { measures, ...session } = exported;
+    const database = new DatabaseSync(join(process.env.TUNED_IN_DATA_DIR ?? join(root, "backend/data"), "study.sqlite"), { readOnly: true });
+    const metadata = JSON.parse(database.prepare("SELECT snapshot FROM sessions WHERE id = ?").get(id).snapshot);
+    const events = database.prepare("SELECT event_json FROM events WHERE session_id = ? AND active = 1 ORDER BY sequence").all(id).map(row => JSON.parse(row.event_json));
+    database.close();
+    const saved = { ...metadata, events };
     assert.deepEqual(session, saved);
     for (const e of saved.events.filter(e => e.eventType === "record_submitted")) {
         const events = saved.events.filter(item => item.recordId === e.recordId);
@@ -75,7 +80,7 @@ async function finishAndCheck(page, id) {
     assert.ok(measures[0].medianInitiationLatencyMs >= 0);
     assert.ok(measures[0].medianFirstPassEntryDurationMs >= 0);
     const csv = await (await page.request.get(`${origin}/api/sessions/${id}/export/records.csv`)).text();
-    assert.equal(csv, readFileSync(join(root, "backend/data/exports", id, "records.csv"), "utf8"));
+    assert.equal(csv, readFileSync(join(process.env.TUNED_IN_DATA_DIR ?? join(root, "backend/data"), "exports", id, "records.csv"), "utf8"));
     const rows = csv.trim().split("\n").map(line => [...line.matchAll(/"((?:[^"]|"")*)"/g)].map(m => m[1].replaceAll('""', '"')));
     const [header, ...data] = rows;
     for (const values of data) {
@@ -181,7 +186,7 @@ try {
             await page.clock.fastForward(30_000);
             await page.getByRole("heading", { name: "Saving events", exact: true }).waitFor();
             assert.equal(submits, 0);
-            assert.equal(JSON.parse(readFileSync(join(root, "backend/data", sessionId + ".json"), "utf8")).blocks[0].endedAt, null);
+            assert.equal((await (await page.request.get(`${origin}/api/sessions/${sessionId}/export/session.json`)).json()).blocks[0].endedAt, null);
             // Wait for the route to receive the retry before releasing it.
             const deadline = Date.now() + 5000;
             while (!held && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 10));

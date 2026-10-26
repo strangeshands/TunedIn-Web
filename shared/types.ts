@@ -80,6 +80,9 @@ export type EventType =
     | "record_submitted"
     | "validation_result";
 export type TaskEvent = {
+    /** Stable across retries; populated during legacy JSON import. */
+    eventId?: string;
+    attemptId?: string;
     sequence: number;
     blockNumber: number;
     recordId: string;
@@ -130,6 +133,7 @@ export type Session = {
     musicTransitions: MusicTransition[];
 };
 export type Block = {
+    attemptId?: string;
     number: number;
     condition: Condition;
     startedAt: string;
@@ -138,6 +142,7 @@ export type Block = {
     initialMusicTrackId: string | null;
 };
 export type InterruptedBlock = {
+    attemptId?: string;
     number: number;
     condition: Condition;
     startedAt: string;

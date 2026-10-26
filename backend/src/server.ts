@@ -23,7 +23,7 @@ import {
 } from "./playbackPolicy.js";
 import { generateRecord, wrongFields } from "./records.js";
 import { evaluateAdaptiveRule } from "./rule.js";
-import { saveSession, sessions, sessionLoadIssues } from "./store.js";
+import { saveSession, sessions, sessionLoadIssues, store } from "./store.js";
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -50,12 +50,6 @@ const validTiming = (value: unknown): value is StudyTiming => {
             timing[key] <= 86_400,
     );
 };
-const eventTypes = [
-    "record_presented",
-    "first_key",
-    "record_submitted",
-    "validation_result",
-];
 const getSession = (id: string) => {
     const session = sessions.get(id);
     if (!session) throw new Error("Session not found.");
@@ -69,7 +63,9 @@ const exportFilenamePart = (value: string) =>
         .replace(/[^\p{L}\p{N}._-]+/gu, "-")
         .replace(/^-+|-+$/g, "") || "participant";
 const appendEvent = (session: Session, event: Omit<TaskEvent, "sequence">) =>
-    session.events.push({ ...event, sequence: session.events.length + 1 });
+    session.events.push({ ...event, eventId: event.eventId ?? randomUUID(),
+        attemptId: event.attemptId ?? session.blocks.find(block => block.number === event.blockNumber)?.attemptId,
+        sequence: store.nextSequence(session) });
 type RecoveryStage =
     | "introduction"
     | "baseline-intro"
@@ -138,7 +134,7 @@ app.get("/api/health", (_request, response) => {
     const catalogue = loadMusicCatalogue();
     response.json({
         ok: true,
-        storage: "JSON files now; SQLite pending",
+        storage: "SQLite (WAL, synchronous=FULL)",
         skippedSessionFiles: sessionLoadIssues.map(issue => issue.file),
         audioIntegration: config.audioIntegration,
         buildVersion: config.buildVersion,
@@ -258,6 +254,7 @@ function createStartedBlock(session: Session, number: number, condition: Conditi
         loadMusicCatalogue(),
     );
     const block: Block = {
+        attemptId: randomUUID(),
         number,
         condition,
         startedAt: new Date().toISOString(),
@@ -269,6 +266,7 @@ function createStartedBlock(session: Session, number: number, condition: Conditi
     return {
         record: generateRecord(0, number, session.randomizationSeed),
         initialMusicTrackId: block.initialMusicTrackId,
+        attemptId: block.attemptId,
     };
 }
 
@@ -282,6 +280,7 @@ app.post("/api/sessions/:sessionId/recovery/restart-block", async (request, resp
     session.interruptedBlocks ??= [];
     session.interruptedBlocks.push({
         number,
+        attemptId: activeBlock.attemptId,
         condition: activeBlock.condition,
         startedAt: activeBlock.startedAt,
         interruptedAt: new Date().toISOString(),
@@ -343,37 +342,35 @@ app.post(
 app.post("/api/sessions/:sessionId/events", async (request, response) => {
     const session = getSession(request.params.sessionId);
     const events = request.body?.events as Omit<TaskEvent, "sequence">[];
-    if (!Array.isArray(events) || !events.length)
-        throw new Error("Expected task events.");
+    if (!Array.isArray(events) || !events.length) throw new Error("Expected task events.");
+    // Validate the whole batch before mutating the session.
+    const additions: Omit<TaskEvent, "sequence">[] = [];
+    const acknowledgedEventIds: string[] = [];
     for (const event of events) {
-        if (
-            !Number.isInteger(event.blockNumber) ||
-            !session.blocks.find(
-                (block) =>
-                    block.number === event.blockNumber &&
-                    block.endedAt === null,
-            ) ||
-            typeof event.recordId !== "string" ||
-            !eventTypes.includes(event.eventType) ||
-            !Number.isFinite(event.clientTimeMs)
-        )
+        if (!event || typeof event.eventId !== "string" || !event.eventId || event.eventId.length > 200 ||
+            !["record_presented", "first_key"].includes(event.eventType) ||
+            !Number.isInteger(event.blockNumber) || typeof event.recordId !== "string" ||
+            typeof event.attemptId !== "string" || !event.attemptId || event.payload !== undefined ||
+            !Number.isFinite(event.clientTimeMs) || event.clientTimeMs < 0)
             throw new Error("Invalid task event.");
-        // The queue may retry after a saved event's acknowledgement is lost.
-        if (
-            ["record_presented", "first_key"].includes(event.eventType) &&
-            session.events.some(
-                (saved) =>
-                    saved.blockNumber === event.blockNumber &&
-                    saved.recordId === event.recordId &&
-                    saved.eventType === event.eventType &&
-                    saved.clientTimeMs === event.clientTimeMs,
-            )
-        )
-            continue;
-        appendEvent(session, event);
+        const previous = store.event(session.id, event.eventId) ?? additions.find(item => item.eventId === event.eventId);
+        if (previous) {
+            if (previous.blockNumber !== event.blockNumber || previous.recordId !== event.recordId ||
+                previous.eventType !== event.eventType || previous.clientTimeMs !== event.clientTimeMs ||
+                previous.attemptId !== event.attemptId)
+                throw new Error("Event ID was already used for different data.");
+        } else {
+            const block = session.blocks.find(block => block.number === event.blockNumber && block.endedAt === null);
+            if (!block || block.attemptId !== event.attemptId) throw new Error("Event does not belong to the active attempt.");
+            additions.push({ eventId: event.eventId, attemptId: event.attemptId,
+                blockNumber: event.blockNumber, recordId: event.recordId,
+                eventType: event.eventType, clientTimeMs: event.clientTimeMs });
+        }
+        acknowledgedEventIds.push(event.eventId);
     }
+    for (const event of additions) appendEvent(session, event);
     await saveSession(session);
-    response.json({ saved: events.length });
+    response.json({ saved: events.length, acknowledgedEventIds });
 });
 
 app.post(
@@ -384,12 +381,20 @@ app.post(
         const block = session.blocks.find(
             (item) => item.number === number && item.endedAt === null,
         );
-        const { recordId, values, clientTimeMs } = request.body ?? {};
+        const { recordId, values, clientTimeMs, requestId, attemptId } = request.body ?? {};
+        if (typeof requestId !== "string" || !requestId || requestId.length > 200)
+            throw new Error("A submission request ID is required.");
+        const submissionRequest = JSON.stringify({ number, recordId, values, clientTimeMs, attemptId });
+        const receipt = store.receipt(session.id, requestId);
+        if (receipt) {
+            if (receipt.request !== submissionRequest) throw new Error("Submission ID was already used for different data.");
+            return response.json(JSON.parse(receipt.response));
+        }
         if (
-            !block ||
+            !block || block.attemptId !== attemptId ||
             typeof recordId !== "string" ||
             !values ||
-            !Number.isFinite(clientTimeMs)
+            !Number.isFinite(clientTimeMs) || clientTimeMs < 0
         )
             throw new Error("Invalid record submission.");
         const previousPresentations = session.events.filter(
@@ -421,14 +426,12 @@ app.post(
             clientTimeMs,
             payload: { accepted, incorrectFields },
         });
-        await saveSession(session);
-        response.json({
-            accepted,
-            incorrectFields,
-            nextRecord: accepted
-                ? generateRecord(index + 1, number, session.randomizationSeed)
-                : null,
-        });
+        const result = {
+            requestId, accepted, incorrectFields,
+            nextRecord: accepted ? generateRecord(index + 1, number, session.randomizationSeed) : null,
+        };
+        await saveSession(session, { requestId, request: submissionRequest, response: JSON.stringify(result) });
+        response.json(result);
     },
 );
 
@@ -626,5 +629,5 @@ app.use(
             .json({ error: error.message }),
 );
 app.listen(Number(process.env.PORT ?? 3001), () =>
-    console.log("Tuned In backend running on port 3001"),
+    console.log(`Tuned In backend running on port ${process.env.PORT ?? 3001}`),
 );

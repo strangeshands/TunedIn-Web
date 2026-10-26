@@ -110,3 +110,9 @@ This file records the browser outcome after an adaptive decision. It can be empt
 ## `session.json`
 
 The complete saved session: participant and order data, configuration/build/task versions, selected comfort volume and comfort-check timestamp, blocks, raw events, captured music catalogue, adaptive decisions, playback transitions, calculated block measures, and `endedEarlyAt` when a researcher closes an interrupted session through recovery.
+
+## Durable event identity and audit
+
+Raw events include `eventId` (stable across retries) and `attemptId` (specific timed-block attempt). Session `sequence` values remain unique and increasing even when an attempt is interrupted. Consequently, current-attempt exports may contain gaps in sequence numbers. Legacy events receive stable IDs during SQLite import; timestamps remain unchanged.
+
+`all-events.jsonl` includes every committed event, including interrupted attempts, with `includedInCurrentAttempt` marking inclusion in the normal record/block measures. `events.jsonl` and existing CSV measure definitions retain their current-attempt scope. Submission request IDs and their cached validation responses are retained in SQLite for idempotent retries.

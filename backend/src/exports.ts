@@ -3,7 +3,7 @@ import { join } from "node:path";
 import type { Session } from "../../shared/types.js";
 import { config } from "./config.js";
 import { calculateBlockMeasures } from "./measures.js";
-import { dataDir } from "./store.js";
+import { dataDir, store } from "./store.js";
 
 const quote = (value: unknown) =>
     `"${String(value ?? "").replaceAll('"', '""')}"`;
@@ -317,6 +317,7 @@ export function exportFiles(session: Session) {
         "blocks.csv": blockCsv,
         "records.csv": recordCsv,
         "events.jsonl": eventsJsonl,
+        "all-events.jsonl": store.auditEvents(session.id).map(event => JSON.stringify({ sessionId: session.id, ...event })).join("\n") + "\n",
         "decisions.csv": decisionsCsv,
         "transitions.csv": transitionsCsv,
         "tracks.csv": tracksCsv,
