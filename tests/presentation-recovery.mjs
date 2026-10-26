@@ -25,7 +25,7 @@ async function setup() {
     await page.goto(origin);
     await page.getByRole("textbox", { name: "Participant ID" }).fill(`FUF-RECOVERY-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await page.getByRole("combobox").first().selectOption("Formative");
-    for (const name of ["Practice duration (seconds)", "Baseline duration (seconds)", "Adaptive block duration (seconds)"])
+    for (const name of ["Practice duration (seconds)", "Adaptive block duration (seconds)"])
         await page.getByRole("spinbutton", { name, exact: true }).fill("30");
     const created = page.waitForResponse(r => r.url().endsWith("/api/sessions"));
     await page.getByRole("button", { name: "Save participant & continue" }).click();

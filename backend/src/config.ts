@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import type { Condition } from "../../shared/types.js";
+import type { BaselineConfig, Condition } from "../../shared/types.js";
 
 export const root = fileURLToPath(new URL("../../", import.meta.url));
 export const config = JSON.parse(
@@ -14,6 +14,7 @@ export const config = JSON.parse(
     formativeConditionOrder: Condition[];
     practiceSeconds: number;
     baselineSeconds: number;
+    baseline?: BaselineConfig;
     blockSeconds: number;
     restSeconds: number;
     audioIntegration: "rule-engine";

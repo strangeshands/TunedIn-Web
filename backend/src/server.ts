@@ -1,3 +1,4 @@
+import { baselineOptions, baselineForNewSession, baselineFor, validatedRecordCount, recordBaselineDuration } from "./baseline.js";
 import cors from "cors";
 import express from "express";
 import * as archiver from "archiver";
@@ -161,6 +162,7 @@ app.get("/api/study-setup", (_request, response) =>
         conditionOrders: orders,
         formativeConditionOrder: config.formativeConditionOrder,
         timing: defaultTiming,
+        baseline: baselineOptions,
         restSeconds: config.restSeconds,
         configVersion: config.version,
     }),
@@ -194,13 +196,15 @@ app.post("/api/sessions", async (request, response) => {
         throw new Error(
             "This participant already has a saved session in this mode. Use Recover saved session instead.",
         );
+    const baseline = baselineForNewSession();
     const now = new Date().toISOString();
     const musicCatalogue = loadMusicCatalogue();
     const session: Session = {
         id: randomUUID(),
         participantId,
         studyMode,
-        timing,
+        timing: { ...timing, baselineSeconds: defaultTiming.baselineSeconds },
+        baseline,
         orderId,
         conditionOrder,
         createdAt: now,
@@ -221,7 +225,7 @@ app.post("/api/sessions", async (request, response) => {
         musicTransitions: [],
     };
     await saveSession(session);
-    response.status(201).json({ sessionId: session.id });
+    response.status(201).json({ sessionId: session.id, baseline: session.baseline });
 });
 
 app.get("/api/sessions/recover/:participantId", (request, response) => {
@@ -426,9 +430,18 @@ app.post(
             clientTimeMs,
             payload: { accepted, incorrectFields },
         });
+        const validatedRecords = validatedRecordCount(session, number);
+        const baseline = baselineFor(session);
+        const baselineComplete = number === 1 && baseline.mode === "records" && validatedRecords >= baseline.recordTarget;
+        const completedDurationSeconds = baselineComplete ? recordBaselineDuration(session) : null;
+        if (baselineComplete) {
+            // Complete atomically with the final accepted record and its retry receipt.
+            block.endedAt = new Date().toISOString();
+            block.durationSeconds = completedDurationSeconds;
+        }
         const result = {
-            requestId, accepted, incorrectFields,
-            nextRecord: accepted ? generateRecord(index + 1, number, session.randomizationSeed) : null,
+            requestId, accepted, incorrectFields, validatedRecords, baselineComplete, completedDurationSeconds,
+            nextRecord: accepted && !baselineComplete ? generateRecord(index + 1, number, session.randomizationSeed) : null,
         };
         await saveSession(session, { requestId, request: submissionRequest, response: JSON.stringify(result) });
         response.json(result);
@@ -576,7 +589,11 @@ app.post(
         const session = getSession(request.params.sessionId);
         const number = Number(request.params.blockNumber);
         const block = session.blocks.find((item) => item.number === number);
-        const durationSeconds = Number(request.body?.durationSeconds);
+        const baseline = baselineFor(session);
+        const recordBased = number === 1 && baseline.mode === "records";
+        if (recordBased && validatedRecordCount(session, 1) < baseline.recordTarget)
+            throw new Error(`Complete ${baseline.recordTarget} validated baseline records before finishing.`);
+        const durationSeconds = recordBased ? recordBaselineDuration(session) : Number(request.body?.durationSeconds);
         if (
             !block ||
             (block.endedAt !== null &&

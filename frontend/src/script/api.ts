@@ -1,4 +1,6 @@
 import type {
+    BaselineConfig,
+    BaselineSettings,
     BlockMeasures,
     Condition,
     MusicCatalogue,
@@ -48,6 +50,7 @@ export function getStudySetup() {
         conditionOrders: Record<OrderId, Condition[]>;
         formativeConditionOrder: Condition[];
         timing: StudyTiming;
+        baseline: BaselineConfig;
         restSeconds: number;
         configVersion: string;
     }>("/api/study-setup");
@@ -109,7 +112,7 @@ export function createSession(data: {
     orderId: OrderId;
     conditionOrder: Condition[];
 }) {
-    return request<{ sessionId: string }>("/api/sessions", data);
+    return request<{ sessionId: string; baseline: BaselineSettings }>("/api/sessions", data);
 }
 
 export type RecoveryCheckpoint = {
@@ -223,6 +226,9 @@ export function submitRecord(
         accepted: boolean;
         incorrectFields: string[];
         nextRecord: SourceRecord | null;
+        validatedRecords?: number;
+        baselineComplete?: boolean;
+        completedDurationSeconds?: number | null;
     }>(`/api/sessions/${sessionId}/blocks/${blockNumber}/submit`, {
         recordId,
         values,

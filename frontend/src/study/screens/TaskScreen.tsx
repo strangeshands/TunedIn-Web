@@ -20,6 +20,9 @@ type Props = Pick<
     | "conditionOrder"
     | "duration"
     | "remaining"
+    | "recordBasedBaseline"
+    | "baseline"
+    | "baselineCompletedRecords"
     | "skipPracticeInProgress"
     | "update"
     | "submit"
@@ -41,6 +44,9 @@ export function TaskScreen({
     conditionOrder,
     duration,
     remaining,
+    recordBasedBaseline,
+    baseline,
+    baselineCompletedRecords,
     skipPracticeInProgress,
     update,
     submit,
@@ -73,14 +79,19 @@ export function TaskScreen({
                                 ? "Practice"
                                 : `Block ${blockIndex + 1} / ${conditionOrder.length}`}
                     </span>
-                    <span className="pill">Timed Task</span>
-                    <span>{fmt(remaining)} remaining</span>
+                    <span className="pill">{recordBasedBaseline ? "Record-based calibration" : "Timed Task"}</span>
+                    {recordBasedBaseline ? (
+                        <>
+                            <span aria-live="polite">Baseline: {baselineCompletedRecords} of {baseline.recordTarget} records completed</span>
+                            <span>{fmt(seconds)} elapsed</span>
+                        </>
+                    ) : <span>{fmt(remaining)} remaining</span>}
                 </div>
             </header>
             <div className="progress">
                 <i
                     style={{
-                        width: `${Math.min(100, (seconds / duration) * 100)}%`,
+                        width: `${Math.min(100, (recordBasedBaseline ? baselineCompletedRecords / baseline.recordTarget : seconds / duration) * 100)}%`,
                     }}
                 />
             </div>

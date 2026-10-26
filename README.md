@@ -2,7 +2,7 @@
 
 This branch is the version for the group's first iterative-feedback session. It is a local browser prototype of the Chapter Six fictional digital-encoding task.
 
-The current build identifier is `pilot-1.0.0`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
+The current build identifier is `pilot-1.1.0`. Before collecting a different formative iteration, update `buildVersion` in `config/study.json`. The backend saves that value with each session and in every export, so participants P001–P003 can be traced to the exact build used.
 
 ```text
 Participant setup → Participant introduction → Practice → Silent baseline calibration
@@ -26,9 +26,35 @@ Participants copy fictional Record Code, Batch Code, and Quantity values into ma
 The participant setup screen records one of three modes with every session:
 
 - **Pilot** and **Main** use the counterbalanced orders in `conditionOrders`.
-- **Formative Testing** automatically uses `formativeConditionOrder`, currently one `Adaptive music` block. It also shows editable practice, baseline, and block durations in seconds.
+- **Formative Testing** automatically uses `formativeConditionOrder`, currently one `Adaptive music` block. It also shows editable practice and block durations in seconds. Baseline mode, target, and duration are controlled only by study configuration.
 
 Change these arrays and default timings in `config/study.json` to configure the study without editing application code. Formative timing values are saved as an immutable session snapshot in `session.json`, `events.jsonl`, and every CSV export.
+
+## Choose the baseline completion rule
+
+The default silent baseline requires **15 successfully completed records**, with no time limit. Set **baseline.defaultMode** in `config/study.json` before starting collection. Participant setup has no baseline selector or duration override:
+
+- **15 completed records:** participants continue until 15 distinct records have been accepted. Incorrect submissions require correction of the same record and do not increase the count. Progress and elapsed time are shown.
+- **Timed (120 seconds):** the baseline ends after two minutes, regardless of the number completed. This duration comes from `baselineSeconds` in study configuration.
+
+The introduction and calibration instructions reflect the selected rule. Practice and main-block completion rules are unchanged. The two baseline rules are alternatives: the inactive rule does not stop the block.
+
+Configure availability in `config/study.json`:
+
+```json
+"baselineSeconds": 120,
+"baseline": {
+  "defaultMode": "records",
+  "enabledModes": ["records", "timed"],
+  "recordTarget": 15
+}
+```
+
+To disable timed calibration, set `enabledModes` to `["records"]`. To disable record-based calibration, set it to `["timed"]` and set `defaultMode` to `"timed"`. At least one rule must remain enabled, and the default must be enabled. Set `defaultMode` to `"records"` or `"timed"` to choose the active rule; `enabledModes` restricts which values are valid. Keep `baselineSeconds: 120` to retain the two-minute option. Restart the backend after changing configuration.
+
+The selected rule and target are saved with each new session. Recovering an existing session keeps its original rule; older sessions without a rule snapshot remain timed. Restarting an interrupted record-based baseline starts a new attempt at 0 of 15, preserving the interrupted attempt in the audit data.
+
+Exports include `baseline_mode` and `baseline_target_records`. In record mode, baseline `duration_seconds` is the actual interval from the first presentation to final accepted submission. `configured_baseline_seconds` still records the retained timing setting, but it is inactive in record mode. CSV analysis should check `baseline_mode` before comparing calibration durations.
 
 It uses local SQLite storage with transactional event persistence. Events and submissions are retained in a browser IndexedDB outbox until the backend commits and acknowledges their IDs. Recover a session on the same browser profile and origin to replay pending commands after an interruption.
 
@@ -183,3 +209,9 @@ Run `npm run build` from the repository root to compile the frontend and type-ch
 With both development servers running and Playwright available, run `node tests/presentation-recovery.mjs` to check event retries, lost acknowledgements, duplicate-submit prevention, and block completion while an event is pending. The checks create new Formative sessions and export files; start the backend with `TUNED_IN_DATA_DIR` pointing to a disposable directory, and set the same variable for the test script. Set `PLAYWRIGHT_MODULE` to an installed Playwright module URL if needed, and `PLAYWRIGHT_EXECUTABLE_PATH` to a Chromium browser executable when Google Chrome is unavailable.
 
 Run `node tests/durable-recovery.mjs` against disposable dev servers to test event and submission replay after forced browser termination. It uses a temporary browser profile. Set `TEST_ORIGIN` when the frontend runs on a port other than 5173.
+
+### Baseline checks
+
+Run `npm run test:baseline` for configuration, legacy-session, counting, and duration checks.
+
+For integration checks, start disposable backend/frontend servers with a temporary `TUNED_IN_DATA_DIR`, then run `TEST_API_ORIGIN=http://127.0.0.1:3101 node tests/baseline-api.mjs`. Run `TEST_ORIGIN=http://127.0.0.1:5273 node tests/baseline-browser.mjs` for participant instructions, the configured completion rule and recovery. Run the checks once per configured mode, restarting the backend after each configuration change. Browser checks require Playwright; `PLAYWRIGHT_MODULE` can specify its module path and `PLAYWRIGHT_EXECUTABLE_PATH` a Chromium executable. These checks create test sessions; do not run them against collection data.

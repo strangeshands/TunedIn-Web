@@ -82,20 +82,6 @@ export function ParticipantScreen({
                             />
                         </label>
                         <label className="field">
-                            <span>Baseline duration (seconds)</span>
-                            <input
-                                type="number"
-                                min="1"
-                                value={formativeTiming.baselineSeconds}
-                                onChange={(event) =>
-                                    updateFormativeTiming(
-                                        "baselineSeconds",
-                                        event.target.value,
-                                    )
-                                }
-                            />
-                        </label>
-                        <label className="field">
                             <span>Adaptive block duration (seconds)</span>
                             <input
                                 type="number"

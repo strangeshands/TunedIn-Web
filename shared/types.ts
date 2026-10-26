@@ -2,6 +2,9 @@ export type Condition = "No music" | "Static music" | "Adaptive music";
 /** Configured condition-order key, for example "A" or "Adaptive-only". */
 export type OrderId = string;
 export type StudyMode = "Formative" | "Pilot" | "Main";
+export type BaselineMode = "records" | "timed";
+export type BaselineSettings = { mode: BaselineMode; recordTarget: number };
+export type BaselineConfig = { defaultMode: BaselineMode; enabledModes: BaselineMode[]; recordTarget: number };
 export type StudyTiming = {
     practiceSeconds: number;
     baselineSeconds: number;
@@ -112,6 +115,8 @@ export type Session = {
     participantId: string;
     studyMode: StudyMode;
     timing: StudyTiming;
+    /** Missing on legacy sessions, which always use a timed baseline. */
+    baseline?: BaselineSettings;
     orderId: OrderId;
     conditionOrder: Condition[];
     createdAt: string;

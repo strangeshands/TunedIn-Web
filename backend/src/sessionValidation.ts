@@ -28,6 +28,7 @@ const optional = (check: Check): Check => (value, path) => { if (value !== undef
 const session = shape({
     id: string, participantId: string, studyMode: oneOf("Formative", "Pilot", "Main"),
     timing: shape({ practiceSeconds: nonnegative, baselineSeconds: nonnegative, blockSeconds: nonnegative }),
+    baseline: optional(shape({ mode: oneOf("records", "timed"), recordTarget: (value, path) => { integer(value, path); if ((value as number) < 1) fail(path); } })),
     orderId: string, conditionOrder: array(condition), createdAt: date, updatedAt: date,
     configVersion: string, buildVersion: string, randomizationSeed: string, taskVersion: string,
     audioIntegration: oneOf("rule-engine"), comfortVolumePercent: nullable(nonnegative),

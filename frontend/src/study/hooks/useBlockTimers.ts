@@ -5,6 +5,7 @@ export function useBlockTimers({
     stage,
     started,
     duration,
+    recordBasedBaseline,
     completing,
     setSeconds,
     finishBlock,
@@ -17,6 +18,7 @@ export function useBlockTimers({
     stage: Stage;
     started: number | null;
     duration: number;
+    recordBasedBaseline: boolean;
     completing: RefObject<boolean>;
     setSeconds: (seconds: number) => void;
     finishBlock: (seconds: number) => Promise<void>;
@@ -37,13 +39,13 @@ export function useBlockTimers({
         const timer = window.setInterval(() => {
             const elapsed = Math.floor((performance.now() - started) / 1000);
             setSeconds(elapsed);
-            if (elapsed >= duration && !completing.current) {
+            if (!recordBasedBaseline && elapsed >= duration && !completing.current) {
                 completing.current = true;
                 void finishBlock(duration);
             }
         }, 250);
         return () => window.clearInterval(timer);
-    }, [stage, started, duration]);
+    }, [stage, started, duration, recordBasedBaseline]);
 
     // The rest countdown is client-only: it does not create backend task events or exports.
     useEffect(() => {

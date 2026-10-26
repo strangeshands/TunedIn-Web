@@ -6,6 +6,7 @@ import {
     type FormEvent,
 } from "react";
 import type {
+    BaselineConfig, BaselineSettings,
     Condition,
     OrderId,
     SourceRecord,
@@ -40,6 +41,9 @@ const fallbackTiming: StudyTiming = {
 // Coordinates session changes and preserves event/submission ordering. Rendering,
 // navigation, timers, and audio lifecycles are handled by separate modules.
 export function useStudyController() {
+    const [baselineOptions, setBaselineOptions] = useState<BaselineConfig>({ defaultMode: "records", enabledModes: ["records", "timed"], recordTarget: 15 });
+    const [sessionBaseline, setSessionBaseline] = useState<BaselineSettings | null>(null);
+    const [baselineCompletedRecords, setBaselineCompletedRecords] = useState(0);
     const [stage, setStage] = useState<Stage>("participant");
     const [participantId, setParticipantId] = useState(
         () => localStorage.getItem("tunedIn.participantId") ?? "",
@@ -95,6 +99,8 @@ export function useStudyController() {
     const condition = conditionOrder[blockIndex] ?? "No music";
     const timing =
         studyMode === "Formative" ? formativeTiming : configuredTiming;
+    const baseline = sessionBaseline ?? { mode: baselineOptions.defaultMode, recordTarget: baselineOptions.recordTarget };
+    const recordBasedBaseline = stage === "baseline" && baseline.mode === "records";
     const duration =
         stage === "practice"
             ? timing.practiceSeconds
@@ -114,7 +120,7 @@ export function useStudyController() {
             sessionId, stage, condition, started, blockIndex, completing,
         });
     useBlockTimers({
-        stage, started, duration, completing, setSeconds, finishBlock,
+        stage, started, duration, recordBasedBaseline, completing, setSeconds, finishBlock,
         blockIndex, conditionCount: conditionOrder.length, restSeconds,
         setRestRemaining, continueFromRest
     });
@@ -144,6 +150,7 @@ export function useStudyController() {
                     formativeConditionOrder,
                     timing,
                     restSeconds,
+                    baseline: baselineSetup,
                 }) => {
                     const firstOrderId = Object.keys(conditionOrders)[0] ?? "";
                     setOrders(conditionOrders);
@@ -151,6 +158,7 @@ export function useStudyController() {
                     setConfiguredTiming(timing);
                     setFormativeTiming(timing);
                     setRestSeconds(restSeconds);
+                    setBaselineOptions(baselineSetup);
                     setOrderId((current) =>
                         conditionOrders[current] ? current : firstOrderId,
                     );
@@ -190,6 +198,7 @@ export function useStudyController() {
                 timing,
             });
             setSessionId(response.sessionId);
+            setSessionBaseline(response.baseline);
             setSessionConditionOrder(conditionOrder);
             queue.current = createEventQueue(response.sessionId);
             await Promise.all([loadMusicCatalogue(), loadPlaybackConfig()]);
@@ -219,6 +228,7 @@ export function useStudyController() {
             setParticipantId(session.participantId);
             setStudyMode(session.studyMode);
             setOrderId(session.orderId);
+            setSessionBaseline(session.baseline ?? { mode: "timed", recordTarget: 15 });
             setConfiguredTiming(session.timing);
             setFormativeTiming(session.timing);
             setBlockIndex(checkpoint.blockIndex);
@@ -316,6 +326,7 @@ export function useStudyController() {
         setErrors([]);
         setStreak(0);
         setBlockHighestStreak(0);
+        setBaselineCompletedRecords(0);
         clearSubmissionFeedback();
         setSeconds(0);
         firstKey.current = false;
@@ -414,6 +425,7 @@ export function useStudyController() {
                 pendingSubmissions.current.delete(submission),
             );
             setErrors(response.incorrectFields);
+            if (number === 1 && response.validatedRecords !== undefined) setBaselineCompletedRecords(response.validatedRecords);
             if (response.accepted) {
                 if (number >= 2 && !recordWasRejected.current) {
                     setStreak((current) => {
@@ -427,6 +439,11 @@ export function useStudyController() {
                 recordWasRejected.current = true;
                 setStreak(0);
                 showSubmissionFeedback("incorrect");
+            }
+            if (response.baselineComplete && response.completedDurationSeconds != null) {
+                completing.current = true;
+                await finishBlock(response.completedDurationSeconds);
+                return;
             }
             if (
                 response.accepted &&
@@ -539,12 +556,14 @@ export function useStudyController() {
         setStage("participant");
         setSessionId(null);
         setSessionConditionOrder(null);
+        setSessionBaseline(null);
         setRecoveryActiveBlock(null);
         setBlockIndex(0);
         setRecord(null);
         setForm(empty);
         setStreak(0);
         setBlockHighestStreak(0);
+        setBaselineCompletedRecords(0);
         clearSubmissionFeedback();
         setMessage("");
         setAudioMessage("");
@@ -553,6 +572,7 @@ export function useStudyController() {
         endingBlockNumber.current = null;
     }
     return {
+        baseline, recordBasedBaseline, baselineCompletedRecords,
         stage,
         setStage,
         participantId,

@@ -5,6 +5,8 @@ type Props = Pick<
     StudyController,
     "setStage"
     | "participantId"
+    | "baseline"
+    | "timing"
     | "introductionStep"
     | "setIntroductionStep"
     | "shortcutMessage"
@@ -17,6 +19,8 @@ type Props = Pick<
 export function IntroductionScreen({
     setStage,
     participantId,
+    baseline,
+    timing,
     introductionStep,
     setIntroductionStep,
     shortcutMessage,
@@ -60,9 +64,10 @@ export function IntroductionScreen({
                                 <strong>
                                     Silent Baseline Calibration Block:
                                 </strong>{" "}
-                                Complete the task without music. This
-                                critical measured stage creates your
-                                personal reference for Adaptive Music.
+                                {baseline.mode === "records"
+                                    ? `Complete ${baseline.recordTarget} records correctly without music. Corrections count toward the same record, and there is no time limit.`
+                                    : `Complete the task without music for ${timing.baselineSeconds} seconds, until the timer ends.`}
+                                {" "}This stage creates your personal reference for Adaptive Music.
                             </li>
                             <li>
                                 <strong>Audio Comfort Check:</strong> Listen

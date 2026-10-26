@@ -7,6 +7,7 @@ type Props = Pick<
     "participantId"
     | "navigationLocked"
     | "timing"
+    | "baseline"
     | "goBack"
     | "startBaselineCalibration"
 >;
@@ -15,6 +16,7 @@ export function BaselineIntroScreen({
     participantId,
     navigationLocked,
     timing,
+    baseline,
     goBack,
     startBaselineCalibration,
 }: Props) {
@@ -26,9 +28,15 @@ export function BaselineIntroScreen({
             participantId={participantId}
         >
             <div className="timer-card">
-                <span>Calibration duration</span>
-                <strong>{fmt(timing.baselineSeconds)}</strong>
+                <span>{baseline.mode === "records" ? "Calibration target" : "Calibration duration"}</span>
+                <strong>{baseline.mode === "records" ? `${baseline.recordTarget} completed records` : fmt(timing.baselineSeconds)}</strong>
             </div>
+            <p className="instructions">
+                {baseline.mode === "records"
+                    ? `Complete ${baseline.recordTarget} records correctly. The counter increases only after a record is accepted; correcting a mistake still completes the same record. There is no time limit.`
+                    : `Continue entering records for ${fmt(timing.baselineSeconds)}. Calibration ends when the timer runs out; there is no record target.`}
+                {" "}Work at your normal pace. No music will play.
+            </p>
             <button
                 className="primary large"
                 onClick={startBaselineCalibration}

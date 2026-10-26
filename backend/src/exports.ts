@@ -1,3 +1,4 @@
+import { baselineFor } from "./baseline.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Session } from "../../shared/types.js";
@@ -12,6 +13,8 @@ const csv = (header: string[], rows: unknown[][]) =>
 
 // CSV and JSON Lines are generated only by the backend.
 export function exportFiles(session: Session) {
+    const baseline = baselineFor(session);
+    const baselineTarget = baseline.mode === "records" ? baseline.recordTarget : null;
     const measures = session.blocks.map((block) =>
         calculateBlockMeasures(session, block.number),
     );
@@ -59,6 +62,8 @@ export function exportFiles(session: Session) {
             "comfort_volume_percent",
             "configured_practice_seconds",
             "configured_baseline_seconds",
+            "baseline_mode",
+            "baseline_target_records",
             "configured_block_seconds",
             "block",
             "attempt_status",
@@ -85,7 +90,7 @@ export function exportFiles(session: Session) {
                 session.taskVersion,
                 session.comfortVolumePercent,
                 session.timing.practiceSeconds,
-                session.timing.baselineSeconds,
+                session.timing.baselineSeconds, baseline.mode, baselineTarget,
                 session.timing.blockSeconds,
                 item.number,
                 "interrupted_restart",
@@ -112,7 +117,7 @@ export function exportFiles(session: Session) {
             session.taskVersion,
             session.comfortVolumePercent,
             session.timing.practiceSeconds,
-            session.timing.baselineSeconds,
+            session.timing.baselineSeconds, baseline.mode, baselineTarget,
             session.timing.blockSeconds,
             item.block,
             blockCompletion.get(item.block) ? "completed" : "in_progress",
@@ -142,6 +147,8 @@ export function exportFiles(session: Session) {
             "comfort_volume_percent",
             "configured_practice_seconds",
             "configured_baseline_seconds",
+            "baseline_mode",
+            "baseline_target_records",
             "configured_block_seconds",
             "block",
             "record_id",
@@ -166,7 +173,7 @@ export function exportFiles(session: Session) {
                 session.taskVersion,
                 session.comfortVolumePercent,
                 session.timing.practiceSeconds,
-                session.timing.baselineSeconds,
+                session.timing.baselineSeconds, baseline.mode, baselineTarget,
                 session.timing.blockSeconds,
                 block,
                 recordId,
@@ -200,6 +207,8 @@ export function exportFiles(session: Session) {
                     taskVersion: session.taskVersion,
                     comfortVolumePercent: session.comfortVolumePercent,
                     timing: session.timing,
+                    baselineMode: baseline.mode,
+                    baselineTargetRecords: baselineTarget,
                     ...event,
                 }),
             )
@@ -215,6 +224,8 @@ export function exportFiles(session: Session) {
             "comfort_volume_percent",
             "configured_practice_seconds",
             "configured_baseline_seconds",
+            "baseline_mode",
+            "baseline_target_records",
             "configured_block_seconds",
             "block",
             "window_start_ms",
@@ -235,7 +246,7 @@ export function exportFiles(session: Session) {
             session.participantId, session.id, session.studyMode,
             session.configVersion, session.buildVersion, session.taskVersion,
             session.comfortVolumePercent,
-            session.timing.practiceSeconds, session.timing.baselineSeconds,
+            session.timing.practiceSeconds, session.timing.baselineSeconds, baseline.mode, baselineTarget,
             session.timing.blockSeconds, item.blockNumber,
             item.windowStartMs, item.windowEndMs, item.recordCount,
             item.medianInitiationLatencyMs, item.medianFirstPassEntryDurationMs,
@@ -256,6 +267,8 @@ export function exportFiles(session: Session) {
             "comfort_volume_percent",
             "configured_practice_seconds",
             "configured_baseline_seconds",
+            "baseline_mode",
+            "baseline_target_records",
             "configured_block_seconds",
             "block",
             "decision_id",
@@ -271,7 +284,7 @@ export function exportFiles(session: Session) {
             session.participantId, session.id, session.studyMode,
             session.configVersion, session.buildVersion, session.taskVersion,
             session.comfortVolumePercent,
-            session.timing.practiceSeconds, session.timing.baselineSeconds,
+            session.timing.practiceSeconds, session.timing.baselineSeconds, baseline.mode, baselineTarget,
             session.timing.blockSeconds, item.blockNumber,
             item.decisionId, item.previousTrackId, item.selectedTrackId,
             item.startedMs, item.completedMs, item.configuredCrossfadeMs,
@@ -289,6 +302,8 @@ export function exportFiles(session: Session) {
             "comfort_volume_percent",
             "configured_practice_seconds",
             "configured_baseline_seconds",
+            "baseline_mode",
+            "baseline_target_records",
             "configured_block_seconds",
             "track_id",
             "music_class",
@@ -306,7 +321,7 @@ export function exportFiles(session: Session) {
             session.participantId, session.id, session.studyMode,
             session.configVersion, session.buildVersion, session.taskVersion,
             session.comfortVolumePercent,
-            session.timing.practiceSeconds, session.timing.baselineSeconds,
+            session.timing.practiceSeconds, session.timing.baselineSeconds, baseline.mode, baselineTarget,
             session.timing.blockSeconds, track.id, track.musicClass,
             track.relativeFilePath, track.composer, track.compositionId,
             track.rotationIndex, "frozen_manifest", config.playback.manifestVersion,

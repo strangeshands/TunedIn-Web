@@ -5,6 +5,7 @@ type Props = Pick<
     StudyController,
     "participantId"
     | "recoveryActiveBlock"
+    | "baseline"
     | "message"
     | "endInterruptedSession"
     | "restartInterruptedBlock"
@@ -13,15 +14,19 @@ type Props = Pick<
 export function RecoveryScreen({
     participantId,
     recoveryActiveBlock,
+    baseline,
     message,
     endInterruptedSession,
     restartInterruptedBlock,
 }: Props) {
+    const recordBaseline = recoveryActiveBlock === 1 && baseline.mode === "records";
     return (
         <SimpleStage
             eyebrow="RESEARCHER RECOVERY"
-            title="Timed block was interrupted"
-            description="Completed blocks are preserved. Restarting begins the interrupted timed block again from 0:00."
+            title={recordBaseline ? "Baseline calibration was interrupted" : "Timed block was interrupted"}
+            description={recordBaseline
+                ? `Completed blocks are preserved. Restarting begins baseline calibration again from 0 of ${baseline.recordTarget} completed records.`
+                : "Completed blocks are preserved. Restarting begins the interrupted timed block again from 0:00."}
             participantId={participantId}
         >
             <div className="instructions important-note">
@@ -32,14 +37,14 @@ export function RecoveryScreen({
                         : recoveryActiveBlock === 1
                             ? "Silent Baseline Calibration Block was interrupted."
                             : `Timed Block ${(recoveryActiveBlock ?? 2) - 1} was interrupted.`}{" "}
-                    You may restart this block from 0:00.
+                    {recordBaseline ? `You may restart from 0 of ${baseline.recordTarget} completed records.` : "You may restart this block from 0:00."}
                 </p>
             </div>
             <button
                 className="primary large"
                 onClick={() => void restartInterruptedBlock()}
             >
-                Restart this block from 0:00 <span>→</span>
+                {recordBaseline ? `Restart baseline from 0 of ${baseline.recordTarget} records` : "Restart this block from 0:00"} <span>→</span>
             </button>
             <button
                 className="secondary large"

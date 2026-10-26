@@ -116,3 +116,11 @@ The complete saved session: participant and order data, configuration/build/task
 Raw events include `eventId` (stable across retries) and `attemptId` (specific timed-block attempt). Session `sequence` values remain unique and increasing even when an attempt is interrupted. Consequently, current-attempt exports may contain gaps in sequence numbers. Legacy events receive stable IDs during SQLite import; timestamps remain unchanged.
 
 `all-events.jsonl` includes every committed event, including interrupted attempts, with `includedInCurrentAttempt` marking inclusion in the normal record/block measures. `events.jsonl` and existing CSV measure definitions retain their current-attempt scope. Submission request IDs and their cached validation responses are retained in SQLite for idempotent retries.
+
+## Baseline completion metadata
+
+All CSV exports include `baseline_mode` (`records` or `timed`) and `baseline_target_records` (15 by default in record mode; blank in timed mode). These describe the session's locked baseline rule, including on rows for other blocks.
+
+`configured_baseline_seconds` retains the timing snapshot (normally 120). It is an active deadline only in timed mode. In record mode, block 1 `duration_seconds` is the elapsed interval between its first presentation and final accepted validation, using browser event timestamps. It is not fixed at 120 seconds. Exactly the target number of distinct accepted records completes that baseline; correction submissions do not count as additional records and no next record is presented after completion.
+
+`session.json` stores `baseline: {mode, recordTarget}`. Legacy sessions without this field use timed calibration. `events.jsonl` includes `baselineMode` and `baselineTargetRecords` (null for timed mode). Existing first-pass and correction measures retain their definitions. Use the mode metadata to distinguish baseline protocols in notebook analyses.
