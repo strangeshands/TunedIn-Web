@@ -23,7 +23,7 @@ import {
 } from "./playbackPolicy.js";
 import { generateRecord, wrongFields } from "./records.js";
 import { evaluateAdaptiveRule } from "./rule.js";
-import { saveSession, sessions } from "./store.js";
+import { saveSession, sessions, sessionLoadIssues } from "./store.js";
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -139,6 +139,7 @@ app.get("/api/health", (_request, response) => {
     response.json({
         ok: true,
         storage: "JSON files now; SQLite pending",
+        skippedSessionFiles: sessionLoadIssues.map(issue => issue.file),
         audioIntegration: config.audioIntegration,
         buildVersion: config.buildVersion,
         musicAvailable: hasAnyMusic(catalogue),
@@ -169,7 +170,7 @@ app.get("/api/study-setup", (_request, response) =>
     }),
 );
 
-app.post("/api/sessions", (request, response) => {
+app.post("/api/sessions", async (request, response) => {
     const participantId = String(request.body?.participantId ?? "").trim();
     const orderId = String(request.body?.orderId ?? "") as OrderId;
     const studyMode = request.body?.studyMode as StudyMode;
@@ -223,7 +224,7 @@ app.post("/api/sessions", (request, response) => {
         musicDecisions: [],
         musicTransitions: [],
     };
-    saveSession(session);
+    await saveSession(session);
     response.status(201).json({ sessionId: session.id });
 });
 
@@ -241,10 +242,10 @@ app.get("/api/sessions/recover/:participantId", (request, response) => {
     response.json({ session, checkpoint: recoveryCheckpoint(session) });
 });
 
-app.post("/api/sessions/:sessionId/recovery/end", (request, response) => {
+app.post("/api/sessions/:sessionId/recovery/end", async (request, response) => {
     const session = getSession(request.params.sessionId);
     session.endedEarlyAt ??= new Date().toISOString();
-    saveSession(session);
+    await saveSession(session);
     writeExports(session);
     response.json({ ok: true });
 });
@@ -272,7 +273,7 @@ function createStartedBlock(session: Session, number: number, condition: Conditi
 }
 
 /** Restarts an interrupted timed attempt from 0 while retaining an empty export row. */
-app.post("/api/sessions/:sessionId/recovery/restart-block", (request, response) => {
+app.post("/api/sessions/:sessionId/recovery/restart-block", async (request, response) => {
     const session = getSession(request.params.sessionId);
     const activeBlock = session.blocks.find((block) => block.endedAt === null);
     if (!activeBlock) throw new Error("There is no interrupted block to restart.");
@@ -295,14 +296,14 @@ app.post("/api/sessions/:sessionId/recovery/restart-block", (request, response) 
     );
 
     const started = createStartedBlock(session, number, activeBlock.condition);
-    saveSession(session);
+    await saveSession(session);
     writeExports(session);
     response.json({ ...started, blockNumber: number, condition: activeBlock.condition });
 });
 
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/start",
-    (request, response) => {
+    async (request, response) => {
         const session = getSession(request.params.sessionId);
         const number = Number(request.params.blockNumber);
         const lastBlockNumber = session.blocks.at(-1)?.number;
@@ -334,12 +335,12 @@ app.post(
         )
             throw new Error("Invalid condition.");
         const started = createStartedBlock(session, number, condition);
-        saveSession(session);
+        await saveSession(session);
         response.json(started);
     },
 );
 
-app.post("/api/sessions/:sessionId/events", (request, response) => {
+app.post("/api/sessions/:sessionId/events", async (request, response) => {
     const session = getSession(request.params.sessionId);
     const events = request.body?.events as Omit<TaskEvent, "sequence">[];
     if (!Array.isArray(events) || !events.length)
@@ -371,13 +372,13 @@ app.post("/api/sessions/:sessionId/events", (request, response) => {
             continue;
         appendEvent(session, event);
     }
-    saveSession(session);
+    await saveSession(session);
     response.json({ saved: events.length });
 });
 
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/submit",
-    (request, response) => {
+    async (request, response) => {
         const session = getSession(request.params.sessionId);
         const number = Number(request.params.blockNumber);
         const block = session.blocks.find(
@@ -420,7 +421,7 @@ app.post(
             clientTimeMs,
             payload: { accepted, incorrectFields },
         });
-        saveSession(session);
+        await saveSession(session);
         response.json({
             accepted,
             incorrectFields,
@@ -431,7 +432,7 @@ app.post(
     },
 );
 
-app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
+app.post("/api/sessions/:sessionId/comfort-check", async (request, response) => {
     const session = getSession(request.params.sessionId);
     const comfortVolumePercent = Number(request.body?.comfortVolumePercent);
     if (
@@ -450,7 +451,7 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
         throw new Error("Choose a comfort volume from 0% to 100%.");
     session.comfortVolumePercent = comfortVolumePercent;
     session.comfortCheckCompletedAt = new Date().toISOString();
-    saveSession(session);
+    await saveSession(session);
     response.json({ ok: true });
 });
 
@@ -460,7 +461,7 @@ app.post("/api/sessions/:sessionId/comfort-check", (request, response) => {
  */
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/music/evaluate",
-    (request, response) => {
+    async (request, response) => {
         const session = getSession(request.params.sessionId);
         const blockNumber = Number(request.params.blockNumber);
         const block = session.blocks.find(
@@ -481,7 +482,7 @@ app.post(
             loadMusicCatalogue(),
         );
         session.musicDecisions.push(decision);
-        saveSession(session);
+        await saveSession(session);
         response.json({ decision });
     },
 );
@@ -526,7 +527,7 @@ app.post(
 /** Saves the actual browser playback outcome for one adaptive decision. */
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/music/transitions",
-    (request, response) => {
+    async (request, response) => {
         const session = getSession(request.params.sessionId);
         const blockNumber = Number(request.params.blockNumber);
         const { decisionId, startedMs, completedMs, outcome, error } =
@@ -559,7 +560,7 @@ app.post(
             outcome,
             error: error ?? null,
         });
-        saveSession(session);
+        await saveSession(session);
         if (session.blocks.find((item) => item.number === blockNumber)?.endedAt)
             writeExports(session);
         response.status(201).json({ saved: true });
@@ -568,7 +569,7 @@ app.post(
 
 app.post(
     "/api/sessions/:sessionId/blocks/:blockNumber/finish",
-    (request, response) => {
+    async (request, response) => {
         const session = getSession(request.params.sessionId);
         const number = Number(request.params.blockNumber);
         const block = session.blocks.find((item) => item.number === number);
@@ -583,7 +584,7 @@ app.post(
             throw new Error("Invalid block completion.");
         block.endedAt ??= new Date().toISOString();
         block.durationSeconds = durationSeconds;
-        saveSession(session);
+        await saveSession(session);
         const measures = calculateBlockMeasures(session, number);
         writeExports(session);
         response.json({ measures });

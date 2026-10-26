@@ -30,7 +30,9 @@ The participant setup screen records one of three modes with every session:
 
 Change these arrays and default timings in `config/study.json` to configure the study without editing application code. Formative timing values are saved as an immutable session snapshot in `session.json`, `events.jsonl`, and every CSV export.
 
-It uses local JSON storage. SQLite is documented for later work and is not active.
+It uses local JSON storage. Session writes are asynchronous and queued in order per session; the API confirms a save after the file has been written and renamed into place. SQLite is documented for later work and is not active.
+
+At startup, malformed or structurally invalid session files are skipped and preserved for recovery. The backend terminal reports the affected filenames and validation errors, and `/api/health` lists `skippedSessionFiles`. Valid sessions still load. Correct or restore affected files from a backup, then restart the backend to load them; do not replace them with empty sessions.
 
 ## Set up
 
@@ -159,6 +161,6 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 
 ## Frontend regression checks
 
-Run `npm run build` from the repository root to compile the frontend and type-check the backend.
+Run `npm run build` from the repository root to compile the frontend and type-check the backend. Run `npm run test:storage` to verify safe loading, nested-field validation, legacy defaults, ordered snapshots, write-failure recovery, and independent session writes. Storage tests use temporary directories and do not modify saved study data.
 
 With both development servers running and Playwright available, run `node tests/presentation-recovery.mjs` to check event retries, lost acknowledgements, duplicate-submit prevention, and block completion while an event is pending. The checks create new Formative sessions and export files; use a disposable backend data directory when validating against study data. Set `PLAYWRIGHT_MODULE` to an installed Playwright module URL if needed, and `PLAYWRIGHT_EXECUTABLE_PATH` to a Chromium browser executable when Google Chrome is unavailable.
