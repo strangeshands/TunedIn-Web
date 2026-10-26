@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { fmt } from "../../script/format";
 import { Field, Source } from "../components";
 import type { StudyController } from "../hooks/useStudyController";
@@ -44,6 +45,16 @@ export function TaskScreen({
     update,
     submit,
 }: Props) {
+    const batchCodeInput = useRef<HTMLInputElement | null>(null);
+    const quantityInput = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+        // Follow visual field order even if the backend returns errors in another order.
+        if (errors.includes("recordCode")) recordCodeInput.current?.focus();
+        else if (errors.includes("batchCode")) batchCodeInput.current?.focus();
+        else if (errors.includes("quantity")) quantityInput.current?.focus();
+    }, [errors, recordCodeInput]);
+
     const isPractice = stage === "practice" || stage === "baseline";
     return (
         <main className="task">
@@ -130,6 +141,7 @@ export function TaskScreen({
                                     label="Batch Code"
                                     value={form.batchCode}
                                     error={errors.includes("batchCode")}
+                                    inputRef={batchCodeInput}
                                     onChange={(value) =>
                                         update("batchCode", value)
                                     }
@@ -139,6 +151,7 @@ export function TaskScreen({
                                     value={form.quantity}
                                     error={errors.includes("quantity")}
                                     inputMode="numeric"
+                                    inputRef={quantityInput}
                                     onChange={(value) =>
                                         update("quantity", value)
                                     }
