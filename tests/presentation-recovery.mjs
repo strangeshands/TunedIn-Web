@@ -1,5 +1,6 @@
 // Run against the local dev servers with: node tests/presentation-recovery.mjs
 // Set PLAYWRIGHT_MODULE to an installed Playwright module URL if it isn't local.
+// Set PLAYWRIGHT_EXECUTABLE_PATH to use a Chromium browser other than Chrome.
 import assert from "node:assert/strict";
 import { appendFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -8,7 +9,12 @@ import { fileURLToPath } from "node:url";
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const origin = "http://127.0.0.1:5173";
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const browser = await chromium.launch({
+    ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH
+        ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
+        : { channel: "chrome" }),
+    headless: true,
+});
 
 async function setup() {
     const context = await browser.newContext();
@@ -16,7 +22,7 @@ async function setup() {
     page.setDefaultTimeout(5000);
     await page.clock.install();
     await page.goto(origin);
-    await page.getByRole("textbox", { name: "Participant ID" }).fill("FUF-AUTO-BE1F90E-RECOVERY");
+    await page.getByRole("textbox", { name: "Participant ID" }).fill(`FUF-RECOVERY-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await page.getByRole("combobox").first().selectOption("Formative");
     for (const name of ["Practice duration (seconds)", "Baseline duration (seconds)", "Adaptive block duration (seconds)"])
         await page.getByRole("spinbutton", { name, exact: true }).fill("30");
@@ -24,13 +30,15 @@ async function setup() {
     await page.getByRole("button", { name: "Save participant & continue" }).click();
     const { sessionId } = await (await created).json();
     if (process.env.FUF_TEST_SESSION_IDS) appendFileSync(process.env.FUF_TEST_SESSION_IDS, sessionId + "\n");
-    await page.getByRole("button", { name: "Start", exact: true }).click();
-    await page.getByRole("button", { name: "Start practice" }).waitFor();
+    await page.getByRole("button", { name: /^Next/ }).click();
+    await page.getByRole("button", { name: /^Next/ }).click();
+    await page.getByRole("button", { name: "I have understood the instructions" }).click();
+    await page.getByRole("button", { name: "Start Practice Block" }).waitFor();
     return { context, page, sessionId };
 }
 
 async function start(page) {
-    await page.getByRole("button", { name: "Start practice" }).click();
+    await page.getByRole("button", { name: "Start Practice Block" }).click();
     await page.locator(".source-row strong").first().waitFor();
 }
 
@@ -51,7 +59,7 @@ async function submit(page) {
 
 async function finishAndCheck(page, id) {
     await page.clock.fastForward(30_000);
-    await page.getByRole("button", { name: "Start silent calibration" }).waitFor();
+    await page.getByRole("button", { name: "Start Calibration Block" }).waitFor();
     const saved = JSON.parse(readFileSync(join(root, "backend/data", id + ".json"), "utf8"));
     const exported = await (await page.request.get(`${origin}/api/sessions/${id}/export/session.json`)).json();
     const { measures, ...session } = exported;

@@ -132,7 +132,13 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 
 | Change | File |
 | --- | --- |
-| Participant flow and feedback timings | `frontend/src/App.tsx` |
+| Stage routing | `frontend/src/App.tsx` |
+| Session lifecycle, recovery, and task submissions | `frontend/src/study/hooks/useStudyController.ts` |
+| Participant screen markup | `frontend/src/study/screens/` |
+| Browser history and navigation lock | `frontend/src/study/hooks/useStudyNavigation.ts` |
+| Block and rest countdowns | `frontend/src/study/hooks/useBlockTimers.ts` |
+| Study audio lifecycle and adaptive scheduling | `frontend/src/study/hooks/useStudyAudio.ts` |
+| Shared screen elements and stage types | `frontend/src/study/components.tsx`, `frontend/src/study/types.ts` |
 | Temporary music test screen | `frontend/src/TestMusic.tsx` |
 | Playback implementation | `frontend/src/script/audio.ts` |
 | Track rotation and repeat avoidance | `backend/src/playbackPolicy.ts` |
@@ -150,3 +156,9 @@ See [docs/DATA-DICTIONARY.md](docs/DATA-DICTIONARY.md) for field definitions. Ex
 
 - Local JSON storage only; SQLite remains pending.
 - The frozen manifest must be regenerated when an approved audio source file changes.
+
+## Frontend regression checks
+
+Run `npm run build` from the repository root to compile the frontend and type-check the backend.
+
+With both development servers running and Playwright available, run `node tests/presentation-recovery.mjs` to check event retries, lost acknowledgements, duplicate-submit prevention, and block completion while an event is pending. The checks create new Formative sessions and export files; use a disposable backend data directory when validating against study data. Set `PLAYWRIGHT_MODULE` to an installed Playwright module URL if needed, and `PLAYWRIGHT_EXECUTABLE_PATH` to a Chromium browser executable when Google Chrome is unavailable.
