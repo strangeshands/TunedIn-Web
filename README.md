@@ -32,9 +32,9 @@ Change these arrays and default timings in `config/study.json` to configure the 
 
 ## Choose the baseline completion rule
 
-The default silent baseline requires **15 successfully completed records**, with no time limit. Set **baseline.defaultMode** in `config/study.json` before starting collection. Participant setup has no baseline selector or duration override:
+The revised baseline protocol specifies **20 successfully completed records**, with no time limit. Apply the configuration below before collecting sessions under this protocol; documentation changes alone do not change the app configuration. Set **baseline.defaultMode** in `config/study.json` before starting collection. Participant setup has no baseline selector or duration override:
 
-- **15 completed records:** participants continue until 15 distinct records have been accepted. Incorrect submissions require correction of the same record and do not increase the count. Progress and elapsed time are shown.
+- **20 completed records:** participants continue until 20 distinct records have been accepted. Incorrect submissions require correction of the same record and do not increase the count. Progress and elapsed time are shown.
 - **Timed (120 seconds):** the baseline ends after two minutes, regardless of the number completed. This duration comes from `baselineSeconds` in study configuration.
 
 The introduction and calibration instructions reflect the selected rule. Practice and main-block completion rules are unchanged. The two baseline rules are alternatives: the inactive rule does not stop the block.
@@ -46,13 +46,15 @@ Configure availability in `config/study.json`:
 "baseline": {
   "defaultMode": "records",
   "enabledModes": ["records", "timed"],
-  "recordTarget": 15
+  "recordTarget": 20
 }
 ```
 
 To disable timed calibration, set `enabledModes` to `["records"]`. To disable record-based calibration, set it to `["timed"]` and set `defaultMode` to `"timed"`. At least one rule must remain enabled, and the default must be enabled. Set `defaultMode` to `"records"` or `"timed"` to choose the active rule; `enabledModes` restricts which values are valid. Keep `baselineSeconds: 120` to retain the two-minute option. Restart the backend after changing configuration.
 
-The selected rule and target are saved with each new session. Recovering an existing session keeps its original rule; older sessions without a rule snapshot remain timed. Restarting an interrupted record-based baseline starts a new attempt at 0 of 15, preserving the interrupted attempt in the audit data.
+The selected rule and target are saved with each new session. Recovering an existing session keeps its original rule; older sessions without a rule snapshot remain timed. Restarting an interrupted record-based baseline starts a new attempt at zero toward its saved target, preserving the interrupted attempt in the audit data.
+
+The 20-record target standardizes the number of observations used to estimate participant-specific timing references for adaptive music, rather than measuring output within two minutes. Twenty is a practical target for the next pilot, not a proven statistical minimum. See [baseline protocol, justification, and sources](feedback-files/analysis/Pilot_Study_v1_App_Improvement_Analysis.ipynb#Baseline-calibration-justification:-revised-20-record-protocol) for pilot evidence and planned stability checks.
 
 Exports include `baseline_mode` and `baseline_target_records`. In record mode, baseline `duration_seconds` is the actual interval from the first presentation to final accepted submission. `configured_baseline_seconds` still records the retained timing setting, but it is inactive in record mode. CSV analysis should check `baseline_mode` before comparing calibration durations.
 

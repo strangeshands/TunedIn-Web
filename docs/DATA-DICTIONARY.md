@@ -119,7 +119,7 @@ Raw events include `eventId` (stable across retries) and `attemptId` (specific t
 
 ## Baseline completion metadata
 
-All CSV exports include `baseline_mode` (`records` or `timed`) and `baseline_target_records` (15 by default in record mode; blank in timed mode). These describe the session's locked baseline rule, including on rows for other blocks.
+All CSV exports include `baseline_mode` (`records` or `timed`) and `baseline_target_records` (the saved target in record mode; 20 under the revised protocol, blank in timed mode). These describe the session's locked baseline rule, including on rows for other blocks. See the [20-record baseline protocol](../feedback-files/analysis/Pilot_Study_v1_App_Improvement_Analysis.ipynb#Baseline-calibration-justification:-revised-20-record-protocol) for its rationale. Historical 15-record and timed sessions retain their original metadata and must not be relabeled as 20-record sessions.
 
 `configured_baseline_seconds` retains the timing snapshot (normally 120). It is an active deadline only in timed mode. In record mode, block 1 `duration_seconds` is the elapsed interval between its first presentation and final accepted validation, using browser event timestamps. It is not fixed at 120 seconds. Exactly the target number of distinct accepted records completes that baseline; correction submissions do not count as additional records and no next record is presented after completion.
 
