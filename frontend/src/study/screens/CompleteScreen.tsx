@@ -6,7 +6,6 @@ type Props = Pick<
     StudyController,
     "participantId"
     | "sessionId"
-    | "highestStreak"
     | "conditionOrder"
     | "restart"
 >;
@@ -14,7 +13,6 @@ type Props = Pick<
 export function CompleteScreen({
     participantId,
     sessionId,
-    highestStreak,
     conditionOrder,
     restart,
 }: Props) {
@@ -25,13 +23,6 @@ export function CompleteScreen({
             description={`Participant ${participantId} has completed all ${conditionOrder.length} configured conditions.`}
             participantId={participantId}
         >
-            <div
-                className={`highest-streak${highestStreak > 0 ? ` streak-${Math.min(highestStreak, 5)}` : ""}`}
-            >
-                <span>Your highest streak was</span>
-                <strong>{highestStreak}</strong>
-                <span>consecutive correct records</span>
-            </div>
             <div>
                 {sessionId && (
                     <a

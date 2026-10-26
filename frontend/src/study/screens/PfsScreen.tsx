@@ -26,7 +26,7 @@ export function PfsScreen({
         >
             <button className="primary large" onClick={continueAfterPfs}>
                 {isFinalBlock
-                    ? "I have completed the questionnaire. Finish experiment"
+                    ? "I have completed the questionnaire. Continue to block results"
                     : "I have completed the questionnaire. Continue to rest"}{" "}
                 <span>→</span>
             </button>

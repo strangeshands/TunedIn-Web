@@ -99,7 +99,7 @@ export function TaskScreen({
                 </div>
                 {record && (
                     <div
-                        className={`streak-area${streak > 1 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}${submissionFeedback === "correct" && streak > 1 ? ` streak-celebrate streak-celebrate-${Math.min(streak, 5)}` : ""}`}
+                        className={`streak-area${!isPractice && streak > 1 ? ` streak-frame streak-${Math.min(streak, 5)}` : ""}${!isPractice && submissionFeedback === "correct" && streak > 1 ? ` streak-celebrate streak-celebrate-${Math.min(streak, 5)}` : ""}`}
                     >
                         <div className="grid">
                             <section className="panel">
@@ -160,7 +160,7 @@ export function TaskScreen({
                                 )}
                             </form>
                         </div>
-                        {streak > 1 && (
+                        {!isPractice && streak > 1 && (
                             <div className="streak" aria-live="polite">
                                 🔥 Current Streak: {streak} 🔥
                             </div>

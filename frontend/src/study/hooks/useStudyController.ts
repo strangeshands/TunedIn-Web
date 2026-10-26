@@ -66,7 +66,7 @@ export function useStudyController() {
     const [form, setForm] = useState<FormValues>(empty);
     const [errors, setErrors] = useState<string[]>([]);
     const [streak, setStreak] = useState(0);
-    const [highestStreak, setHighestStreak] = useState(0);
+    const [blockHighestStreak, setBlockHighestStreak] = useState(0);
     const [submissionFeedback, setSubmissionFeedback] =
         useState<SubmissionFeedback>(null);
     const [seconds, setSeconds] = useState(0);
@@ -76,6 +76,7 @@ export function useStudyController() {
     const [introductionStep, setIntroductionStep] = useState(0);
     const [shortcutMessage, setShortcutMessage] = useState("");
     const firstKey = useRef(false);
+    const recordWasRejected = useRef(false);
     const feedbackTimer = useRef<number | null>(null);
     const recordCodeInput = useRef<HTMLInputElement | null>(null);
     const introPracticeForm = useRef<HTMLFormElement | null>(null);
@@ -195,7 +196,7 @@ export function useStudyController() {
             localStorage.setItem("tunedIn.participantId", clean);
             localStorage.setItem(activeSessionStorageKey, response.sessionId);
             setParticipantId(clean);
-            setHighestStreak(0);
+            setBlockHighestStreak(0);
             setIntroductionStep(0);
             setShortcutMessage("");
             setStage("introduction");
@@ -314,9 +315,11 @@ export function useStudyController() {
         setForm(empty);
         setErrors([]);
         setStreak(0);
+        setBlockHighestStreak(0);
         clearSubmissionFeedback();
         setSeconds(0);
         firstKey.current = false;
+        recordWasRejected.current = false;
         completing.current = false;
         setStarted(taskStarted);
         setStage(
@@ -412,13 +415,16 @@ export function useStudyController() {
             );
             setErrors(response.incorrectFields);
             if (response.accepted) {
-                setStreak((current) => {
-                    const next = current + 1;
-                    setHighestStreak((highest) => Math.max(highest, next));
-                    return next;
-                });
+                if (number >= 2 && !recordWasRejected.current) {
+                    setStreak((current) => {
+                        const next = current + 1;
+                        setBlockHighestStreak((highest) => Math.max(highest, next));
+                        return next;
+                    });
+                }
                 showSubmissionFeedback("correct");
             } else {
+                recordWasRejected.current = true;
                 setStreak(0);
                 showSubmissionFeedback("incorrect");
             }
@@ -430,6 +436,7 @@ export function useStudyController() {
                 setRecord(response.nextRecord);
                 setForm(empty);
                 firstKey.current = false;
+                recordWasRejected.current = false;
                 requestAnimationFrame(() => recordCodeInput.current?.focus());
                 await queue.current!.send({
                     blockNumber: number,
@@ -511,12 +518,15 @@ export function useStudyController() {
     function continueFromRest() {
         if (restTransitioning.current) return;
         restTransitioning.current = true;
-        setBlockIndex((old) => old + 1);
-        setStage("block-intro");
+        if (blockIndex === conditionOrder.length - 1) {
+            setStage("handover");
+        } else {
+            setBlockIndex((old) => old + 1);
+            setStage("block-intro");
+        }
     }
     function continueAfterPfs() {
-        if (blockIndex === conditionOrder.length - 1) setStage("handover");
-        else setStage("block-results");
+        setStage("block-results");
     }
     function retrySavingEvents() {
         if (endingDuration.current !== null)
@@ -534,7 +544,7 @@ export function useStudyController() {
         setRecord(null);
         setForm(empty);
         setStreak(0);
-        setHighestStreak(0);
+        setBlockHighestStreak(0);
         clearSubmissionFeedback();
         setMessage("");
         setAudioMessage("");
@@ -561,7 +571,7 @@ export function useStudyController() {
         form,
         errors,
         streak,
-        highestStreak,
+        blockHighestStreak,
         submissionFeedback,
         seconds,
         started,
