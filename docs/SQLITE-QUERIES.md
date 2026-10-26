@@ -132,3 +132,30 @@ decisions = pd.read_csv("decisions.csv")
 ```
 
 Keep the original ZIP and database backups. To back up database files, stop the backend first and copy the entire data directory, including any SQLite sidecar files. Querying the database read-only does not require stopping the backend.
+
+## Start fresh with an empty database — development tests only
+
+> **WARNING: Resetting, removing, or clearing saved data is only for development/debugging with disposable test sessions. Never use this procedure during actual participant testing or pilot/main-study data collection. It disconnects the app from existing sessions and clears browser recovery data, including potentially unsent events. For actual study sessions, preserve the database, browser recovery data, and original exports; use the normal recovery and backup procedures instead.**
+
+A normal app restart does **not** erase data. The following procedure starts fresh by archiving the entire test-data directory rather than permanently deleting it.
+
+1. Stop the frontend and backend with **Ctrl+C** in the terminal running `npm run dev`. Exit any open SQLite shell with `.quit`.
+2. Close other browser tabs running the app. Confirm that the data directory contains only disposable test sessions.
+3. From the repository root, archive the test-data directory:
+
+   ```bash
+   mv backend/data "backend/data/backup/data-backup-$(date +%Y%m%d-%H%M%S)"
+   ```
+
+   If `TUNED_IN_DATA_DIR` is configured, archive that directory instead. Keep the entire directory together, including `study.sqlite`, any `study.sqlite-wal` / `study.sqlite-shm` files, legacy session JSON files, and exports. Do not remove only `study.sqlite`: legacy JSON files left behind may be imported again on startup.
+
+4. In the remaining app tab, open Developer Tools → **Application** → **Storage** → **Clear site data** for the app's origin. This removes stored participant details, recovery pointers, and the IndexedDB outbox. Clear browser data only for these disposable test sessions; pending events may otherwise be lost. Close the tab afterward.
+5. Restart from the repository root:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Reopen the app. The backend creates a new data directory and an empty `study.sqlite`. Previous test sessions and exports remain in the archived directory.
+
+For future development runs, prefer a dedicated disposable directory through `TUNED_IN_DATA_DIR` so test data stays separate from participant collection data. Do not point development reset commands at the actual study-data directory.
