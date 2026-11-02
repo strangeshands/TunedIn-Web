@@ -114,7 +114,7 @@ export function useStudyController() {
 
     const { navigationLocked, lockNavigation, unlockNavigation, goBack } =
         useStudyNavigation(stage, introductionStep, setStage, setIntroductionStep);
-    const { musicCatalogue, audio, playbackBlock, audioMessage, setAudioMessage, audioVolume,
+    const { audioCheckTrack, musicCatalogue, audio, playbackBlock, audioMessage, setAudioMessage, audioVolume,
         setAudioVolume, testAudioPlaying, setTestAudioPlaying, loadMusicCatalogue,
         loadPlaybackConfig, toggleTestAudio, startMusic } = useStudyAudio({
             sessionId, stage, condition, started, blockIndex, completing,
@@ -596,7 +596,7 @@ export function useStudyController() {
         seconds,
         started,
         message,
-        musicCatalogue,
+        audioCheckTrack, musicCatalogue,
         audioMessage,
         audioVolume,
         setAudioVolume,

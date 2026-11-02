@@ -1,4 +1,5 @@
 import type {
+    AudioCheckTrack,
     BaselineConfig,
     BaselineSettings,
     BlockMeasures,
@@ -39,6 +40,10 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
     }
 
     return response.json() as Promise<T>;
+}
+
+export function getAudioCheckTrack() {
+    return request<{ track: AudioCheckTrack | null }>("/api/music/audio-check");
 }
 
 export function getMusicCatalogue() {

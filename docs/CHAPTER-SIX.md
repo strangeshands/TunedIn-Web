@@ -13,8 +13,9 @@ This maps the study elements to the current implementation. Configuration values
 | Session metadata, condition order and comfort check | Persisted in the SQLite `sessions.snapshot` JSON and included in exported `session.json` |
 | JSONL, CSV and participant ZIP exports | `backend/src/exports.ts` and export endpoints in `backend/src/server.ts`; CSV remains the notebook analysis input |
 | SQLite storage | Implemented by `backend/src/sqliteStore.ts` and `backend/src/store.ts`; transactional sessions, events and submission receipts, WAL journaling, and `synchronous=FULL` |
-| Static Music stimulus | Fixed `baseline/B02.wav`, selected by `backend/src/playbackPolicy.ts`; excluded from Adaptive Music's baseline-state rotation |
+| Static Music stimulus | Fixed `baseline/B09.wav`, selected by `backend/src/playbackPolicy.ts`; excluded from Adaptive Music's baseline-state rotation |
 | Reduced/baseline/elevated banks and approved track metadata | `backend/src/music.ts`, `config/playback-bank.json`, and `backend/src/playbackPolicy.ts` |
+| Dedicated comfort-check recording | `music/Audio-Check/B01.wav`, approved separately by the manifest and `/api/music/audio-check`; never included in study banks |
 | Browser playback, comfort-volume check and crossfades | `frontend/src/script/audio.ts`, `frontend/src/study/hooks/useStudyAudio.ts`, and `AudioCheckScreen.tsx`; crossfade duration currently configured as five seconds |
 | Adaptive performance rule | Implemented in `backend/src/rule.ts`; backend evaluation endpoints persist decisions and selected tracks |
 | Playback transition outcomes | Browser-reported start/end timestamps, outcome and error details persisted in session snapshots and exported in `transitions.csv` |
@@ -28,3 +29,5 @@ The implemented rule uses a 60-second rolling window, evaluated every 30 seconds
 Events and submission receipts commit with session updates before the backend acknowledges success. The browser's IndexedDB outbox retains pending commands for retry; stable IDs prevent duplicate saves. Restarted attempts retain their audit events, while current-attempt exports and measures exclude the archived attempt. SQLite is the saved source for recovery and export generation; researchers continue to use exported CSV files for notebook analysis.
 
 See [storage and recovery](SQLITE-NEXT.md), [SQLite queries and development-only reset instructions](SQLITE-QUERIES.md), and the [data dictionary](DATA-DICTIONARY.md). The [pilot analysis notebook](../feedback-files/analysis/Pilot_Study_v1_App_Improvement_Analysis.ipynb) contains the revised 20-record calibration justification and distinguishes it from the historical two-minute pilot baselines.
+
+The replacement bank contains 12 Baseline, 15 Reduced and 9 Elevated tracks. Static reserves B09; Adaptive uses the other 11 Baseline tracks. Composer/composition attribution and loudness/true-peak measurements are unknown where blank/null in the new manifest. Playback does not imply that these measurements or source identities have been verified; composer-based avoidance requires verified metadata. See the README music setup instructions.

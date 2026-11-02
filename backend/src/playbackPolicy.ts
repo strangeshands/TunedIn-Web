@@ -24,7 +24,7 @@ function choices(
     seed: string,
     entry: number,
 ) {
-    // B02 is reserved for the Static Music condition and is never selected
+    // B09 is reserved for the Static Music condition and is never selected
     // while Adaptive Music is in its baseline playback state.
     const bank = catalogue[state].filter(
         (track) =>
@@ -41,8 +41,9 @@ function choose(candidates: MusicTrack[], previous: MusicTrack | null) {
     return (
         candidates.find(
             (track) =>
-                track.composer !== previous.composer &&
-                track.compositionId !== previous.compositionId,
+                track.id !== previous.id &&
+                (!track.composer || !previous.composer || track.composer !== previous.composer) &&
+                (!track.compositionId || !previous.compositionId || track.compositionId !== previous.compositionId),
         ) ??
         candidates[0] ??
         null

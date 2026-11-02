@@ -3,15 +3,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { baselineForNewSession, baselineFor, validateBaselineOptions, validatedRecordCount, recordBaselineDuration } from "../backend/src/baseline.ts";
 
-test("the configured default is 15 records; each alternative can be disabled", () => {
-    assert.deepEqual(baselineForNewSession(), { mode: "records", recordTarget: 15 });
+test("the configured default is 20 records; each alternative can be disabled", () => {
+    assert.deepEqual(baselineForNewSession(), { mode: "records", recordTarget: 20 });
     for (const mode of ["records", "timed"]) {
-        const options = { defaultMode: mode, enabledModes: [mode], recordTarget: 15 };
+        const options = { defaultMode: mode, enabledModes: [mode], recordTarget: 20 };
         assert.equal(baselineForNewSession(options).mode, mode);
         assert.equal(baselineForNewSession({ ...options, enabledModes: ["records", "timed"] }).mode, mode);
     }
-    assert.throws(() => validateBaselineOptions({ defaultMode: "records", enabledModes: [], recordTarget: 15 }), /Invalid/);
-    assert.throws(() => validateBaselineOptions({ defaultMode: "timed", enabledModes: ["records"], recordTarget: 15 }), /Invalid/);
+    assert.throws(() => validateBaselineOptions({ defaultMode: "records", enabledModes: [], recordTarget: 20 }), /Invalid/);
+    assert.throws(() => validateBaselineOptions({ defaultMode: "timed", enabledModes: ["records"], recordTarget: 20 }), /Invalid/);
 });
 
 test("legacy sessions stay timed and completed count uses distinct accepted records", () => {

@@ -324,7 +324,7 @@ export function exportFiles(session: Session) {
             session.timing.practiceSeconds, session.timing.baselineSeconds, baseline.mode, baselineTarget,
             session.timing.blockSeconds, track.id, track.musicClass,
             track.relativeFilePath, track.composer, track.compositionId,
-            track.rotationIndex, "frozen_manifest", config.playback.manifestVersion,
+            track.rotationIndex, "frozen_manifest", session.musicManifestVersion ?? "legacy-unspecified",
             track.integratedLoudnessLufs, track.truePeakDbtp, track.sourceSha256,
         ]),
     );

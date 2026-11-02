@@ -16,7 +16,7 @@ import type {
 import { config, root } from "./config.js";
 import { exportFiles, writeExports } from "./exports.js";
 import { calculateBlockMeasures } from "./measures.js";
-import { hasAnyMusic, loadMusicCatalogue } from "./music.js";
+import { hasAnyMusic, loadMusicCatalogue, loadAudioCheckTrack } from "./music.js";
 import {
     selectInitialTrack,
     selectNextTrackInState,
@@ -148,6 +148,10 @@ app.get("/api/music/catalogue", (_request, response) =>
     response.json(loadMusicCatalogue()),
 );
 
+app.get("/api/music/audio-check", (_request, response) =>
+    response.json({ track: loadAudioCheckTrack() }),
+);
+
 app.get("/api/music/playback-config", (_request, response) =>
     response.json({
         crossfadeMs: config.playback.crossfadeMs,
@@ -220,6 +224,7 @@ app.post("/api/sessions", async (request, response) => {
         interruptedBlocks: [],
         blocks: [],
         events: [],
+        musicManifestVersion: config.playback.manifestVersion,
         musicTracks: Object.values(musicCatalogue).flat(),
         musicDecisions: [],
         musicTransitions: [],

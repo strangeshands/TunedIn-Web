@@ -2,13 +2,14 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { isAbsolute, join, normalize, relative } from "node:path";
 import type {
+    AudioCheckTrack, PlaybackTrack,
     MusicCatalogue,
     MusicClass,
     MusicTrack,
 } from "../../shared/types.js";
 import { config, root } from "./config.js";
 
-type PlaybackManifest = { version: string; tracks: MusicTrack[] };
+type PlaybackManifest = { version: string; tracks: MusicTrack[]; audioCheck?: AudioCheckTrack };
 
 const musicClasses: MusicClass[] = ["baseline", "reduced", "elevated"];
 const manifestPath = join(root, "config", "playback-bank.json");
@@ -34,10 +35,11 @@ function fileSha256(filePath: string) {
     return sha256;
 }
 
-function safeTrackPath(track: MusicTrack) {
+function safeTrackPath(track: PlaybackTrack) {
     // Manifests use portable `/` separators; accept `\` too when running on Windows.
     const portablePath = track.relativeFilePath.replaceAll("\\", "/");
-    if (!portablePath.startsWith(`music/${track.musicClass}/`))
+    const folders = { baseline: "Baseline", reduced: "Reduced", elevated: "Elevated", "audio-check": "Audio-Check" };
+    if (!portablePath.startsWith(`music/${folders[track.musicClass]}/`))
         return null;
     const resolved = normalize(join(root, portablePath));
     const musicRoot = normalize(join(root, "music"));
@@ -92,4 +94,15 @@ export function loadMusicCatalogue(): MusicCatalogue {
 
 export function hasAnyMusic(catalogue: MusicCatalogue) {
     return musicClasses.some((musicClass) => catalogue[musicClass].length > 0);
+}
+
+/** Comfort-check audio is approved separately and never enters a study bank. */
+export function loadAudioCheckTrack(): AudioCheckTrack | null {
+    try {
+        const manifest = readManifest();
+        const track = manifest.audioCheck;
+        if (manifest.version !== config.playback.manifestVersion || !track || track.musicClass !== "audio-check") return null;
+        const path = safeTrackPath(track);
+        return path && existsSync(path) && fileSha256(path) === track.sourceSha256 ? track : null;
+    } catch { return null; }
 }

@@ -32,9 +32,12 @@ export type MusicTrack = {
     compositionId: string;
     rotationIndex: number;
     sourceSha256: string;
-    integratedLoudnessLufs: number;
-    truePeakDbtp: number;
+    integratedLoudnessLufs: number | null;
+    truePeakDbtp: number | null;
 };
+
+export type AudioCheckTrack = Omit<MusicTrack, "musicClass"> & { musicClass: "audio-check" };
+export type PlaybackTrack = MusicTrack | AudioCheckTrack;
 
 export type MusicCatalogue = Record<MusicClass, MusicTrack[]>;
 export type AdaptiveState = MusicClass | "silent";
@@ -133,6 +136,8 @@ export type Session = {
     interruptedBlocks: InterruptedBlock[];
     blocks: Block[];
     events: TaskEvent[];
+    /** Manifest version captured for this session; absent on legacy sessions. */
+    musicManifestVersion?: string;
     musicTracks: MusicTrack[];
     musicDecisions: MusicDecision[];
     musicTransitions: MusicTransition[];

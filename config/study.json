@@ -29,12 +29,12 @@
   "restSeconds": 120,
   "audioIntegration": "rule-engine",
   "playback": {
-    "manifestVersion": "final-playback-bank",
+    "manifestVersion": "playback-bank-v2",
     "crossfadeMs": 5000,
     "masterHeadroomDb": -3,
     "avoidImmediateComposerRepeat": true,
     "loopTracks": false,
-    "staticTrackId": "baseline/B02.wav"
+    "staticTrackId": "baseline/B09.wav"
   },
   "adaptiveRules": {
     "rollingWindowSeconds": 60,

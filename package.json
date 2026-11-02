@@ -5,7 +5,8 @@
     "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run dev --prefix backend\"",
     "build": "npm run build --prefix frontend && npm run typecheck --prefix backend",
     "test:storage": "node --import ./backend/node_modules/tsx/dist/loader.mjs --test tests/sqlite-store.mjs",
-    "test:baseline": "node --import ./backend/node_modules/tsx/dist/loader.mjs --test tests/baseline-rules.mjs"
+    "test:baseline": "node --import ./backend/node_modules/tsx/dist/loader.mjs --test tests/baseline-rules.mjs",
+    "test:music": "node --import ./backend/node_modules/tsx/dist/loader.mjs --test tests/music-bank.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

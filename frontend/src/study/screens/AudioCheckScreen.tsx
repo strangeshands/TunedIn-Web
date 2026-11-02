@@ -4,7 +4,7 @@ import type { StudyController } from "../hooks/useStudyController";
 type Props = Pick<
     StudyController,
     "participantId"
-    | "musicCatalogue"
+    | "audioCheckTrack"
     | "audioMessage"
     | "audioVolume"
     | "setAudioVolume"
@@ -15,7 +15,7 @@ type Props = Pick<
 
 export function AudioCheckScreen({
     participantId,
-    musicCatalogue,
+    audioCheckTrack,
     audioMessage,
     audioVolume,
     setAudioVolume,
@@ -45,11 +45,11 @@ export function AudioCheckScreen({
                 </ul>
             </div>
             <div className="test-banner">
-                {musicCatalogue.baseline.length
-                    ? "Use the test button to check the first baseline track."
+                {audioCheckTrack
+                    ? "Use the test button to play the dedicated comfort-check recording."
                     : "No test track was found. The session can still continue silently."}
             </div>
-            {musicCatalogue.baseline.length > 0 && (
+            {audioCheckTrack !== null && (
                 <div className="audio-controls">
                     <button
                         className="secondary"

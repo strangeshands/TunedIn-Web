@@ -26,9 +26,11 @@ async function present(session, index) {
     return time;
 }
 const setup = await (await fetch(origin + "/api/study-setup")).json();
+const target = setup.baseline.recordTarget;
+const expectedDuration = ((target - 1) * 50 + 20) / 1000;
 for (const mode of [setup.baseline.defaultMode]) {
     const session = await create(mode); let finalRequest, result;
-    for (let index = 0; index < 15; index++) {
+    for (let index = 0; index < target; index++) {
         const time = await present(session, index);
         if (index === 0) {
             const rejected = await ok(`/api/sessions/${session.id}/blocks/1/submit`, { requestId: randomUUID(), attemptId: session.attemptId,
@@ -38,21 +40,21 @@ for (const mode of [setup.baseline.defaultMode]) {
         finalRequest = { requestId: randomUUID(), attemptId: session.attemptId, recordId: session.record.id, values: session.record, clientTimeMs: time+20 };
         result = await ok(`/api/sessions/${session.id}/blocks/1/submit`, finalRequest);
         assert.equal(result.validatedRecords, index+1);
-        if (index === 13 && mode === "records") assert.equal((await post(`/api/sessions/${session.id}/blocks/1/finish`, { durationSeconds: 2 })).status, 400);
-        if (index < 14) { assert.equal(result.baselineComplete, false); assert.ok(result.nextRecord); session.record = result.nextRecord; }
+        if (index === target - 2 && mode === "records") assert.equal((await post(`/api/sessions/${session.id}/blocks/1/finish`, { durationSeconds: 2 })).status, 400);
+        if (index < target - 1) { assert.equal(result.baselineComplete, false); assert.ok(result.nextRecord); session.record = result.nextRecord; }
     }
     if (mode === "records") {
         assert.equal(result.baselineComplete, true); assert.equal(result.nextRecord, null);
-        assert.equal(result.completedDurationSeconds, 0.72);
-        // A lost final acknowledgement must replay without creating a sixteenth record.
+        assert.equal(result.completedDurationSeconds, expectedDuration);
+        // A lost final acknowledgement must replay without creating a record beyond the configured target.
         assert.deepEqual(await ok(`/api/sessions/${session.id}/blocks/1/submit`, finalRequest), result);
         let saved = await snapshot(session.id);
-        assert.equal(saved.blocks[0].durationSeconds, 0.72); assert.ok(saved.blocks[0].endedAt);
-        assert.equal(saved.measures[0].validatedRecords, 15); assert.equal(saved.measures[0].recordsPresented, 15);
+        assert.equal(saved.blocks[0].durationSeconds, expectedDuration); assert.ok(saved.blocks[0].endedAt);
+        assert.equal(saved.measures[0].validatedRecords, target); assert.equal(saved.measures[0].recordsPresented, target);
         assert.equal(saved.measures[0].correctionCycles, 1);
-        assert.equal(saved.measures[0].firstPassRecordErrorRate, 1/15);
+        assert.equal(saved.measures[0].firstPassRecordErrorRate, 1/target);
         await ok(`/api/sessions/${session.id}/blocks/1/finish`, { durationSeconds: 999 }); // Backend owns actual record-based duration.
-        saved = await snapshot(session.id); assert.equal(saved.blocks[0].durationSeconds, 0.72);
+        saved = await snapshot(session.id); assert.equal(saved.blocks[0].durationSeconds, expectedDuration);
     } else {
         assert.equal(result.baselineComplete, false); assert.ok(result.nextRecord);
         const saved = await snapshot(session.id); assert.equal(saved.blocks[0].endedAt, null);
@@ -65,7 +67,7 @@ for (const mode of [setup.baseline.defaultMode]) {
         const [header,...data] = rows;
         assert.ok(header.includes("baseline_mode")); assert.ok(header.includes("baseline_target_records"));
         for (const values of data) { assert.equal(values.length, header.length); assert.equal(values[header.indexOf("baseline_mode")], mode);
-            assert.equal(values[header.indexOf("baseline_target_records")], mode === "records" ? "15" : ""); }
+            assert.equal(values[header.indexOf("baseline_target_records")], mode === "records" ? String(target) : ""); }
     }
     console.log(`PASS ${mode} baseline: completion rule, correction counting, duration, retry receipt, and export labels`);
 }

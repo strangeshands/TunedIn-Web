@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import type { Condition, MusicCatalogue, MusicTrack } from "../../../../shared/types";
-import { evaluateAdaptiveMusic, getMusicCatalogue, getNextMusicTrack, getPlaybackConfig, recordMusicTransition } from "../../script/api";
+import type { AudioCheckTrack, Condition, MusicCatalogue, MusicTrack } from "../../../../shared/types";
+import { evaluateAdaptiveMusic, getAudioCheckTrack, getMusicCatalogue, getNextMusicTrack, getPlaybackConfig, recordMusicTransition } from "../../script/api";
 import { AudioController } from "../../script/audio";
 import type { Stage } from "../types";
 
@@ -24,6 +24,7 @@ export function useStudyAudio({
         reduced: [],
         elevated: [],
     });
+    const [audioCheckTrack, setAudioCheckTrack] = useState<AudioCheckTrack | null>(null);
     const [audioMessage, setAudioMessage] = useState("");
     const [audioVolume, setAudioVolume] = useState(0.75);
     const [testAudioPlaying, setTestAudioPlaying] = useState(false);
@@ -85,10 +86,13 @@ export function useStudyAudio({
 
     async function loadMusicCatalogue() {
         try {
-            setMusicCatalogue(await getMusicCatalogue());
+            const [catalogue, comfort] = await Promise.all([getMusicCatalogue(), getAudioCheckTrack().catch(() => ({ track: null }))]);
+            setMusicCatalogue(catalogue);
+            setAudioCheckTrack(comfort.track);
         } catch {
             // A catalogue failure must never prevent the participant task from running.
             setMusicCatalogue({ baseline: [], reduced: [], elevated: [] });
+            setAudioCheckTrack(null);
             setAudioMessage(
                 "Music is unavailable. This session will continue silently.",
             );
@@ -112,7 +116,7 @@ export function useStudyAudio({
         );
     }
 
-    async function playTrack(track: MusicTrack | null) {
+    async function playTrack(track: MusicTrack | AudioCheckTrack | null) {
         const result = await audio.current.play(track);
         if (result.status === "playing") setAudioMessage("");
         else
@@ -139,7 +143,7 @@ export function useStudyAudio({
                 );
             return;
         }
-        const result = await playTrack(musicCatalogue.baseline[0] ?? null);
+        const result = await playTrack(audioCheckTrack);
         setTestAudioPlaying(result.status === "playing");
     }
 
@@ -228,5 +232,5 @@ export function useStudyAudio({
         }
     }
 
-    return { musicCatalogue, audio, playbackBlock, audioMessage, setAudioMessage, audioVolume, setAudioVolume, testAudioPlaying, setTestAudioPlaying, loadMusicCatalogue, loadPlaybackConfig, toggleTestAudio, startMusic };
+    return { audioCheckTrack, musicCatalogue, audio, playbackBlock, audioMessage, setAudioMessage, audioVolume, setAudioVolume, testAudioPlaying, setTestAudioPlaying, loadMusicCatalogue, loadPlaybackConfig, toggleTestAudio, startMusic };
 }

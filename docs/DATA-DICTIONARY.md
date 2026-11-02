@@ -103,7 +103,7 @@ This file records the browser outcome after an adaptive decision. It can be empt
 | `music_class` | Frozen manifest bank: `baseline`, `reduced`, or `elevated`. |
 | `relative_file_path` | Path relative to the project music folder. |
 | `composer`, `composition_id`, `rotation_index` | Metadata used to document deterministic bank rotation and avoid immediate composer/composition repeats. |
-| `classification_method`, `classification_version` | `frozen_manifest` and its manifest version. |
+| `classification_method`, `classification_version` | `frozen_manifest` and the manifest version captured in `session.musicManifestVersion`. Legacy sessions without a captured version export `legacy-unspecified`; their saved file checksums remain available. |
 | `integrated_loudness_lufs`, `true_peak_dbtp` | Source loudness and true-peak measurements retained from the approved playback manifest. |
 | `file_sha256` | Source-file SHA-256 expected by the frozen manifest. Files with another hash are not played. |
 
@@ -124,3 +124,11 @@ All CSV exports include `baseline_mode` (`records` or `timed`) and `baseline_tar
 `configured_baseline_seconds` retains the timing snapshot (normally 120). It is an active deadline only in timed mode. In record mode, block 1 `duration_seconds` is the elapsed interval between its first presentation and final accepted validation, using browser event timestamps. It is not fixed at 120 seconds. Exactly the target number of distinct accepted records completes that baseline; correction submissions do not count as additional records and no next record is presented after completion.
 
 `session.json` stores `baseline: {mode, recordTarget}`. Legacy sessions without this field use timed calibration. `events.jsonl` includes `baselineMode` and `baselineTargetRecords` (null for timed mode). Existing first-pass and correction measures retain their definitions. Use the mode metadata to distinguish baseline protocols in notebook analyses.
+
+## Replacement music bank (2026-11-02)
+
+The current manifest is `playback-bank-2026-11-02`. Study track IDs remain lowercase bank IDs (for example `baseline/B09.wav`), while `relative_file_path` records actual capitalized folders such as `music/Baseline/B09.wav`. Static Music reserves B09; it is excluded from every Adaptive selection path. B02 may now appear in Adaptive baseline playback.
+
+The separate `audio-check/B01.wav` recording lives in `music/Audio-Check/` and is returned only by the comfort-check metadata endpoint. It is not an experimental bank track and is absent from session `musicTracks` and `tracks.csv`. The manifest contains its approved path/checksum; existing comfort-check logs retain the selected volume and completion timestamp, not a separate playback-transition history for this clip.
+
+Blank `composer`/`composition_id` and blank CSV loudness/true-peak values (`null` in manifest/JSON) mean metadata was not supplied or measured for the replacement files. They do not mean zero loudness or a known distinct composer/composition. Historical sessions retain their saved catalogue metadata; do not relabel their tracks as B09 or substitute new-file measurements for the old recordings. Use saved track IDs and checksums to distinguish recordings. Old sessions cannot reproduce removed or modified WAVs unless their original bank is retained separately.

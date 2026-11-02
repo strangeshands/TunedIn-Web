@@ -1,4 +1,4 @@
-import type { MusicTrack } from "../../../shared/types";
+import type { PlaybackTrack } from "../../../shared/types";
 
 export type PlaybackSettings = {
     crossfadeMs: number;
@@ -29,7 +29,7 @@ const defaultSettings: PlaybackSettings = {
 };
 
 const dbToGain = (decibels: number) => 10 ** (decibels / 20);
-const urlFor = (track: MusicTrack) =>
+const urlFor = (track: PlaybackTrack) =>
     `/${track.relativeFilePath
         .replaceAll("\\", "/")
         .split("/")
@@ -110,7 +110,7 @@ export class AudioController {
         return true;
     }
 
-    async play(track: MusicTrack | null): Promise<PlaybackResult> {
+    async play(track: PlaybackTrack | null): Promise<PlaybackResult> {
         const attempt = ++this.playbackAttempt;
         if (!track) {
             this.stop();
