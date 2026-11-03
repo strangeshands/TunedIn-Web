@@ -1,7 +1,7 @@
 {
   "version": "pilot",
-  "buildVersion": "pilot-1.0.1",
-  "randomizationSeed": "pilot1.0.1",
+  "buildVersion": "pilot-2.0.0",
+  "randomizationSeed": "pilot2.0.0",
   "taskVersion": "fictional-records",
   "conditionOrders": {
     "A": [

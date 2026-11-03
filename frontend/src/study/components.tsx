@@ -58,7 +58,7 @@ export function SimpleStage(props: {
                 {props.children}
             </section>
             <footer>
-                Version 3: Third Iteration of Formative User Feedback
+                Pilot v2
             </footer>
         </main>
     );
