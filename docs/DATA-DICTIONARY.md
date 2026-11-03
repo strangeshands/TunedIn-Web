@@ -104,7 +104,6 @@ This file records the browser outcome after an adaptive decision. It can be empt
 | `relative_file_path` | Path relative to the project music folder. |
 | `composer`, `composition_id`, `rotation_index` | Metadata used to document deterministic bank rotation and avoid immediate composer/composition repeats. |
 | `classification_method`, `classification_version` | `frozen_manifest` and the manifest version captured in `session.musicManifestVersion`. Legacy sessions without a captured version export `legacy-unspecified`; their saved file checksums remain available. |
-| `integrated_loudness_lufs`, `true_peak_dbtp` | Source loudness and true-peak measurements retained from the approved playback manifest. |
 | `file_sha256` | Source-file SHA-256 expected by the frozen manifest. Files with another hash are not played. |
 
 ## `session.json`
@@ -125,10 +124,24 @@ All CSV exports include `baseline_mode` (`records` or `timed`) and `baseline_tar
 
 `session.json` stores `baseline: {mode, recordTarget}`. Legacy sessions without this field use timed calibration. `events.jsonl` includes `baselineMode` and `baselineTargetRecords` (null for timed mode). Existing first-pass and correction measures retain their definitions. Use the mode metadata to distinguish baseline protocols in notebook analyses.
 
-## Replacement music bank (2026-11-02)
+## Final version 2 music bank
 
-The current manifest is `playback-bank-2026-11-02`. Study track IDs remain lowercase bank IDs (for example `baseline/B09.wav`), while `relative_file_path` records actual capitalized folders such as `music/Baseline/B09.wav`. Static Music reserves B09; it is excluded from every Adaptive selection path. B02 may now appear in Adaptive baseline playback.
+The current manifest is `playback-bank-v2`: 8 Baseline, 8 Reduced, and 8 Elevated study recordings. With B09 reserved for Static, Adaptive has 7 eligible Baseline tracks. Study track IDs remain lowercase bank IDs (for example `baseline/B09.wav`), while `relative_file_path` records actual capitalized folders such as `music/Baseline/B09.wav`. Static Music reserves B09; it is excluded from every Adaptive selection path. B02 may now appear in Adaptive baseline playback.
 
 The separate `audio-check/B01.wav` recording lives in `music/Audio-Check/` and is returned only by the comfort-check metadata endpoint. It is not an experimental bank track and is absent from session `musicTracks` and `tracks.csv`. The manifest contains its approved path/checksum; existing comfort-check logs retain the selected volume and completion timestamp, not a separate playback-transition history for this clip.
 
-Blank `composer`/`composition_id` and blank CSV loudness/true-peak values (`null` in manifest/JSON) mean metadata was not supplied or measured for the replacement files. They do not mean zero loudness or a known distinct composer/composition. Historical sessions retain their saved catalogue metadata; do not relabel their tracks as B09 or substitute new-file measurements for the old recordings. Use saved track IDs and checksums to distinguish recordings. Old sessions cannot reproduce removed or modified WAVs unless their original bank is retained separately.
+The manifest retains descriptive source metadata from `music/Tuned In - Final Playback Bank Metadata v2.xlsx`. Its `metadataSource` stores the workbook path and checksum. The workbook's technical measurements, MI scores/ranks, temporal status, nominal mode and technical QC details remain in the workbook, not the current manifest or `tracks.csv`.
+
+| Workbook descriptive field | App/JSON field | CSV field |
+| --- | --- | --- |
+| `state` | `musicClass` | `music_class` |
+| `performance_identity` | `performanceId` | `performance_id` |
+| `source_wav_relative_path` | `sourceWavRelativePath` | `source_wav_relative_path` |
+| `source_wav_sha256` | `sourceSha256` | `file_sha256` |
+| `existing_screening_package_relative_path` | `relativeFilePath` (prefixed with `music/`) | `relative_file_path` |
+| `canonical_composer` | `composer` | `composer` |
+| `canonical_work_movement` | `workMovement` | `work_movement` |
+
+Track ID, confirmed composition ID, rotation index and manifest version are also retained for playback, repeat avoidance and export identification. Existing rotation order is unchanged. Work/performance/source descriptions are optional for historical sessions and the separate comfort clip; missing values export blank.
+
+All 24 study WAVs match their workbook checksums. Historical sessions retain their saved catalogue; older snapshots or exports may still contain technical metadata. New exports use the descriptive columns above, without rewriting historical source files. The app does not backfill historical identities from the current bank or use classification scores to alter adaptive thresholds. Removed technical columns can be looked up in the source workbook using the recording identity/checksum.

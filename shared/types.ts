@@ -32,8 +32,10 @@ export type MusicTrack = {
     compositionId: string;
     rotationIndex: number;
     sourceSha256: string;
-    integratedLoudnessLufs: number | null;
-    truePeakDbtp: number | null;
+    /** Descriptive source identity; optional on historical and comfort tracks. */
+    workMovement?: string;
+    performanceId?: string;
+    sourceWavRelativePath?: string;
 };
 
 export type AudioCheckTrack = Omit<MusicTrack, "musicClass"> & { musicClass: "audio-check" };

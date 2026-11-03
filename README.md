@@ -114,15 +114,17 @@ music/Elevated/
 music/Audio-Check/
 ```
 
-`config/playback-bank.json` is the approved playback manifest. The replacement bank (`playback-bank-2026-11-02`) contains **12 Baseline, 15 Reduced, and 9 Elevated recordings**, plus one separate comfort-check recording. File paths are case-sensitive and SHA-256 checks must match. Source WAV files are played without rewriting or normalizing them.
+`config/playback-bank.json` is the approved playback manifest. The final version 2 bank (`playback-bank-v2`) contains **8 Baseline, 8 Reduced, and 8 Elevated recordings**, plus one separate comfort-check recording. File paths are case-sensitive and SHA-256 checks must match. Source WAV files are played without rewriting or normalizing them.
 
 - **Static Music:** uses only `music/Baseline/B09.wav` (`baseline/B09.wav`). B09 is excluded from Adaptive Music's initial selection, state transitions, and track-end continuation. B02 is no longer reserved and can be used in Adaptive Music's baseline state.
-- **Adaptive Music:** uses the other 11 Baseline tracks and the Reduced/Elevated banks.
+- **Adaptive Music:** uses the other 7 Baseline tracks and the Reduced/Elevated banks.
 - **Audio Comfort Check:** uses only `music/Audio-Check/B01.wav`, served through the dedicated `/api/music/audio-check` metadata endpoint. It is absent from all experimental catalogues and rotations. Missing or invalid comfort audio does not fall back to a study recording.
 
 For an intentional bank replacement, update the approved paths and SHA-256 checksums in `config/playback-bank.json`, and set a new matching manifest version in that file and `study.json`. 
 
-Composer/composition attribution and LUFS/true-peak measurements were not supplied with this replacement bank. Blank attribution and `null` measurements explicitly mean **unknown**; old values are not carried over by filename. CSV measurement fields are blank when unknown. Playback still uses the configured master headroom and participant volume. The composer/composition avoidance rule can only enforce known metadata; it avoids immediate track-ID repetition where alternatives exist. Add verified attribution and measurements to the manifest before relying on those metadata claims. Retain existing metadata only when verified for the actual replacement recording.
+Descriptive metadata comes from `music/Tuned In - Final Playback Bank Metadata v2.xlsx`. Each entry keeps the state, performance identity, original source path/checksum, app playback path, composer, and work/movement. Track IDs, composition IDs, and rotation positions are retained for playback and repeat avoidance. Technical measurements and classification/QC details stay in the workbook rather than the app manifest or track CSV. The manifest's `metadataSource` identifies the workbook and its checksum.
+
+All 24 study WAV checksums match the workbook. Playback order is retained, with B09 reserved for Static. The comfort clip is separate and has no workbook row. These documentation/metadata changes do not normalize audio or alter volume, crossfades, or adaptive thresholds. Restart the backend and begin a new session after changing banks. Run `npm run test:music` to check loading, source metadata, and track isolation.
 
 Empty or missing study folders do not crash the task; unavailable tracks are omitted and playback can remain silent. Verify that the expected banks and comfort clip load before participant collection.
 
