@@ -410,9 +410,12 @@ footer {
     background: transparent;
     box-shadow: none;
     content: "";
-    transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 450ms ease, border-color 450ms ease, box-shadow 450ms ease;
 }
 .streak-area.streak-frame::before {
+    opacity: var(--streak-frame-opacity, 1);
     border-color: var(--streak-border);
     background: var(--streak-background);
     box-shadow: 0 0 0 3px var(--streak-ring), 0 0 var(--streak-glow) var(--streak-glow-color);
@@ -702,18 +705,20 @@ footer {
 }
 .streak {
     display: flex;
+    gap: 8px;
     align-items: center;
     justify-content: center;
     width: 100%;
     min-height: 42px;
     margin-top: 14px;
     padding: 0 22px;
-    border-top: 1px solid var(--streak-border);
+    border-top: 1px solid color-mix(in srgb, var(--streak-border) 35%, transparent);
     color: var(--streak-text);
     font-size: 13px;
     font-weight: 800;
-    transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, color 180ms ease;
+    transition: border-color 450ms ease, color 450ms ease;
 }
+.streak-0,
 .streak-1 {
     --streak-border: #d69b54;
     --streak-background: #fffaf0;
@@ -722,7 +727,25 @@ footer {
     --streak-glow-color: transparent;
     --streak-text: #9d6c3a;
 }
+.streak-0 {
+    --streak-frame-opacity: 0.18;
+    --streak-icon-opacity: 0.35;
+}
+.streak-1 {
+    --streak-frame-opacity: 0.28;
+    --streak-icon-opacity: 0.5;
+}
+.streak-0 .streak,
+.streak-1 .streak {
+    color: #59675d;
+}
+.streak-icon {
+    opacity: var(--streak-icon-opacity, 1);
+    transition: opacity 450ms ease;
+}
 .streak-2 {
+    --streak-frame-opacity: 0.4;
+    --streak-icon-opacity: 0.7;
     --streak-border: #e09a35;
     --streak-background: linear-gradient(120deg, #fff9db, #fff4e7);
     --streak-ring: rgba(224, 154, 53, 0.16);
@@ -731,6 +754,7 @@ footer {
     --streak-text: #a76320;
 }
 .streak-3 {
+    --streak-frame-opacity: 0.6;
     --streak-border: #ed852b;
     --streak-background: linear-gradient(120deg, #fff3b8, #ffe8d4);
     --streak-ring: rgba(237, 133, 43, 0.2);
@@ -739,6 +763,7 @@ footer {
     --streak-text: #a7461f;
 }
 .streak-4 {
+    --streak-frame-opacity: 0.8;
     --streak-border: #e96327;
     --streak-background: linear-gradient(120deg, #ffe78c, #ffd8c3);
     --streak-ring: rgba(233, 99, 39, 0.25);
@@ -747,6 +772,7 @@ footer {
     --streak-text: #963518;
 }
 .streak-5 {
+    --streak-frame-opacity: 1;
     --streak-border: #dc3e22;
     --streak-background: linear-gradient(120deg, #ffd94d, #ffbc73, #ffc6b7);
     --streak-ring: rgba(220, 62, 34, 0.3);
@@ -1233,4 +1259,10 @@ footer {
     flex: 1;
     height: 1px;
     background: #d7ded9;
+}
+@media (prefers-reduced-motion: reduce) {
+    .streak-area.streak-celebrate { animation: none; }
+    .streak-area::before,
+    .streak,
+    .streak-icon { transition: none; }
 }
