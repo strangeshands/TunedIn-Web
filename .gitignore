@@ -5,3 +5,4 @@ frontend/dist/
 backend/data/
 .DS_Store
 music/
+__pycache__
