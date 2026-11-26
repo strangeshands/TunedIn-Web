@@ -1,0 +1,5763 @@
+{
+  "id": "1a520092-da15-40c7-947f-997c958d9d16",
+  "participantId": "PIL005",
+  "studyMode": "Pilot",
+  "timing": {
+    "practiceSeconds": 60,
+    "baselineSeconds": 120,
+    "blockSeconds": 300
+  },
+  "baseline": {
+    "mode": "records",
+    "recordTarget": 20
+  },
+  "orderId": "B",
+  "conditionOrder": [
+    "Static music",
+    "Adaptive music",
+    "No music"
+  ],
+  "createdAt": "2026-11-04T05:34:13.471Z",
+  "updatedAt": "2026-11-04T06:07:43.110Z",
+  "configVersion": "pilot",
+  "buildVersion": "pilot-2.0.0",
+  "randomizationSeed": "pilot2.0.0",
+  "taskVersion": "fictional-records",
+  "audioIntegration": "rule-engine",
+  "comfortVolumePercent": 2,
+  "comfortCheckCompletedAt": "2026-11-04T05:49:13.224Z",
+  "endedEarlyAt": null,
+  "interruptedBlocks": [],
+  "blocks": [
+    {
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "number": 0,
+      "condition": "No music",
+      "startedAt": "2026-11-04T05:41:54.242Z",
+      "endedAt": "2026-11-04T05:42:54.302Z",
+      "durationSeconds": 60,
+      "initialMusicTrackId": null
+    },
+    {
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "number": 1,
+      "condition": "No music",
+      "startedAt": "2026-11-04T05:43:17.883Z",
+      "endedAt": "2026-11-04T05:47:46.389Z",
+      "durationSeconds": 268.46759999999404,
+      "initialMusicTrackId": null
+    },
+    {
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "number": 2,
+      "condition": "Static music",
+      "startedAt": "2026-11-04T05:49:20.464Z",
+      "endedAt": "2026-11-04T05:54:20.540Z",
+      "durationSeconds": 300,
+      "initialMusicTrackId": "baseline/B09.wav"
+    },
+    {
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "number": 3,
+      "condition": "Adaptive music",
+      "startedAt": "2026-11-04T05:56:43.912Z",
+      "endedAt": "2026-11-04T06:01:43.998Z",
+      "durationSeconds": 300,
+      "initialMusicTrackId": "baseline/B18.wav"
+    },
+    {
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "number": 4,
+      "condition": "No music",
+      "startedAt": "2026-11-04T06:02:43.082Z",
+      "endedAt": "2026-11-04T06:07:43.110Z",
+      "durationSeconds": 300,
+      "initialMusicTrackId": null
+    }
+  ],
+  "events": [
+    {
+      "eventId": "f54b45c6-8e7e-4dca-9ee4-cae449b68c8d",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R1",
+      "eventType": "record_presented",
+      "clientTimeMs": 6710923.5,
+      "sequence": 1
+    },
+    {
+      "eventId": "54d0ac5a-ba1e-423f-a03f-a5d8d9dce275",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R1",
+      "eventType": "first_key",
+      "clientTimeMs": 6712530.5,
+      "sequence": 2
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6726548.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "S4W-758",
+          "batchCode": "KY-57",
+          "quantity": "802"
+        }
+      },
+      "eventId": "6af52c43-19f4-422d-9c77-fddbeb2b7779",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 3
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 6726548.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "4a7b1d21-48e2-4ba5-8fc0-12f60f37781b",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 4
+    },
+    {
+      "eventId": "31206446-6edf-407a-9dd0-fbe51d0d4422",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R2",
+      "eventType": "record_presented",
+      "clientTimeMs": 6726580.900000006,
+      "sequence": 5
+    },
+    {
+      "eventId": "2a577cad-1fc2-4d13-9451-2c6868139fcd",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R2",
+      "eventType": "first_key",
+      "clientTimeMs": 6728769.5,
+      "sequence": 6
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6740429.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "w2m-619",
+          "batchCode": "pF-40",
+          "quantity": "503"
+        }
+      },
+      "eventId": "888a9544-423c-48b7-8d5f-430ee3313e82",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 7
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 6740429.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "f3a89a88-de51-4ba2-8ba9-abc8f9ad2d89",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 8
+    },
+    {
+      "eventId": "14687863-b9ab-44ed-8eee-c24686a69b14",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "record_presented",
+      "clientTimeMs": 6740450.100000024,
+      "sequence": 9
+    },
+    {
+      "eventId": "da9176c8-a5c1-426a-9cdd-b32ec92bf7c6",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "first_key",
+      "clientTimeMs": 6741814.200000018,
+      "sequence": 10
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6752009.5,
+      "payload": {
+        "values": {
+          "recordCode": "A67-023",
+          "batchCode": "IY-50",
+          "quantity": "146"
+        }
+      },
+      "eventId": "c678354d-7e26-47a1-9ab4-23f343f13cfe",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 11
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 6752009.5,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "043fed86-367e-4e0f-ad85-d93c1cb99b70",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 12
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6757382,
+      "payload": {
+        "values": {
+          "recordCode": "A6Z-023",
+          "batchCode": "IY-50",
+          "quantity": "146"
+        }
+      },
+      "eventId": "909c755d-9bd2-4d05-a18f-820f46325fd7",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 13
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 6757382,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "4f5ec706-40cc-4b77-9e9c-d8f12e9475a5",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 14
+    },
+    {
+      "eventId": "3648dbdf-fe5e-4064-9062-d439f250f074",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R4",
+      "eventType": "record_presented",
+      "clientTimeMs": 6757415.100000024,
+      "sequence": 15
+    },
+    {
+      "eventId": "d94cea7b-dabd-4572-888d-682bed66b88b",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "blockNumber": 0,
+      "recordId": "S0-R4",
+      "eventType": "first_key",
+      "clientTimeMs": 6759074.800000012,
+      "sequence": 16
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R4",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6770606.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "e30-984",
+          "batchCode": "nf-43",
+          "quantity": "847"
+        }
+      },
+      "eventId": "77b540d2-d3e0-4201-a2b4-bcb6de900cf9",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 17
+    },
+    {
+      "blockNumber": 0,
+      "recordId": "S0-R4",
+      "eventType": "validation_result",
+      "clientTimeMs": 6770606.400000006,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "e4f07956-cef5-4140-a59c-2eb76d6ac0ba",
+      "attemptId": "bded6a61-405b-48ee-ad83-001e00b2adb8",
+      "sequence": 18
+    },
+    {
+      "eventId": "0113b3e3-874f-4828-a479-f4ff4d9ec66f",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "record_presented",
+      "clientTimeMs": 6794566.200000018,
+      "sequence": 19
+    },
+    {
+      "eventId": "7796b0fa-2836-4d1b-8cd0-d7c6f4f2ec30",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "first_key",
+      "clientTimeMs": 6796260,
+      "sequence": 20
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6807727.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "o2E-954",
+          "batchCode": "dX-48",
+          "quantity": "493"
+        }
+      },
+      "eventId": "3c81c535-326f-4af5-9614-c117af674646",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 21
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 6807727.800000012,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "48ce54ef-c233-459d-8cc6-7719ab7af9c4",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 22
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6810375.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "o2E-952",
+          "batchCode": "dX-48",
+          "quantity": "493"
+        }
+      },
+      "eventId": "173bf887-d6c4-49ec-9100-b8d3b07a23cf",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 23
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 6810375.200000018,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "f8646fad-a82a-486f-9366-ddfbe5ca1aa5",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 24
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6815778.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "o2E-942",
+          "batchCode": "dX-48",
+          "quantity": "493"
+        }
+      },
+      "eventId": "4bf0fc87-4b46-4035-b516-61ad55073d45",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 25
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 6815778.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "38004ae2-97bc-4524-9b25-c41f25e02cec",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 26
+    },
+    {
+      "eventId": "f6b2cc5a-2b3b-47df-8027-083132ac2861",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "record_presented",
+      "clientTimeMs": 6815817.600000024,
+      "sequence": 27
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6815871.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "",
+          "batchCode": "",
+          "quantity": ""
+        }
+      },
+      "eventId": "f983fb10-7d35-4d45-9f8d-718e8fbc9d3e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 28
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 6815871.100000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode",
+          "batchCode",
+          "quantity"
+        ]
+      },
+      "eventId": "e68848c5-7b20-4ac0-acfe-8668afe5d1d3",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 29
+    },
+    {
+      "eventId": "0505edc7-4b90-43a2-b826-352c058268c2",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "first_key",
+      "clientTimeMs": 6819159.700000018,
+      "sequence": 30
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6833784,
+      "payload": {
+        "values": {
+          "recordCode": "W4c-068",
+          "batchCode": "Pe-87",
+          "quantity": "587"
+        }
+      },
+      "eventId": "6dbf5e5c-3497-4efb-8ad0-eeb94e9ca50a",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 31
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 6833784,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e918a757-6ff8-4309-bfb2-11982b12e366",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 32
+    },
+    {
+      "eventId": "b832c407-f489-4af5-bf26-add8e374615d",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R3",
+      "eventType": "record_presented",
+      "clientTimeMs": 6833814.300000012,
+      "sequence": 33
+    },
+    {
+      "eventId": "f0baca37-ff3e-4e59-be6f-1c6621ff1643",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R3",
+      "eventType": "first_key",
+      "clientTimeMs": 6835160.5,
+      "sequence": 34
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6855940,
+      "payload": {
+        "values": {
+          "recordCode": "c5r-292",
+          "batchCode": "GA-24",
+          "quantity": "969"
+        }
+      },
+      "eventId": "074bfa60-0284-4143-a327-e66b92020964",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 35
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 6855940,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "3425d80d-928e-4b7d-8956-a7398af3be09",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 36
+    },
+    {
+      "eventId": "572d6188-70a9-4d45-97f9-3636d6316f67",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R4",
+      "eventType": "record_presented",
+      "clientTimeMs": 6855971.200000018,
+      "sequence": 37
+    },
+    {
+      "eventId": "e4907b94-c521-4482-ae40-8628af100133",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R4",
+      "eventType": "first_key",
+      "clientTimeMs": 6857229.700000018,
+      "sequence": 38
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R4",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6871004.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "z9E-298",
+          "batchCode": "hT-07",
+          "quantity": "558"
+        }
+      },
+      "eventId": "53d57cf9-627c-404e-bc54-b34324b8d837",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 39
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R4",
+      "eventType": "validation_result",
+      "clientTimeMs": 6871004.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "95504aa8-edeb-4f16-b38d-f742daf53e16",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 40
+    },
+    {
+      "eventId": "94930e81-e1a3-4381-b74e-0cfe8167308d",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R5",
+      "eventType": "record_presented",
+      "clientTimeMs": 6871037.100000024,
+      "sequence": 41
+    },
+    {
+      "eventId": "2e84fc05-6dd7-4269-8653-df828229ddd1",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R5",
+      "eventType": "first_key",
+      "clientTimeMs": 6872465.800000012,
+      "sequence": 42
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R5",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6885568.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "Z3I-557",
+          "batchCode": "vt-85",
+          "quantity": "744"
+        }
+      },
+      "eventId": "3a8d99f3-3d9d-45cc-90c4-b3a1dab05f7b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 43
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R5",
+      "eventType": "validation_result",
+      "clientTimeMs": 6885568.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "9de13b35-e3b3-4b75-83f0-343a2c846dac",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 44
+    },
+    {
+      "eventId": "2fbef1e1-a0a6-4b43-8e1e-8d4440d879d4",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "record_presented",
+      "clientTimeMs": 6885598.300000012,
+      "sequence": 45
+    },
+    {
+      "eventId": "126d3763-131e-4fe7-8b93-1e2ffed99af7",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "first_key",
+      "clientTimeMs": 6886933.700000018,
+      "sequence": 46
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6896917.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "L^M-875",
+          "batchCode": "RY-67",
+          "quantity": "355"
+        }
+      },
+      "eventId": "f56f493f-d0bd-4e7b-a8cd-39f8bcf62d90",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 47
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 6896917.600000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "0dd39629-0e22-428f-952e-433f382970ec",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 48
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6901794.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "L6M-875",
+          "batchCode": "RY-67",
+          "quantity": "355"
+        }
+      },
+      "eventId": "4b567e64-00d2-4237-ba91-010918b35fd5",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 49
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 6901794.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "fcaaa40a-3a30-4b16-8b65-317c6132a33e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 50
+    },
+    {
+      "eventId": "78c9afa7-e0a0-4034-ae80-96421df8a7d4",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R7",
+      "eventType": "record_presented",
+      "clientTimeMs": 6901826.700000018,
+      "sequence": 51
+    },
+    {
+      "eventId": "31359945-800d-44f5-98d2-7b1e2d913e09",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R7",
+      "eventType": "first_key",
+      "clientTimeMs": 6903182.400000006,
+      "sequence": 52
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R7",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6915534,
+      "payload": {
+        "values": {
+          "recordCode": "b6M-947",
+          "batchCode": "WM-94",
+          "quantity": "506"
+        }
+      },
+      "eventId": "3e745a60-6221-424f-91c2-fa7997357322",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 53
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R7",
+      "eventType": "validation_result",
+      "clientTimeMs": 6915534,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ed45be07-4b74-4df5-9883-ee73e0719738",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 54
+    },
+    {
+      "eventId": "768b2d18-96ef-46bf-af1b-cc76eedaa716",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R8",
+      "eventType": "record_presented",
+      "clientTimeMs": 6915563.400000006,
+      "sequence": 55
+    },
+    {
+      "eventId": "2ef9bcdd-6fda-47d4-bc89-2b55de97378c",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R8",
+      "eventType": "first_key",
+      "clientTimeMs": 6917002.600000024,
+      "sequence": 56
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R8",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6925395,
+      "payload": {
+        "values": {
+          "recordCode": "j8i-255",
+          "batchCode": "dq-11",
+          "quantity": "306"
+        }
+      },
+      "eventId": "2315c49a-9d51-4fda-b812-2ab03fa0b98b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 57
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R8",
+      "eventType": "validation_result",
+      "clientTimeMs": 6925395,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "7602d634-225d-4176-9618-edd9a506f641",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 58
+    },
+    {
+      "eventId": "ec093f50-9ac7-46ba-8975-0f52f1007a1e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R9",
+      "eventType": "record_presented",
+      "clientTimeMs": 6925416.300000012,
+      "sequence": 59
+    },
+    {
+      "eventId": "0deeb127-2dbf-42fd-af8a-85297a4c0717",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R9",
+      "eventType": "first_key",
+      "clientTimeMs": 6926896.100000024,
+      "sequence": 60
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R9",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6937818.5,
+      "payload": {
+        "values": {
+          "recordCode": "g1w-538",
+          "batchCode": "eb-51",
+          "quantity": "272"
+        }
+      },
+      "eventId": "bf67e5ce-6c8b-49a6-8fa4-450e42546b34",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 61
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R9",
+      "eventType": "validation_result",
+      "clientTimeMs": 6937818.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "7e0b916d-05aa-40f9-81b2-dc77fb7b83c6",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 62
+    },
+    {
+      "eventId": "9e0ab857-6961-41d1-9537-bd752284a377",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R10",
+      "eventType": "record_presented",
+      "clientTimeMs": 6937849.200000018,
+      "sequence": 63
+    },
+    {
+      "eventId": "8cc94882-5e20-4b14-a8a3-c24a352721ba",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R10",
+      "eventType": "first_key",
+      "clientTimeMs": 6939031.200000018,
+      "sequence": 64
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R10",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6947139.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "W7r-496",
+          "batchCode": "ut-33",
+          "quantity": "889"
+        }
+      },
+      "eventId": "4791bd90-95a3-406f-9cdd-56bc2b821427",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 65
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R10",
+      "eventType": "validation_result",
+      "clientTimeMs": 6947139.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "291efa68-0536-48a1-818f-84f54bdbcdfa",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 66
+    },
+    {
+      "eventId": "af5b36b0-7dda-4c4a-bba7-2b16caa04f8d",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R11",
+      "eventType": "record_presented",
+      "clientTimeMs": 6947172.800000012,
+      "sequence": 67
+    },
+    {
+      "eventId": "a721f3ea-44bf-4442-ab06-018c5c6c21c0",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R11",
+      "eventType": "first_key",
+      "clientTimeMs": 6948446,
+      "sequence": 68
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R11",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6958312.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "i8Y-880",
+          "batchCode": "qT-14",
+          "quantity": "375"
+        }
+      },
+      "eventId": "1d3923f8-4180-436a-b314-c4a54b6651f6",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 69
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R11",
+      "eventType": "validation_result",
+      "clientTimeMs": 6958312.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "7638f92d-9899-4ed5-826d-2cea39b379af",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 70
+    },
+    {
+      "eventId": "a37b8c4d-2aea-45ae-951c-a68450d5ce58",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R12",
+      "eventType": "record_presented",
+      "clientTimeMs": 6958343.800000012,
+      "sequence": 71
+    },
+    {
+      "eventId": "a0ceec36-5502-477e-b455-7ba248e13d42",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R12",
+      "eventType": "first_key",
+      "clientTimeMs": 6959860.300000012,
+      "sequence": 72
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R12",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6972807.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "I5G-138",
+          "batchCode": "hE-38",
+          "quantity": "602"
+        }
+      },
+      "eventId": "c3218dba-eff0-4f34-840c-23884c51db5e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 73
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R12",
+      "eventType": "validation_result",
+      "clientTimeMs": 6972807.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ce8b2c47-6038-4944-b7c4-c2297ea5763e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 74
+    },
+    {
+      "eventId": "0ba3723e-316b-436f-8a3d-60f3bef7ef82",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R13",
+      "eventType": "record_presented",
+      "clientTimeMs": 6972841.5,
+      "sequence": 75
+    },
+    {
+      "eventId": "ccbd0401-f868-49bd-af64-9aea3ba40a52",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R13",
+      "eventType": "first_key",
+      "clientTimeMs": 6973899.100000024,
+      "sequence": 76
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R13",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6983783.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "L3b-020",
+          "batchCode": "Ji-23",
+          "quantity": "256"
+        }
+      },
+      "eventId": "e23c3583-fad0-49a1-8c9d-26c50ab1ea73",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 77
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R13",
+      "eventType": "validation_result",
+      "clientTimeMs": 6983783.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "da2db6a2-854d-4eff-b655-b89788a6e47b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 78
+    },
+    {
+      "eventId": "06edf8e1-36d8-4596-8479-25760118ad59",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R14",
+      "eventType": "record_presented",
+      "clientTimeMs": 6983815.800000012,
+      "sequence": 79
+    },
+    {
+      "eventId": "96f11744-564e-4228-b8bd-7f1280c77a0b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R14",
+      "eventType": "first_key",
+      "clientTimeMs": 6985204.400000006,
+      "sequence": 80
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R14",
+      "eventType": "record_submitted",
+      "clientTimeMs": 6994368.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "g2W-685",
+          "batchCode": "ST-76",
+          "quantity": "203"
+        }
+      },
+      "eventId": "5e0bbe92-925b-4453-9020-2f68ca670c4c",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 81
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R14",
+      "eventType": "validation_result",
+      "clientTimeMs": 6994368.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "3c9f5a26-28a3-49fe-88a8-bfbc43149b91",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 82
+    },
+    {
+      "eventId": "8c912d0f-4780-4f84-8dca-64a4708558e8",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "record_presented",
+      "clientTimeMs": 6994401.200000018,
+      "sequence": 83
+    },
+    {
+      "eventId": "6b98caff-6ccc-4fca-a33d-64aae99a657b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "first_key",
+      "clientTimeMs": 6995608.200000018,
+      "sequence": 84
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7004873.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "S(C-395",
+          "batchCode": "Ip-41",
+          "quantity": "626"
+        }
+      },
+      "eventId": "6d6f7eb9-be9d-4572-b67a-54c9b65a274e",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 85
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "validation_result",
+      "clientTimeMs": 7004873.900000006,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "c001e47d-a69a-4f12-a0b4-9ba62d7cd139",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 86
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7009232.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "S9C-395",
+          "batchCode": "Ip-41",
+          "quantity": "626"
+        }
+      },
+      "eventId": "68a0b2b5-2af4-4bdd-b151-3a31f5aec8c6",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 87
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R15",
+      "eventType": "validation_result",
+      "clientTimeMs": 7009232.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "2755cbed-4de3-4a42-8a22-0887f7a06cc2",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 88
+    },
+    {
+      "eventId": "3244f737-bbef-44c6-837f-e8c91f726c89",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R16",
+      "eventType": "record_presented",
+      "clientTimeMs": 7009266.300000012,
+      "sequence": 89
+    },
+    {
+      "eventId": "cccaceb9-4ac8-46c3-a28f-93412a0ed2e7",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R16",
+      "eventType": "first_key",
+      "clientTimeMs": 7010244.400000006,
+      "sequence": 90
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7020669.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "z7D-563",
+          "batchCode": "YA-88",
+          "quantity": "936"
+        }
+      },
+      "eventId": "486a04a7-ed21-4100-a874-62500e12ef79",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 91
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 7020669.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "053df35e-92b6-4b56-b973-e46c5799a022",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 92
+    },
+    {
+      "eventId": "19fa09af-8561-4585-ad42-470cd5f96948",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R17",
+      "eventType": "record_presented",
+      "clientTimeMs": 7020703.600000024,
+      "sequence": 93
+    },
+    {
+      "eventId": "febbf1ec-078a-4422-b64e-92605b82d48a",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R17",
+      "eventType": "first_key",
+      "clientTimeMs": 7021764.400000006,
+      "sequence": 94
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R17",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7032797.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "a3l-288",
+          "batchCode": "pd-81",
+          "quantity": "630"
+        }
+      },
+      "eventId": "6c4a6be7-4327-4ae5-b053-01a29d28fd9b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 95
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R17",
+      "eventType": "validation_result",
+      "clientTimeMs": 7032797.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "bff28a99-cc16-4f63-bb1d-dbfce1b57255",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 96
+    },
+    {
+      "eventId": "e6550bac-fb7a-41ee-af08-bbac3664cb87",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R18",
+      "eventType": "record_presented",
+      "clientTimeMs": 7032830.700000018,
+      "sequence": 97
+    },
+    {
+      "eventId": "e2712a64-6c2c-43e6-a625-0f96a150764a",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R18",
+      "eventType": "first_key",
+      "clientTimeMs": 7033957.100000024,
+      "sequence": 98
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R18",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7043702,
+      "payload": {
+        "values": {
+          "recordCode": "S7p-383",
+          "batchCode": "fv-80",
+          "quantity": "184"
+        }
+      },
+      "eventId": "cd15fb57-ceaf-402a-890e-4ca87702a2b8",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 99
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R18",
+      "eventType": "validation_result",
+      "clientTimeMs": 7043702,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "cc0f0c95-a13d-4717-aedd-26777b49b144",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 100
+    },
+    {
+      "eventId": "7b25dbf7-3695-4096-8048-d836811661b3",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R19",
+      "eventType": "record_presented",
+      "clientTimeMs": 7043739.400000006,
+      "sequence": 101
+    },
+    {
+      "eventId": "35abee59-a0ba-4c45-baed-f46a472d592b",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R19",
+      "eventType": "first_key",
+      "clientTimeMs": 7045012.400000006,
+      "sequence": 102
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R19",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7053362.5,
+      "payload": {
+        "values": {
+          "recordCode": "i1N-217",
+          "batchCode": "wH-59",
+          "quantity": "686"
+        }
+      },
+      "eventId": "4cde94a3-2957-48ec-bf01-c1849c40a03c",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 103
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R19",
+      "eventType": "validation_result",
+      "clientTimeMs": 7053362.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "d441763f-cdfe-4068-929e-8e2bc7c1a615",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 104
+    },
+    {
+      "eventId": "9e2ef0c5-9f86-4a1d-a0e3-cd1f9848559f",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R20",
+      "eventType": "record_presented",
+      "clientTimeMs": 7053395.900000006,
+      "sequence": 105
+    },
+    {
+      "eventId": "05586dac-0b06-4130-947c-5e2d310c51e1",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "blockNumber": 1,
+      "recordId": "S1-R20",
+      "eventType": "first_key",
+      "clientTimeMs": 7054659.900000006,
+      "sequence": 106
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R20",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7063033.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "f5b-214",
+          "batchCode": "xB-22",
+          "quantity": "275"
+        }
+      },
+      "eventId": "2c222aa3-6ce1-4a39-a981-9cf77c2f03e9",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 107
+    },
+    {
+      "blockNumber": 1,
+      "recordId": "S1-R20",
+      "eventType": "validation_result",
+      "clientTimeMs": 7063033.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "81cba0d9-848b-4cc8-9231-bfb09ad18f09",
+      "attemptId": "bb905954-7859-4b88-a0a2-9ba63ba019a3",
+      "sequence": 108
+    },
+    {
+      "eventId": "7e58c8dd-d1bf-4893-b4b2-5b1f789ab9ce",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R1",
+      "eventType": "record_presented",
+      "clientTimeMs": 7157169.900000006,
+      "sequence": 109
+    },
+    {
+      "eventId": "90b95c32-03f4-43cd-b353-25f574b429cf",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R1",
+      "eventType": "first_key",
+      "clientTimeMs": 7158658.5,
+      "sequence": 110
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7166417.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "i1L-945",
+          "batchCode": "jg-34",
+          "quantity": "801"
+        }
+      },
+      "eventId": "9cfb31a8-08a3-41af-951c-d13bfe6a0fc5",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 111
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 7166417.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "62275419-32eb-46f5-ac2e-ec26eaf7f634",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 112
+    },
+    {
+      "eventId": "95015e7d-6872-4dc1-8676-85feecc24b11",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R2",
+      "eventType": "record_presented",
+      "clientTimeMs": 7166459.400000006,
+      "sequence": 113
+    },
+    {
+      "eventId": "ba99bebc-8fe2-4d59-9b53-2bbbdfb234f2",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R2",
+      "eventType": "first_key",
+      "clientTimeMs": 7167571.900000006,
+      "sequence": 114
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7176851.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "Y5l-467",
+          "batchCode": "RD-83",
+          "quantity": "191"
+        }
+      },
+      "eventId": "4d954a88-a97d-4ffa-965e-75790c9b4a9c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 115
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 7176851.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b41cc9f8-42e8-456d-9fce-a81ac8d5172a",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 116
+    },
+    {
+      "eventId": "f2313fdd-3b4f-4234-8d74-88b265cd710f",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R3",
+      "eventType": "record_presented",
+      "clientTimeMs": 7176883.400000006,
+      "sequence": 117
+    },
+    {
+      "eventId": "4a410cab-3c59-4632-b3fc-9d7b56b78993",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R3",
+      "eventType": "first_key",
+      "clientTimeMs": 7178099.900000006,
+      "sequence": 118
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7190283.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "P7M-466",
+          "batchCode": "hM-68",
+          "quantity": "181"
+        }
+      },
+      "eventId": "8e9539f9-f9b0-4552-a246-0455980433e6",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 119
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 7190283.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "c7bfba8a-5a22-4d1b-bdc1-aec94bd85ded",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 120
+    },
+    {
+      "eventId": "f10de426-a24e-41be-8c74-3f1de95bd008",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R4",
+      "eventType": "record_presented",
+      "clientTimeMs": 7190324.900000006,
+      "sequence": 121
+    },
+    {
+      "eventId": "1746aea3-c43f-4f88-913c-8e6d349b0adf",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R4",
+      "eventType": "first_key",
+      "clientTimeMs": 7191250.700000018,
+      "sequence": 122
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R4",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7201161,
+      "payload": {
+        "values": {
+          "recordCode": "k9g-090",
+          "batchCode": "pF-56",
+          "quantity": "875"
+        }
+      },
+      "eventId": "1553963e-64bf-4f45-b9e4-669bcc26641e",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 123
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R4",
+      "eventType": "validation_result",
+      "clientTimeMs": 7201161,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a8b06e22-a5e6-4a9f-b953-4586a96ecce4",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 124
+    },
+    {
+      "eventId": "63f7ea79-61a1-4d89-9a27-aee77fea6fb3",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R5",
+      "eventType": "record_presented",
+      "clientTimeMs": 7201193.700000018,
+      "sequence": 125
+    },
+    {
+      "eventId": "4a5f6da9-80c5-4aaa-84df-dcc590b40446",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R5",
+      "eventType": "first_key",
+      "clientTimeMs": 7202731.100000024,
+      "sequence": 126
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R5",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7211721.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "Q4B-688",
+          "batchCode": "KU-02",
+          "quantity": "470"
+        }
+      },
+      "eventId": "90f8e230-0881-45cc-a1d9-477d2462608f",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 127
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R5",
+      "eventType": "validation_result",
+      "clientTimeMs": 7211721.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "acdbccec-679b-4267-9612-ce4fbd91a710",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 128
+    },
+    {
+      "eventId": "5f683d19-759a-4be4-bb0e-890307bec28d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R6",
+      "eventType": "record_presented",
+      "clientTimeMs": 7211755.400000006,
+      "sequence": 129
+    },
+    {
+      "eventId": "a0674efe-ac8c-4977-8cf6-cd0a2dde947a",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R6",
+      "eventType": "first_key",
+      "clientTimeMs": 7213630.700000018,
+      "sequence": 130
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7224853.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "Y4K-364",
+          "batchCode": "CO-01",
+          "quantity": "703"
+        }
+      },
+      "eventId": "2879fb2d-0fec-49cb-9a37-877468aed3a0",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 131
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 7224853.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "fa44738e-4e72-4766-bbef-1566a4fc4ce1",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 132
+    },
+    {
+      "eventId": "54f7fd71-19e2-4433-9ea8-198f238895b5",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R7",
+      "eventType": "record_presented",
+      "clientTimeMs": 7224884.100000024,
+      "sequence": 133
+    },
+    {
+      "eventId": "5a713df6-c591-4301-8ead-75ccf7990017",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R7",
+      "eventType": "first_key",
+      "clientTimeMs": 7225879.5,
+      "sequence": 134
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R7",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7237647.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "B6C-870",
+          "batchCode": "Vi-58",
+          "quantity": "524"
+        }
+      },
+      "eventId": "dd40a7ef-5c7b-4ae9-8a11-2fe0e316fc52",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 135
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R7",
+      "eventType": "validation_result",
+      "clientTimeMs": 7237647.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "f3d294e6-f34a-4562-82c6-ad00718ab045",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 136
+    },
+    {
+      "eventId": "ff75180e-77e9-47d0-9b3b-cb219c542321",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R8",
+      "eventType": "record_presented",
+      "clientTimeMs": 7237681.5,
+      "sequence": 137
+    },
+    {
+      "eventId": "1f5ab9e0-ca39-4f4d-88b9-83634128c146",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R8",
+      "eventType": "first_key",
+      "clientTimeMs": 7238745.200000018,
+      "sequence": 138
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R8",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7248151.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "Z0Y-222",
+          "batchCode": "Fi-05",
+          "quantity": "572"
+        }
+      },
+      "eventId": "042a4f98-6b95-41c6-8cea-3f286c98764c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 139
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R8",
+      "eventType": "validation_result",
+      "clientTimeMs": 7248151.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "abb4316c-4cfc-4e77-8305-9fa06fde9a71",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 140
+    },
+    {
+      "eventId": "8dbb6baf-3a52-4e86-8d4e-1d0fd245fcb9",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R9",
+      "eventType": "record_presented",
+      "clientTimeMs": 7248185.300000012,
+      "sequence": 141
+    },
+    {
+      "eventId": "e48768b4-1a61-4777-ba7f-cb7fd026aae0",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R9",
+      "eventType": "first_key",
+      "clientTimeMs": 7249623.800000012,
+      "sequence": 142
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R9",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7259982.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "d9F-078",
+          "batchCode": "iR-52",
+          "quantity": "145"
+        }
+      },
+      "eventId": "348a1d47-4e90-4f12-8d6b-3c60bc7acacc",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 143
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R9",
+      "eventType": "validation_result",
+      "clientTimeMs": 7259982.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "feb154dc-1777-4da7-afbb-59169930071d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 144
+    },
+    {
+      "eventId": "f0fb4b00-5923-40d4-bfd5-43f815826ed2",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R10",
+      "eventType": "record_presented",
+      "clientTimeMs": 7260016.5,
+      "sequence": 145
+    },
+    {
+      "eventId": "bbe17aac-a8cd-4407-874a-7b8530f7179b",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R10",
+      "eventType": "first_key",
+      "clientTimeMs": 7261035.600000024,
+      "sequence": 146
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R10",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7272763.5,
+      "payload": {
+        "values": {
+          "recordCode": "p4V-361",
+          "batchCode": "wl-95",
+          "quantity": "595"
+        }
+      },
+      "eventId": "4353f426-3473-4c5d-bc04-2170179c0734",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 147
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R10",
+      "eventType": "validation_result",
+      "clientTimeMs": 7272763.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "c9fc9c37-3ea1-4afd-833b-234daf17cc06",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 148
+    },
+    {
+      "eventId": "440ed131-23b7-421f-a01f-5e4ffaed3e1f",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R11",
+      "eventType": "record_presented",
+      "clientTimeMs": 7272794.800000012,
+      "sequence": 149
+    },
+    {
+      "eventId": "a079bfe4-4797-44db-bb84-31071e0c2dab",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R11",
+      "eventType": "first_key",
+      "clientTimeMs": 7273822.300000012,
+      "sequence": 150
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R11",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7284847.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "X5x-391",
+          "batchCode": "TJ-71",
+          "quantity": "313"
+        }
+      },
+      "eventId": "740af993-9598-4297-b8e8-346fae51d04c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 151
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R11",
+      "eventType": "validation_result",
+      "clientTimeMs": 7284847.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "7b65bdf6-8e9d-4f42-957b-9d0994d4fcde",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 152
+    },
+    {
+      "eventId": "3660bbb5-a4bc-4add-930e-3cb983d6f9a6",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "record_presented",
+      "clientTimeMs": 7284884,
+      "sequence": 153
+    },
+    {
+      "eventId": "e6ed38ff-9a88-4936-a28c-ffbf7ebe599d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "first_key",
+      "clientTimeMs": 7286600.900000006,
+      "sequence": 154
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7295632.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "g3P-865",
+          "batchCode": "GW-71",
+          "quantity": "132"
+        }
+      },
+      "eventId": "4d5c3515-cdd1-4432-ad29-3ca52d1a0e3d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 155
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "validation_result",
+      "clientTimeMs": 7295632.100000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "batchCode"
+        ]
+      },
+      "eventId": "70053c73-7621-4815-a02f-368d73ba9158",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 156
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7298919.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "g3P-865",
+          "batchCode": "GW-72",
+          "quantity": "132"
+        }
+      },
+      "eventId": "4f120f42-4216-4691-9834-58115556bfb6",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 157
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R12",
+      "eventType": "validation_result",
+      "clientTimeMs": 7298919.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "9c6d1961-fee0-4625-a11e-23616964a401",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 158
+    },
+    {
+      "eventId": "7d4e777a-0090-4644-bf35-5167e1647fd4",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R13",
+      "eventType": "record_presented",
+      "clientTimeMs": 7298971.600000024,
+      "sequence": 159
+    },
+    {
+      "eventId": "a0b1fa42-1a86-4324-992a-d39bee1aebb3",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R13",
+      "eventType": "first_key",
+      "clientTimeMs": 7300003.400000006,
+      "sequence": 160
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R13",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7309057.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "w3c-091",
+          "batchCode": "Wg-87",
+          "quantity": "357"
+        }
+      },
+      "eventId": "702fd210-739f-459f-8438-dd056a6a7a65",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 161
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R13",
+      "eventType": "validation_result",
+      "clientTimeMs": 7309057.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "13abd6ae-7c4d-44c8-bb3e-dc6ff3a43f86",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 162
+    },
+    {
+      "eventId": "dafdf04e-4b45-4ea6-81f3-6e3823dbb3be",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R14",
+      "eventType": "record_presented",
+      "clientTimeMs": 7309089,
+      "sequence": 163
+    },
+    {
+      "eventId": "49d8f7e5-0b52-4067-af91-c23bf638ebae",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R14",
+      "eventType": "first_key",
+      "clientTimeMs": 7310280.400000006,
+      "sequence": 164
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R14",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7317500.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "a4R-009",
+          "batchCode": "fN-40",
+          "quantity": "034"
+        }
+      },
+      "eventId": "df55420b-463b-443a-9d0b-2a9deabd5304",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 165
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R14",
+      "eventType": "validation_result",
+      "clientTimeMs": 7317500.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "982c628c-df94-462f-8b85-0be7ab41a35f",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 166
+    },
+    {
+      "eventId": "230f82a0-8ccf-434a-9088-36a35417f387",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R15",
+      "eventType": "record_presented",
+      "clientTimeMs": 7317532,
+      "sequence": 167
+    },
+    {
+      "eventId": "3d969cf0-b8ac-43c7-9427-bef74df47361",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R15",
+      "eventType": "first_key",
+      "clientTimeMs": 7319228.400000006,
+      "sequence": 168
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R15",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7326756.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "o9L-676",
+          "batchCode": "tm-74",
+          "quantity": "701"
+        }
+      },
+      "eventId": "5735b8af-4459-45ac-a2dc-aec7a4ce0e4c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 169
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R15",
+      "eventType": "validation_result",
+      "clientTimeMs": 7326756.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "bca573d2-b92c-46bd-9c76-2b8156d20c9f",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 170
+    },
+    {
+      "eventId": "5b4674d1-6e02-4a1e-9dee-7b18b5d79b9d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "record_presented",
+      "clientTimeMs": 7326788.100000024,
+      "sequence": 171
+    },
+    {
+      "eventId": "578c9807-33e3-4023-9fc6-f7c1e1c77bab",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "first_key",
+      "clientTimeMs": 7327732.100000024,
+      "sequence": 172
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7335141.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "n30-001",
+          "batchCode": "Iw-22",
+          "quantity": "324"
+        }
+      },
+      "eventId": "bf720924-f8b8-44c2-bae6-aee256c4c1c2",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 173
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 7335141.100000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "cff99b68-fca8-43cb-a61a-8f05e0cb42bf",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 174
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7340066.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "n3O-001",
+          "batchCode": "Iw-22",
+          "quantity": "324"
+        }
+      },
+      "eventId": "dea3e7b1-e890-48fd-8c6f-c21ba3908d1c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 175
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 7340066.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a2282070-b33a-4053-ada4-4511d4a30ee1",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 176
+    },
+    {
+      "eventId": "ca6da4f4-73bd-4077-b48a-802e71cf5b89",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R17",
+      "eventType": "record_presented",
+      "clientTimeMs": 7340097.300000012,
+      "sequence": 177
+    },
+    {
+      "eventId": "c08fcb58-c1a1-4e2a-8bd4-b33c62870a6a",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R17",
+      "eventType": "first_key",
+      "clientTimeMs": 7341112.400000006,
+      "sequence": 178
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R17",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7351507,
+      "payload": {
+        "values": {
+          "recordCode": "P0T-486",
+          "batchCode": "Sz-97",
+          "quantity": "960"
+        }
+      },
+      "eventId": "7d824489-50e3-4c44-89b5-c07ed7725fb0",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 179
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R17",
+      "eventType": "validation_result",
+      "clientTimeMs": 7351507,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "6d62c927-a9d3-49bf-9899-f9d9f4eb9fbc",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 180
+    },
+    {
+      "eventId": "c2e87062-3bcb-4f68-987b-1611cb0636b3",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "record_presented",
+      "clientTimeMs": 7351539.5,
+      "sequence": 181
+    },
+    {
+      "eventId": "af5af5fe-b42a-4c90-8303-e7bcb9da1bd9",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "first_key",
+      "clientTimeMs": 7352817.200000018,
+      "sequence": 182
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7361909.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "C6i-799",
+          "batchCode": "Mx-85",
+          "quantity": "096"
+        }
+      },
+      "eventId": "23c3431b-97db-4885-9b14-198d92bac4d6",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 183
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "validation_result",
+      "clientTimeMs": 7361909.800000012,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "batchCode"
+        ]
+      },
+      "eventId": "5e4d875e-0721-4061-b0d5-061f90eb81ac",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 184
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7365961.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "C6i-799",
+          "batchCode": "Mx-95",
+          "quantity": "096"
+        }
+      },
+      "eventId": "aa3b80f2-a549-4d3b-afa2-93fe0b1f3a9c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 185
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R18",
+      "eventType": "validation_result",
+      "clientTimeMs": 7365961.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a6b4e017-a3d9-4cd3-9907-9b80a3b537bb",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 186
+    },
+    {
+      "eventId": "6db12438-b85f-413d-9aaf-dd9d656ad622",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R19",
+      "eventType": "record_presented",
+      "clientTimeMs": 7365993.5,
+      "sequence": 187
+    },
+    {
+      "eventId": "1f599ad6-5d88-4448-bbc0-393986831d8c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R19",
+      "eventType": "first_key",
+      "clientTimeMs": 7367085,
+      "sequence": 188
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R19",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7376970.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "W2Q-437",
+          "batchCode": "yc-29",
+          "quantity": "665"
+        }
+      },
+      "eventId": "fd1f7a2e-53d2-4f01-9d01-1cccb48489cc",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 189
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R19",
+      "eventType": "validation_result",
+      "clientTimeMs": 7376970.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "aaeb5660-2bf6-458f-9c97-7fa1be1b418a",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 190
+    },
+    {
+      "eventId": "98900e81-bea8-4c2a-b1ce-f9ff2f3e3878",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "record_presented",
+      "clientTimeMs": 7376992.300000012,
+      "sequence": 191
+    },
+    {
+      "eventId": "bb45eaf1-c80d-42c5-93b6-f0f8d80b354e",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "first_key",
+      "clientTimeMs": 7378030.300000012,
+      "sequence": 192
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7384958.5,
+      "payload": {
+        "values": {
+          "recordCode": "w7w-927",
+          "batchCode": "rh-47",
+          "quantity": ""
+        }
+      },
+      "eventId": "bc231a44-12c0-4a2d-82fe-5107c8f91e37",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 193
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "validation_result",
+      "clientTimeMs": 7384958.5,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "quantity"
+        ]
+      },
+      "eventId": "6f6ffafb-4548-4f88-9b7d-1439e72f7216",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 194
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7388941.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "w7w-927",
+          "batchCode": "rh-47",
+          "quantity": "876"
+        }
+      },
+      "eventId": "4d675e5b-8abb-4c33-875f-5b93981fa5ed",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 195
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R20",
+      "eventType": "validation_result",
+      "clientTimeMs": 7388941.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "4cb27f07-b01b-4614-92bd-d1e4509d42e5",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 196
+    },
+    {
+      "eventId": "57568cc9-e819-4724-802a-ebe82b0e6e9e",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R21",
+      "eventType": "record_presented",
+      "clientTimeMs": 7388968,
+      "sequence": 197
+    },
+    {
+      "eventId": "48a061e1-5b79-4c3d-b651-c9e49ef9e482",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R21",
+      "eventType": "first_key",
+      "clientTimeMs": 7390229.200000018,
+      "sequence": 198
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R21",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7400931,
+      "payload": {
+        "values": {
+          "recordCode": "o8E-782",
+          "batchCode": "cn-36",
+          "quantity": "389"
+        }
+      },
+      "eventId": "2ade99a2-813f-44e9-864e-db0e25fc0638",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 199
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R21",
+      "eventType": "validation_result",
+      "clientTimeMs": 7400931,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "54bfc2a9-c1e6-4ceb-b865-226adb1e3e84",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 200
+    },
+    {
+      "eventId": "66962001-3a53-4480-b545-2b1b83fd9b7d",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R22",
+      "eventType": "record_presented",
+      "clientTimeMs": 7400961.800000012,
+      "sequence": 201
+    },
+    {
+      "eventId": "08686a39-507e-40af-8abb-b54537a61c67",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R22",
+      "eventType": "first_key",
+      "clientTimeMs": 7402098.700000018,
+      "sequence": 202
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R22",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7414755.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "c4y-359",
+          "batchCode": "qn-70",
+          "quantity": "166"
+        }
+      },
+      "eventId": "8d540815-333f-47be-8758-5a8d8b76cf61",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 203
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R22",
+      "eventType": "validation_result",
+      "clientTimeMs": 7414755.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b7ed3666-aa42-4d54-96fb-1583ea913b36",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 204
+    },
+    {
+      "eventId": "cc36170d-3e24-4f11-83fe-555e5c462500",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R23",
+      "eventType": "record_presented",
+      "clientTimeMs": 7414786.300000012,
+      "sequence": 205
+    },
+    {
+      "eventId": "202ead68-722a-4a4a-9103-c9ccdd602a51",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R23",
+      "eventType": "first_key",
+      "clientTimeMs": 7415795.100000024,
+      "sequence": 206
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R23",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7424422.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "n3C-598",
+          "batchCode": "mJ-19",
+          "quantity": "340"
+        }
+      },
+      "eventId": "d466bc9d-28f4-419f-83c8-2704db38036e",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 207
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R23",
+      "eventType": "validation_result",
+      "clientTimeMs": 7424422.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a4fc4574-c199-4df3-bdd1-b57a7076bae4",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 208
+    },
+    {
+      "eventId": "e39a80c3-f8cc-4e00-808e-c4d4dc535ca4",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R24",
+      "eventType": "record_presented",
+      "clientTimeMs": 7424463.5,
+      "sequence": 209
+    },
+    {
+      "eventId": "233cb689-78c7-4ba4-9487-4da0bef3b684",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R24",
+      "eventType": "first_key",
+      "clientTimeMs": 7425635.100000024,
+      "sequence": 210
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R24",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7436928.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "A7r-427",
+          "batchCode": "jU-69",
+          "quantity": "846"
+        }
+      },
+      "eventId": "0749d684-e61d-4d06-bf21-04e0aecb69d5",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 211
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R24",
+      "eventType": "validation_result",
+      "clientTimeMs": 7436928.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "64d18048-5443-4d03-b3be-500fbd8c98cc",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 212
+    },
+    {
+      "eventId": "1f3a5e37-6287-4d28-9ca8-d217c25bbd80",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R25",
+      "eventType": "record_presented",
+      "clientTimeMs": 7436954.600000024,
+      "sequence": 213
+    },
+    {
+      "eventId": "1862d1a5-ba03-47f0-9ce1-ce4e80fd549c",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R25",
+      "eventType": "first_key",
+      "clientTimeMs": 7438022.400000006,
+      "sequence": 214
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R25",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7449259.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "b8F-659",
+          "batchCode": "Ci-05",
+          "quantity": "230"
+        }
+      },
+      "eventId": "5456bb2b-ea50-48f6-a4bc-e39bc504b7fe",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 215
+    },
+    {
+      "blockNumber": 2,
+      "recordId": "S2-R25",
+      "eventType": "validation_result",
+      "clientTimeMs": 7449259.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e23636f2-4486-466d-948a-0dc26e4cd712",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "sequence": 216
+    },
+    {
+      "eventId": "244492d3-054a-499c-bdbd-4a1e6a27d137",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R26",
+      "eventType": "record_presented",
+      "clientTimeMs": 7449296.900000006,
+      "sequence": 217
+    },
+    {
+      "eventId": "74fdd689-d9e5-416a-8f10-e5182caa0343",
+      "attemptId": "aa183ce6-ca90-4f62-944f-0952b01282e0",
+      "blockNumber": 2,
+      "recordId": "S2-R26",
+      "eventType": "first_key",
+      "clientTimeMs": 7450320.700000018,
+      "sequence": 218
+    },
+    {
+      "eventId": "47960adb-6e24-469a-8091-a8cc5bb5163d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R1",
+      "eventType": "record_presented",
+      "clientTimeMs": 7600601.300000012,
+      "sequence": 219
+    },
+    {
+      "eventId": "86145290-c1be-4fb3-824e-96d6182e52b6",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R1",
+      "eventType": "first_key",
+      "clientTimeMs": 7603229.600000024,
+      "sequence": 220
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7613152.5,
+      "payload": {
+        "values": {
+          "recordCode": "y3s-258",
+          "batchCode": "xz-37",
+          "quantity": "917"
+        }
+      },
+      "eventId": "98d9ce00-24d7-46e7-8575-ae0fb00ac469",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 221
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 7613152.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "9d6f61bf-69a9-40e9-b2f5-1a3da3bf8759",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 222
+    },
+    {
+      "eventId": "e0c14144-7cb7-4c12-967b-7328756eb766",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R2",
+      "eventType": "record_presented",
+      "clientTimeMs": 7613184.400000006,
+      "sequence": 223
+    },
+    {
+      "eventId": "3d3b85ee-fbd7-4933-9328-ab1913ff48ef",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R2",
+      "eventType": "first_key",
+      "clientTimeMs": 7614366.5,
+      "sequence": 224
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7623233.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "U2C-079",
+          "batchCode": "vF-32",
+          "quantity": "774"
+        }
+      },
+      "eventId": "f8be2eda-4c27-4033-97db-954d45928214",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 225
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 7623233.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b186135d-6496-480c-8aae-a0740b1ccc3a",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 226
+    },
+    {
+      "eventId": "9c1a5958-2ff2-4acc-8aa2-81021097d313",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R3",
+      "eventType": "record_presented",
+      "clientTimeMs": 7623267.100000024,
+      "sequence": 227
+    },
+    {
+      "eventId": "c4507c17-aa86-4c05-97b9-3f827074ca36",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R3",
+      "eventType": "first_key",
+      "clientTimeMs": 7624364.100000024,
+      "sequence": 228
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7635233.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "Y2y-346",
+          "batchCode": "Zm-49",
+          "quantity": "315"
+        }
+      },
+      "eventId": "a10b7b6d-0bd5-4b91-acd9-c925f1302b35",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 229
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 7635233.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ad58099f-2207-42e5-8fb5-4eb56fc2b7f8",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 230
+    },
+    {
+      "eventId": "bf543216-8b5a-4b51-8bea-b2f70f4f5d8e",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R4",
+      "eventType": "record_presented",
+      "clientTimeMs": 7635267.200000018,
+      "sequence": 231
+    },
+    {
+      "eventId": "bd458550-d49a-4fa4-a971-3bf25943a048",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R4",
+      "eventType": "first_key",
+      "clientTimeMs": 7636357,
+      "sequence": 232
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R4",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7646533.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "H7F-897",
+          "batchCode": "uA-48",
+          "quantity": "684"
+        }
+      },
+      "eventId": "91544d59-f695-434b-bd83-65a861259eb2",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 233
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R4",
+      "eventType": "validation_result",
+      "clientTimeMs": 7646533.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "9b26b206-9234-4dcd-ba86-d0cb41965dd7",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 234
+    },
+    {
+      "eventId": "eae2d6d9-cc0d-4715-8862-a36a8bc39d21",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R5",
+      "eventType": "record_presented",
+      "clientTimeMs": 7646555.700000018,
+      "sequence": 235
+    },
+    {
+      "eventId": "cc6ec3c1-2a4b-4392-986d-0b149c8a7ccb",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R5",
+      "eventType": "first_key",
+      "clientTimeMs": 7647593.700000018,
+      "sequence": 236
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R5",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7657501.5,
+      "payload": {
+        "values": {
+          "recordCode": "o8H-810",
+          "batchCode": "bX-71",
+          "quantity": "842"
+        }
+      },
+      "eventId": "83479178-7b52-45bb-b8cb-f8e3eccc82a4",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 237
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R5",
+      "eventType": "validation_result",
+      "clientTimeMs": 7657501.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "bacd2098-3f2d-4544-9bed-34e3e74f9e53",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 238
+    },
+    {
+      "eventId": "6b7c8778-e82a-447d-a39a-d16f986351b7",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "record_presented",
+      "clientTimeMs": 7657531.800000012,
+      "sequence": 239
+    },
+    {
+      "eventId": "1b2807c1-95e8-4567-a5df-bae2fa9504f0",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "first_key",
+      "clientTimeMs": 7658681,
+      "sequence": 240
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7670830,
+      "payload": {
+        "values": {
+          "recordCode": "T9c-244",
+          "batchCode": "tz-62",
+          "quantity": "5511"
+        }
+      },
+      "eventId": "62bb62da-629b-40a9-a5e9-0fcc4d2b8a83",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 241
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 7670830,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "quantity"
+        ]
+      },
+      "eventId": "f67bb0c6-949c-49bb-9c13-afd3b4373ef5",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 242
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7672589.5,
+      "payload": {
+        "values": {
+          "recordCode": "T9c-244",
+          "batchCode": "tz-62",
+          "quantity": "551"
+        }
+      },
+      "eventId": "b10d7674-dc10-4e3d-87e0-d03f2dcb0084",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 243
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 7672589.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "5f25cec7-9ae4-44a7-b1c6-7405d504de01",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 244
+    },
+    {
+      "eventId": "3d502918-edc4-4b3c-b16e-624b3d8f047a",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R7",
+      "eventType": "record_presented",
+      "clientTimeMs": 7672620.600000024,
+      "sequence": 245
+    },
+    {
+      "eventId": "96b3475a-505a-4cfd-b1f3-0862bb4dffe5",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R7",
+      "eventType": "first_key",
+      "clientTimeMs": 7674539,
+      "sequence": 246
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R7",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7687363.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "M8B-869",
+          "batchCode": "Zp-42",
+          "quantity": "364"
+        }
+      },
+      "eventId": "ddef3a14-9bb3-46c9-91ca-77ae0f9cfe99",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 247
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R7",
+      "eventType": "validation_result",
+      "clientTimeMs": 7687363.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "f94394da-b19d-42d8-a47d-36b437dbbf07",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 248
+    },
+    {
+      "eventId": "8523937e-e65c-4fe6-bab9-26bae1e33970",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R8",
+      "eventType": "record_presented",
+      "clientTimeMs": 7687394.600000024,
+      "sequence": 249
+    },
+    {
+      "eventId": "96203eb8-191b-4fae-8e2c-adcb0fd6dce2",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R8",
+      "eventType": "first_key",
+      "clientTimeMs": 7688607,
+      "sequence": 250
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R8",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7701366.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "q5d-693",
+          "batchCode": "Qk-05",
+          "quantity": "280"
+        }
+      },
+      "eventId": "e52af640-dcae-4641-a272-100d52ea4a94",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 251
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R8",
+      "eventType": "validation_result",
+      "clientTimeMs": 7701366.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "3a624aa8-dbc4-4abb-93a3-765c35b3049c",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 252
+    },
+    {
+      "eventId": "00d52616-d1a2-428e-89fc-abeeddbd30a5",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R9",
+      "eventType": "record_presented",
+      "clientTimeMs": 7701401.400000006,
+      "sequence": 253
+    },
+    {
+      "eventId": "e4f67f9b-b20c-43b0-8d8b-1f9e9e6eeb76",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R9",
+      "eventType": "first_key",
+      "clientTimeMs": 7702423.200000018,
+      "sequence": 254
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R9",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7715331.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "B8V-693",
+          "batchCode": "jV-76",
+          "quantity": "768"
+        }
+      },
+      "eventId": "cc8af026-a558-46db-8631-c072a7d62dbc",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 255
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R9",
+      "eventType": "validation_result",
+      "clientTimeMs": 7715331.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e729b4b0-983c-4844-933b-2ab13535f0bb",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 256
+    },
+    {
+      "eventId": "cb60fcfb-b4f6-45b8-b2bf-97d37a91d585",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R10",
+      "eventType": "record_presented",
+      "clientTimeMs": 7715363.800000012,
+      "sequence": 257
+    },
+    {
+      "eventId": "6d3ca144-b909-4351-bdeb-3416104d78b8",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R10",
+      "eventType": "first_key",
+      "clientTimeMs": 7716644.5,
+      "sequence": 258
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R10",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7726935.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "S5o-438",
+          "batchCode": "UM-33",
+          "quantity": "104"
+        }
+      },
+      "eventId": "9207abfe-b092-40fd-ab29-ada8d76db495",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 259
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R10",
+      "eventType": "validation_result",
+      "clientTimeMs": 7726935.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "8fe22835-8577-468b-a5a0-b28d5a0e7eb3",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 260
+    },
+    {
+      "eventId": "c321cf0b-33e3-4a7a-b09f-683468a0b1f9",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R11",
+      "eventType": "record_presented",
+      "clientTimeMs": 7726966.900000006,
+      "sequence": 261
+    },
+    {
+      "eventId": "462038c0-13c1-4e93-acda-9f002ac2d011",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R11",
+      "eventType": "first_key",
+      "clientTimeMs": 7728109,
+      "sequence": 262
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R11",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7738368,
+      "payload": {
+        "values": {
+          "recordCode": "H7B-458",
+          "batchCode": "fv-04",
+          "quantity": "109"
+        }
+      },
+      "eventId": "2db39d50-3b00-41e3-b36f-4dfbbf477df9",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 263
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R11",
+      "eventType": "validation_result",
+      "clientTimeMs": 7738368,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b83f28e3-ef5d-4277-899d-7b951c4972f2",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 264
+    },
+    {
+      "eventId": "05ad246a-3fc1-4b08-9f7a-9edc21d5e721",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R12",
+      "eventType": "record_presented",
+      "clientTimeMs": 7738400,
+      "sequence": 265
+    },
+    {
+      "eventId": "24ea9dc6-d913-4858-ae9c-3bad4dd9949c",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R12",
+      "eventType": "first_key",
+      "clientTimeMs": 7739446.900000006,
+      "sequence": 266
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R12",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7749012,
+      "payload": {
+        "values": {
+          "recordCode": "w7f-734",
+          "batchCode": "ZL-53",
+          "quantity": "252"
+        }
+      },
+      "eventId": "fc599d67-d5a4-4b7e-9a95-15cd884162b2",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 267
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R12",
+      "eventType": "validation_result",
+      "clientTimeMs": 7749012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "bb3af74c-49e6-482e-a8d6-7890e17a21d0",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 268
+    },
+    {
+      "eventId": "5102b37f-f0f6-483b-a304-4755944266cf",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R13",
+      "eventType": "record_presented",
+      "clientTimeMs": 7749031.100000024,
+      "sequence": 269
+    },
+    {
+      "eventId": "8a4fc99d-27e5-4118-a7ea-dec34420d716",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R13",
+      "eventType": "first_key",
+      "clientTimeMs": 7750545,
+      "sequence": 270
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R13",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7757959.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "d8i-195",
+          "batchCode": "ad-49",
+          "quantity": "772"
+        }
+      },
+      "eventId": "af7d23d6-aca1-41dc-b604-c5656fb3b493",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 271
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R13",
+      "eventType": "validation_result",
+      "clientTimeMs": 7757959.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "27feb618-73a6-4c1a-9ff6-e19193f2dbbe",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 272
+    },
+    {
+      "eventId": "c8803bcb-0ed8-4d44-9533-54bd271d3122",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R14",
+      "eventType": "record_presented",
+      "clientTimeMs": 7757991.5,
+      "sequence": 273
+    },
+    {
+      "eventId": "02fd370e-5370-49c3-8f34-a96b0c7a8b70",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R14",
+      "eventType": "first_key",
+      "clientTimeMs": 7759389.400000006,
+      "sequence": 274
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R14",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7769907.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "p5s-937",
+          "batchCode": "EY-54",
+          "quantity": "357"
+        }
+      },
+      "eventId": "bd40d1a8-c9a3-485a-8cde-c17f4a60ea2f",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 275
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R14",
+      "eventType": "validation_result",
+      "clientTimeMs": 7769907.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "c698552d-c108-48b9-a642-05880476cc8d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 276
+    },
+    {
+      "eventId": "cb7e3fb7-ede8-4044-894e-e939902ddb9d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R15",
+      "eventType": "record_presented",
+      "clientTimeMs": 7769931.700000018,
+      "sequence": 277
+    },
+    {
+      "eventId": "ff1a3578-d05d-42e4-a03b-b55dcfa92897",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R15",
+      "eventType": "first_key",
+      "clientTimeMs": 7771203.200000018,
+      "sequence": 278
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R15",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7782637.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "h3M-742",
+          "batchCode": "GI-85",
+          "quantity": "852"
+        }
+      },
+      "eventId": "479ce500-b434-428f-b8d7-16d0866e3a82",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 279
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R15",
+      "eventType": "validation_result",
+      "clientTimeMs": 7782637.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a905affc-b3f2-4d78-aaf0-5b0775966efa",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 280
+    },
+    {
+      "eventId": "d682d043-3dde-4392-8d82-b38c2e3bb151",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R16",
+      "eventType": "record_presented",
+      "clientTimeMs": 7782668.700000018,
+      "sequence": 281
+    },
+    {
+      "eventId": "65da39d4-54f5-4cc9-8bf3-ec08737c2e3b",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R16",
+      "eventType": "first_key",
+      "clientTimeMs": 7783785,
+      "sequence": 282
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7793245.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "t4f-136",
+          "batchCode": "TF-89",
+          "quantity": "106"
+        }
+      },
+      "eventId": "5d64fbd8-0d01-44c5-bd98-4482ba7a9f3c",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 283
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 7793245.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ccd4594f-7c3a-41e3-af28-ca18c263d4c5",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 284
+    },
+    {
+      "eventId": "e6c5ea93-1028-4425-ad45-6ea8805fc28d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R17",
+      "eventType": "record_presented",
+      "clientTimeMs": 7793277.5,
+      "sequence": 285
+    },
+    {
+      "eventId": "a33d0b8a-5e74-4687-8a4c-b18be68a2d2e",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R17",
+      "eventType": "first_key",
+      "clientTimeMs": 7794269.100000024,
+      "sequence": 286
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R17",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7806162.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "s6g-406",
+          "batchCode": "zC-07",
+          "quantity": "209"
+        }
+      },
+      "eventId": "be1fbabf-34b8-4ab0-b8b3-38cdca937ab0",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 287
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R17",
+      "eventType": "validation_result",
+      "clientTimeMs": 7806162.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "d2f273f4-3ded-485e-a2b1-f7a31aaa7482",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 288
+    },
+    {
+      "eventId": "f226d035-2a5e-4967-8fcf-69eba771ee3d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R18",
+      "eventType": "record_presented",
+      "clientTimeMs": 7806196.200000018,
+      "sequence": 289
+    },
+    {
+      "eventId": "732ccaea-00d8-4e80-a9d9-6cc82dca3140",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R18",
+      "eventType": "first_key",
+      "clientTimeMs": 7807396.300000012,
+      "sequence": 290
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R18",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7818530.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "w3q-961",
+          "batchCode": "xI-17",
+          "quantity": "020"
+        }
+      },
+      "eventId": "fdc0aff2-2256-4dfd-90be-4436ec317f12",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 291
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R18",
+      "eventType": "validation_result",
+      "clientTimeMs": 7818530.300000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "0e0bdff3-eb2f-40b7-aa3c-ee26bdc9b12c",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 292
+    },
+    {
+      "eventId": "fcb765e0-a6e9-4f7d-a70a-dd4d0fe57cf4",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R19",
+      "eventType": "record_presented",
+      "clientTimeMs": 7818562.700000018,
+      "sequence": 293
+    },
+    {
+      "eventId": "9fb954be-b0c7-4a43-bf2b-ecfaa77b9bff",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R19",
+      "eventType": "first_key",
+      "clientTimeMs": 7819691.600000024,
+      "sequence": 294
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R19",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7830694.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "v7b-426",
+          "batchCode": "oA-84",
+          "quantity": "181"
+        }
+      },
+      "eventId": "95960a99-4594-4f55-abdc-ac30166d0faf",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 295
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R19",
+      "eventType": "validation_result",
+      "clientTimeMs": 7830694.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "cb3c7cad-dbc1-4f26-8b4f-cdbd0c6eb192",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 296
+    },
+    {
+      "eventId": "cd7d5344-feda-470c-a1f1-12587f65e8a4",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R20",
+      "eventType": "record_presented",
+      "clientTimeMs": 7830736.5,
+      "sequence": 297
+    },
+    {
+      "eventId": "fd69afdc-f0b0-4018-9af8-cf05b425fac0",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R20",
+      "eventType": "first_key",
+      "clientTimeMs": 7831813.400000006,
+      "sequence": 298
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R20",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7840342.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "I3d-600",
+          "batchCode": "kB-62",
+          "quantity": "655"
+        }
+      },
+      "eventId": "4398f428-d599-4c4c-a692-ab61ccf78650",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 299
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R20",
+      "eventType": "validation_result",
+      "clientTimeMs": 7840342.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "3665364c-a086-4f6b-a6d3-c7f507c604f8",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 300
+    },
+    {
+      "eventId": "8318049c-ee77-4b0a-8693-9ac278dc57fb",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R21",
+      "eventType": "record_presented",
+      "clientTimeMs": 7840362.600000024,
+      "sequence": 301
+    },
+    {
+      "eventId": "571bf098-4a97-4a3f-8cb3-5d4444a53475",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R21",
+      "eventType": "first_key",
+      "clientTimeMs": 7841785.600000024,
+      "sequence": 302
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R21",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7850626.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "r2a-410",
+          "batchCode": "Ts-10",
+          "quantity": "396"
+        }
+      },
+      "eventId": "c5db5e52-53dc-42b0-92cb-03ceb3bdd823",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 303
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R21",
+      "eventType": "validation_result",
+      "clientTimeMs": 7850626.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "c775ce69-65ea-4b47-90cc-6d5e75a3917a",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 304
+    },
+    {
+      "eventId": "b257748e-06d7-4734-818a-43989a59e82f",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R22",
+      "eventType": "record_presented",
+      "clientTimeMs": 7850671.300000012,
+      "sequence": 305
+    },
+    {
+      "eventId": "a1ccee7a-4510-45d6-9745-edf58bd2bdf0",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R22",
+      "eventType": "first_key",
+      "clientTimeMs": 7851698.900000006,
+      "sequence": 306
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R22",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7860939.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "I3b-503",
+          "batchCode": "sA-33",
+          "quantity": "535"
+        }
+      },
+      "eventId": "90b51f7d-7f00-4005-bfe0-20ee26deef82",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 307
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R22",
+      "eventType": "validation_result",
+      "clientTimeMs": 7860939.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ae594b94-dd34-4f9d-a5cc-3fe83e7cd54f",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 308
+    },
+    {
+      "eventId": "840d013a-a6cd-48b0-a1f5-2a2652df890d",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R23",
+      "eventType": "record_presented",
+      "clientTimeMs": 7860963.600000024,
+      "sequence": 309
+    },
+    {
+      "eventId": "4a8afa1e-2bec-4287-a4ba-87704e0237dc",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R23",
+      "eventType": "first_key",
+      "clientTimeMs": 7862175,
+      "sequence": 310
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R23",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7877736.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "g1T-243",
+          "batchCode": "Dx-44",
+          "quantity": "700"
+        }
+      },
+      "eventId": "0add8c89-6926-4c39-8eea-4036fd2832ba",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 311
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R23",
+      "eventType": "validation_result",
+      "clientTimeMs": 7877736.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "52f86fad-02ac-4fa9-8cb7-6264f1689852",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 312
+    },
+    {
+      "eventId": "11055dff-2ae8-4c97-9823-1866df240922",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R24",
+      "eventType": "record_presented",
+      "clientTimeMs": 7877770.400000006,
+      "sequence": 313
+    },
+    {
+      "eventId": "678de849-876f-4d54-ac73-3be287e7e4fa",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R24",
+      "eventType": "first_key",
+      "clientTimeMs": 7878728.700000018,
+      "sequence": 314
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R24",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7889754.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "Z5C-790",
+          "batchCode": "wM-74",
+          "quantity": "238"
+        }
+      },
+      "eventId": "959c5c9e-a97e-4e60-8709-a2a307e7816c",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 315
+    },
+    {
+      "blockNumber": 3,
+      "recordId": "S3-R24",
+      "eventType": "validation_result",
+      "clientTimeMs": 7889754.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e01c8376-82e9-462a-bbce-5ab4b15e2502",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "sequence": 316
+    },
+    {
+      "eventId": "04ea986c-1ad7-4dfa-9bda-d16c99c12833",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R25",
+      "eventType": "record_presented",
+      "clientTimeMs": 7889784.700000018,
+      "sequence": 317
+    },
+    {
+      "eventId": "c897ed06-524f-45e9-83c7-e30ea872717e",
+      "attemptId": "3fd2ccc0-857c-4a85-8817-0529d9631cc5",
+      "blockNumber": 3,
+      "recordId": "S3-R25",
+      "eventType": "first_key",
+      "clientTimeMs": 7890983.300000012,
+      "sequence": 318
+    },
+    {
+      "eventId": "e953996b-c55e-4db9-a886-c9613c89ad14",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "record_presented",
+      "clientTimeMs": 7959760.700000018,
+      "sequence": 319
+    },
+    {
+      "eventId": "fee6c8df-a3a7-4eba-9a3b-5f85510b6b74",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "first_key",
+      "clientTimeMs": 7961731.900000006,
+      "sequence": 320
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7974645.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "c9u-679",
+          "batchCode": "wq-12",
+          "quantity": "566"
+        }
+      },
+      "eventId": "b9e6ce4c-8f46-49c9-8d6f-6f7d1954fe01",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 321
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 7974645.300000012,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "batchCode"
+        ]
+      },
+      "eventId": "c70ca834-30b1-4c4e-989c-c9628f89f5d3",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 322
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7979313.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "c9u-679",
+          "batchCode": "xq-12",
+          "quantity": "566"
+        }
+      },
+      "eventId": "582215f6-9bb1-491b-abc1-b49fbb970b8a",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 323
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R1",
+      "eventType": "validation_result",
+      "clientTimeMs": 7979313.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e7071086-9177-4728-877b-0b42ef9a8822",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 324
+    },
+    {
+      "eventId": "94a3607b-f4d3-4990-8cd8-cf541c1136c2",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "record_presented",
+      "clientTimeMs": 7979348.400000006,
+      "sequence": 325
+    },
+    {
+      "eventId": "02218246-234a-4b39-994f-b4994e6ea9f0",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "first_key",
+      "clientTimeMs": 7980714.900000006,
+      "sequence": 326
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7988070.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "t10-247",
+          "batchCode": "Xx-55",
+          "quantity": "993"
+        }
+      },
+      "eventId": "b6cc88f5-a6b4-4c52-9daf-855085e8bd94",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 327
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 7988070.100000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "63ad1419-445f-4d24-8ee3-532c579e5eec",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 328
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "record_submitted",
+      "clientTimeMs": 7994837.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "t1O-247",
+          "batchCode": "Xx-55",
+          "quantity": "993"
+        }
+      },
+      "eventId": "065437be-bbb9-45b3-8353-6d4e4fdb2105",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 329
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R2",
+      "eventType": "validation_result",
+      "clientTimeMs": 7994837.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "f1a5dd28-2708-4ca2-98ff-359c1ed0533d",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 330
+    },
+    {
+      "eventId": "21a57fe8-d28b-486c-b61e-b8f74db5fe7b",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R3",
+      "eventType": "record_presented",
+      "clientTimeMs": 7994870.100000024,
+      "sequence": 331
+    },
+    {
+      "eventId": "bb98b33f-5ebf-446f-b919-b8253ba49650",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R3",
+      "eventType": "first_key",
+      "clientTimeMs": 7996100.900000006,
+      "sequence": 332
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R3",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8007790.5,
+      "payload": {
+        "values": {
+          "recordCode": "Y5F-683",
+          "batchCode": "fO-95",
+          "quantity": "708"
+        }
+      },
+      "eventId": "49a07a2f-a11c-446f-813f-2a44f860912c",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 333
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R3",
+      "eventType": "validation_result",
+      "clientTimeMs": 8007790.5,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "4a9f1070-e8e6-47bb-8a1c-be71694fe3f7",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 334
+    },
+    {
+      "eventId": "485544a5-6292-471e-b674-0283a9c52d3a",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R4",
+      "eventType": "record_presented",
+      "clientTimeMs": 8007827.600000024,
+      "sequence": 335
+    },
+    {
+      "eventId": "ff39ba7c-8e9d-45ca-a4f0-1058da88fbfa",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R4",
+      "eventType": "first_key",
+      "clientTimeMs": 8008830.100000024,
+      "sequence": 336
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R4",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8019323.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "S0f-818",
+          "batchCode": "qy-79",
+          "quantity": "380"
+        }
+      },
+      "eventId": "0ba581ba-42c6-424d-b50d-ee8e7bc83bbe",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 337
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R4",
+      "eventType": "validation_result",
+      "clientTimeMs": 8019323.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "49b26877-b7b1-499d-86fd-a3bd5a219d5c",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 338
+    },
+    {
+      "eventId": "c126f788-4cd9-450c-bebc-d05fcb4a78d3",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R5",
+      "eventType": "record_presented",
+      "clientTimeMs": 8019358.900000006,
+      "sequence": 339
+    },
+    {
+      "eventId": "ce7d3f19-b36c-43a3-836c-f23ae3f13645",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R5",
+      "eventType": "first_key",
+      "clientTimeMs": 8020451.100000024,
+      "sequence": 340
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R5",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8027923.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "b7W-479",
+          "batchCode": "VC-80",
+          "quantity": "400"
+        }
+      },
+      "eventId": "21ce5af6-2b2b-45c3-ba17-48f8b11f7c2a",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 341
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R5",
+      "eventType": "validation_result",
+      "clientTimeMs": 8027923.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ca9e98b4-ab06-48dd-80b9-0ad939891a2a",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 342
+    },
+    {
+      "eventId": "17fb26bc-68d5-4518-93a4-955ca1b7888b",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R6",
+      "eventType": "record_presented",
+      "clientTimeMs": 8027959.300000012,
+      "sequence": 343
+    },
+    {
+      "eventId": "d27b9107-f60a-4fa8-8079-9f5ae5c6c085",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R6",
+      "eventType": "first_key",
+      "clientTimeMs": 8029455.600000024,
+      "sequence": 344
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R6",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8043096,
+      "payload": {
+        "values": {
+          "recordCode": "q6E-502",
+          "batchCode": "OF-07",
+          "quantity": "315"
+        }
+      },
+      "eventId": "d1507ebc-e20b-489b-8117-986a279ad0d7",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 345
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R6",
+      "eventType": "validation_result",
+      "clientTimeMs": 8043096,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "2973cea7-041b-48e2-b570-58216650f246",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 346
+    },
+    {
+      "eventId": "09c67c9c-1ae7-47c8-ba7e-32afa43106ec",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R7",
+      "eventType": "record_presented",
+      "clientTimeMs": 8043130.300000012,
+      "sequence": 347
+    },
+    {
+      "eventId": "60553a86-be47-4075-a27a-aa68430b4b27",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R7",
+      "eventType": "first_key",
+      "clientTimeMs": 8044199,
+      "sequence": 348
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R7",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8051644.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "M2j-742",
+          "batchCode": "Ek-27",
+          "quantity": "824"
+        }
+      },
+      "eventId": "27e0610e-0d5f-4382-b8da-d27f7247db5b",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 349
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R7",
+      "eventType": "validation_result",
+      "clientTimeMs": 8051644.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "53a7f76e-7321-40c6-952e-e509f07bae61",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 350
+    },
+    {
+      "eventId": "cd368998-9a29-4faf-992b-34d486912333",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "record_presented",
+      "clientTimeMs": 8051677.400000006,
+      "sequence": 351
+    },
+    {
+      "eventId": "4a027289-7ec9-430b-a2e7-547e8826be55",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "first_key",
+      "clientTimeMs": 8052608.800000012,
+      "sequence": 352
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8062600.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "z8ww-321",
+          "batchCode": "ID-30",
+          "quantity": "949"
+        }
+      },
+      "eventId": "3123825a-7ddd-47f9-ae72-150437ec6d52",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 353
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "validation_result",
+      "clientTimeMs": 8062600.100000024,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode"
+        ]
+      },
+      "eventId": "3afc4695-e476-47fb-a1fd-145dd44e4703",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 354
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8066109.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "z8w-321",
+          "batchCode": "ID-30",
+          "quantity": "949"
+        }
+      },
+      "eventId": "2d97482c-5c7c-43d0-b60f-ce812711397d",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 355
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R8",
+      "eventType": "validation_result",
+      "clientTimeMs": 8066109.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "9c80e5c8-caca-4ad8-a996-d97368e6d9bb",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 356
+    },
+    {
+      "eventId": "e1ff0052-a16f-4cc3-8af2-37908b2ff691",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R9",
+      "eventType": "record_presented",
+      "clientTimeMs": 8066145.300000012,
+      "sequence": 357
+    },
+    {
+      "eventId": "507524f2-b706-41dd-9341-6382910ead38",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R9",
+      "eventType": "first_key",
+      "clientTimeMs": 8067040,
+      "sequence": 358
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R9",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8077565.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "Z3I-010",
+          "batchCode": "oE-65",
+          "quantity": "338"
+        }
+      },
+      "eventId": "17b7d7a9-36fe-47cf-9512-c0a036ec1058",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 359
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R9",
+      "eventType": "validation_result",
+      "clientTimeMs": 8077565.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "1073286d-fa9b-43ea-83f9-a5ae7f6f3679",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 360
+    },
+    {
+      "eventId": "470a38a2-cd46-4c08-b00c-e56bf3f0b103",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R10",
+      "eventType": "record_presented",
+      "clientTimeMs": 8077597.300000012,
+      "sequence": 361
+    },
+    {
+      "eventId": "7677fe3e-09c9-40c2-8f07-00f01fcebe56",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R10",
+      "eventType": "first_key",
+      "clientTimeMs": 8078588.800000012,
+      "sequence": 362
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R10",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8095257.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "Z7I-540",
+          "batchCode": "MO-74",
+          "quantity": "406"
+        }
+      },
+      "eventId": "95dfbb11-fa7f-42cd-af89-6f1ddfd661ba",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 363
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R10",
+      "eventType": "validation_result",
+      "clientTimeMs": 8095257.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a779e342-cb8e-4517-a586-8ef0a951bdd5",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 364
+    },
+    {
+      "eventId": "668d6170-9eb1-42be-a61e-ec2cc2d9b5d7",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R11",
+      "eventType": "record_presented",
+      "clientTimeMs": 8095293.200000018,
+      "sequence": 365
+    },
+    {
+      "eventId": "90ba3c5e-a818-47e7-9a34-898fd78bfc6f",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R11",
+      "eventType": "first_key",
+      "clientTimeMs": 8096337.600000024,
+      "sequence": 366
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R11",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8107457.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "w3o-781",
+          "batchCode": "qE-31",
+          "quantity": "620"
+        }
+      },
+      "eventId": "60230c8d-6a88-40c8-9c75-e0b232fc3fe1",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 367
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R11",
+      "eventType": "validation_result",
+      "clientTimeMs": 8107457.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b09238be-24a4-4373-96e3-917199e79ae1",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 368
+    },
+    {
+      "eventId": "e6bf19bf-dc5d-4ae4-b6a9-b86925e4e3e9",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R12",
+      "eventType": "record_presented",
+      "clientTimeMs": 8107488.800000012,
+      "sequence": 369
+    },
+    {
+      "eventId": "14a7cebf-1898-4497-aadb-7a4671ee8bb9",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R12",
+      "eventType": "first_key",
+      "clientTimeMs": 8108454.5,
+      "sequence": 370
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R12",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8115571.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "f1A-196",
+          "batchCode": "rY-27",
+          "quantity": "998"
+        }
+      },
+      "eventId": "0ba91af6-50d0-4b64-9ed1-1cc4d87108f4",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 371
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R12",
+      "eventType": "validation_result",
+      "clientTimeMs": 8115571.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "b257bc4d-0178-429d-9ad6-cd2743c26c1b",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 372
+    },
+    {
+      "eventId": "30fe64cc-7fd4-4346-b994-4fc3b74d88f5",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R13",
+      "eventType": "record_presented",
+      "clientTimeMs": 8115602.100000024,
+      "sequence": 373
+    },
+    {
+      "eventId": "da68314f-220c-473c-8b84-49ee677d9200",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R13",
+      "eventType": "first_key",
+      "clientTimeMs": 8116567.800000012,
+      "sequence": 374
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R13",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8124034.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "l8A-334",
+          "batchCode": "oS-27",
+          "quantity": "345"
+        }
+      },
+      "eventId": "f7a52ccb-61f9-4952-b54a-d540942ae6ba",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 375
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R13",
+      "eventType": "validation_result",
+      "clientTimeMs": 8124034.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "99d30309-cc48-40af-9ccd-893d60ec0d70",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 376
+    },
+    {
+      "eventId": "9f1e7c88-7bb9-430e-b993-4dd016b95c81",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R14",
+      "eventType": "record_presented",
+      "clientTimeMs": 8124064.300000012,
+      "sequence": 377
+    },
+    {
+      "eventId": "f7e1ab44-6a75-4292-ba7c-8ece997dbb97",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R14",
+      "eventType": "first_key",
+      "clientTimeMs": 8125101.600000024,
+      "sequence": 378
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R14",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8135008.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "i1S-804",
+          "batchCode": "JB-45",
+          "quantity": "408"
+        }
+      },
+      "eventId": "76209303-df2d-4af7-a416-743a3811e698",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 379
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R14",
+      "eventType": "validation_result",
+      "clientTimeMs": 8135008.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "45a9c445-4d38-4431-b033-19b8dde45589",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 380
+    },
+    {
+      "eventId": "dc684997-0407-4f6d-9dbf-4068abd8681e",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R15",
+      "eventType": "record_presented",
+      "clientTimeMs": 8135047.100000024,
+      "sequence": 381
+    },
+    {
+      "eventId": "e724af22-0b35-4ca8-b4dd-eef2782024c4",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R15",
+      "eventType": "first_key",
+      "clientTimeMs": 8136106.200000018,
+      "sequence": 382
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R15",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8145367,
+      "payload": {
+        "values": {
+          "recordCode": "k0s-840",
+          "batchCode": "Pb-63",
+          "quantity": "646"
+        }
+      },
+      "eventId": "90da16b9-3e3a-4eb4-9d60-a788b88c5773",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 383
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R15",
+      "eventType": "validation_result",
+      "clientTimeMs": 8145367,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "c213ed8b-e7e7-4a98-bcd8-f46288e9b3ac",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 384
+    },
+    {
+      "eventId": "0f05c70f-b4c8-4100-bced-ee8daec07a54",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "record_presented",
+      "clientTimeMs": 8145401.900000006,
+      "sequence": 385
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8145452.300000012,
+      "payload": {
+        "values": {
+          "recordCode": "",
+          "batchCode": "",
+          "quantity": ""
+        }
+      },
+      "eventId": "37a78fde-4140-47f8-8285-c2120ec94359",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 386
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 8145452.300000012,
+      "payload": {
+        "accepted": false,
+        "incorrectFields": [
+          "recordCode",
+          "batchCode",
+          "quantity"
+        ]
+      },
+      "eventId": "bcd96241-fcc0-482b-8405-4a57753157fd",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 387
+    },
+    {
+      "eventId": "82ed1109-8424-461c-8955-c2a5ece601c1",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "first_key",
+      "clientTimeMs": 8147398.900000006,
+      "sequence": 388
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8159862.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "M9S-609",
+          "batchCode": "Id-88",
+          "quantity": "657"
+        }
+      },
+      "eventId": "f50fc03e-b10d-40e1-be01-9ccfc470b102",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 389
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R16",
+      "eventType": "validation_result",
+      "clientTimeMs": 8159862.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "a19d7035-5768-4c69-9037-590d57bbd409",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 390
+    },
+    {
+      "eventId": "b0859749-b0a2-466e-a2d2-b4c74906d2e3",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R17",
+      "eventType": "record_presented",
+      "clientTimeMs": 8159908.600000024,
+      "sequence": 391
+    },
+    {
+      "eventId": "f8ed1a54-42f9-43af-9ac4-8cc8fb9cae88",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R17",
+      "eventType": "first_key",
+      "clientTimeMs": 8160850.300000012,
+      "sequence": 392
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R17",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8169303.600000024,
+      "payload": {
+        "values": {
+          "recordCode": "D3I-291",
+          "batchCode": "Ho-23",
+          "quantity": "008"
+        }
+      },
+      "eventId": "63051aac-285f-4c6d-9bd6-627068b6626e",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 393
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R17",
+      "eventType": "validation_result",
+      "clientTimeMs": 8169303.600000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "35852246-ce2f-44d4-aaa9-d5971c9f928d",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 394
+    },
+    {
+      "eventId": "77f0b7b8-f72e-4332-9994-3f7af224d6ed",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R18",
+      "eventType": "record_presented",
+      "clientTimeMs": 8169333.600000024,
+      "sequence": 395
+    },
+    {
+      "eventId": "34f6dd0e-6e7c-4579-a647-2d969f836b84",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R18",
+      "eventType": "first_key",
+      "clientTimeMs": 8170422.800000012,
+      "sequence": 396
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R18",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8179543.800000012,
+      "payload": {
+        "values": {
+          "recordCode": "e5X-857",
+          "batchCode": "ok-45",
+          "quantity": "373"
+        }
+      },
+      "eventId": "7d806d47-ba91-4b9e-9379-d5be3a4d36c1",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 397
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R18",
+      "eventType": "validation_result",
+      "clientTimeMs": 8179543.800000012,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "48e36e1b-41be-4d30-b5e9-3c9463439e6c",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 398
+    },
+    {
+      "eventId": "eeff8905-52f7-49e9-bfcf-0028119690a4",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R19",
+      "eventType": "record_presented",
+      "clientTimeMs": 8179577.700000018,
+      "sequence": 399
+    },
+    {
+      "eventId": "5d9abb85-517c-47e3-8c65-b556b7c35115",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R19",
+      "eventType": "first_key",
+      "clientTimeMs": 8180547.600000024,
+      "sequence": 400
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R19",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8188504.900000006,
+      "payload": {
+        "values": {
+          "recordCode": "p6f-615",
+          "batchCode": "Dd-55",
+          "quantity": "536"
+        }
+      },
+      "eventId": "03af589e-43a2-48b4-9a5b-0259bceb3538",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 401
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R19",
+      "eventType": "validation_result",
+      "clientTimeMs": 8188504.900000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "71777a20-12e7-45d1-8927-9e094faf5fd7",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 402
+    },
+    {
+      "eventId": "4f873243-39b0-400f-912d-d4db83faaf9d",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R20",
+      "eventType": "record_presented",
+      "clientTimeMs": 8188538.100000024,
+      "sequence": 403
+    },
+    {
+      "eventId": "b59428fd-c37c-401e-bee8-a87233f059b1",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R20",
+      "eventType": "first_key",
+      "clientTimeMs": 8189491.200000018,
+      "sequence": 404
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R20",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8197345.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "l3k-578",
+          "batchCode": "Tq-08",
+          "quantity": "778"
+        }
+      },
+      "eventId": "95bbb094-f76b-48fd-9a3d-eddd49c3593a",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 405
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R20",
+      "eventType": "validation_result",
+      "clientTimeMs": 8197345.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "6c8e2e1f-997f-4966-b1df-eacf973a3032",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 406
+    },
+    {
+      "eventId": "d3f6d64b-9cb2-491c-9617-1fc935fe1dc0",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R21",
+      "eventType": "record_presented",
+      "clientTimeMs": 8197378.200000018,
+      "sequence": 407
+    },
+    {
+      "eventId": "575ba734-2785-4ce1-90a4-efe7bf60afb6",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R21",
+      "eventType": "first_key",
+      "clientTimeMs": 8198624.200000018,
+      "sequence": 408
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R21",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8208104.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "x2C-999",
+          "batchCode": "MP-77",
+          "quantity": "897"
+        }
+      },
+      "eventId": "8109cd3e-8789-484f-a30e-0dd3bfd8bf50",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 409
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R21",
+      "eventType": "validation_result",
+      "clientTimeMs": 8208104.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e591a866-a4b6-44c6-9947-71888d433704",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 410
+    },
+    {
+      "eventId": "b5c0f9a4-de05-4261-a226-a6d3e7491d3b",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R22",
+      "eventType": "record_presented",
+      "clientTimeMs": 8208138.700000018,
+      "sequence": 411
+    },
+    {
+      "eventId": "76b6ddc8-6e6e-4775-af33-79c5b0c3c69c",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R22",
+      "eventType": "first_key",
+      "clientTimeMs": 8209464.900000006,
+      "sequence": 412
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R22",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8225709.700000018,
+      "payload": {
+        "values": {
+          "recordCode": "O8D-845",
+          "batchCode": "Iu-02",
+          "quantity": "968"
+        }
+      },
+      "eventId": "9ccb0622-6183-4404-814c-3927e9ffc356",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 413
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R22",
+      "eventType": "validation_result",
+      "clientTimeMs": 8225709.700000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "77be3a6e-563b-4b8a-a736-a50c4e6c1560",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 414
+    },
+    {
+      "eventId": "a02cccbb-b342-4c2a-bc9c-570ade4dac01",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R23",
+      "eventType": "record_presented",
+      "clientTimeMs": 8225744.600000024,
+      "sequence": 415
+    },
+    {
+      "eventId": "e42d5f2c-8cdf-4eb2-a992-6522069394de",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R23",
+      "eventType": "first_key",
+      "clientTimeMs": 8226739.5,
+      "sequence": 416
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R23",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8239234.100000024,
+      "payload": {
+        "values": {
+          "recordCode": "n0u-546",
+          "batchCode": "dd-07",
+          "quantity": "605"
+        }
+      },
+      "eventId": "94362ba5-07fb-409b-b018-352bbf4f60b6",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 417
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R23",
+      "eventType": "validation_result",
+      "clientTimeMs": 8239234.100000024,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "e9075ff8-b593-463b-8cbf-c23a7433e1b4",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 418
+    },
+    {
+      "eventId": "4b94ab75-2f60-40be-b04f-132ff7a9f510",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R24",
+      "eventType": "record_presented",
+      "clientTimeMs": 8239267.100000024,
+      "sequence": 419
+    },
+    {
+      "eventId": "6198aca9-e4fb-42a8-ad9e-9de4920f2905",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R24",
+      "eventType": "first_key",
+      "clientTimeMs": 8240306.200000018,
+      "sequence": 420
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R24",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8250722.400000006,
+      "payload": {
+        "values": {
+          "recordCode": "k7b-798",
+          "batchCode": "Tt-24",
+          "quantity": "469"
+        }
+      },
+      "eventId": "441f1c69-2966-471b-94d7-ffd658abc2df",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 421
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R24",
+      "eventType": "validation_result",
+      "clientTimeMs": 8250722.400000006,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "f26d0031-0061-4fc3-96e7-f1b202c6a747",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 422
+    },
+    {
+      "eventId": "3fc46cf2-4fc4-4970-898f-f5fac49e8992",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R25",
+      "eventType": "record_presented",
+      "clientTimeMs": 8250753.900000006,
+      "sequence": 423
+    },
+    {
+      "eventId": "d1dbf436-3ab5-4414-82b7-de265f914768",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R25",
+      "eventType": "first_key",
+      "clientTimeMs": 8251854,
+      "sequence": 424
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R25",
+      "eventType": "record_submitted",
+      "clientTimeMs": 8259234.200000018,
+      "payload": {
+        "values": {
+          "recordCode": "R5d-579",
+          "batchCode": "HO-71",
+          "quantity": "716"
+        }
+      },
+      "eventId": "3cdcc80e-6628-4cac-bfdf-46abf42deb19",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 425
+    },
+    {
+      "blockNumber": 4,
+      "recordId": "S4-R25",
+      "eventType": "validation_result",
+      "clientTimeMs": 8259234.200000018,
+      "payload": {
+        "accepted": true,
+        "incorrectFields": []
+      },
+      "eventId": "ea4702f5-d09b-4811-9a4f-e7c2bf11ebf0",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "sequence": 426
+    },
+    {
+      "eventId": "24eb36bb-1452-4e65-b3ac-122ce6737c4c",
+      "attemptId": "10ccb8a6-9926-46ce-878e-a1518cb88814",
+      "blockNumber": 4,
+      "recordId": "S4-R26",
+      "eventType": "record_presented",
+      "clientTimeMs": 8259274.300000012,
+      "sequence": 427
+    }
+  ],
+  "musicManifestVersion": "playback-bank-v2",
+  "musicTracks": [
+    {
+      "id": "baseline/B02.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B02.wav",
+      "composer": "Alexander Scriabin",
+      "compositionId": "scriabin-op51-no1",
+      "rotationIndex": 1,
+      "sourceSha256": "0a1fb5140985bf2673c10a4cd720b530acec0179eeb08d8c8b7820eca3682b68",
+      "workMovement": "Fragilite, Op.51",
+      "performanceId": "maestro-v3.0.0:2009/MIDI-Unprocessed_11_R1_2009_06-09_ORIG_MID--AUDIO_11_R1_2009_11_R1_2009_06_WAV.wav",
+      "sourceWavRelativePath": "2009/MIDI-Unprocessed_11_R1_2009_06-09_ORIG_MID--AUDIO_11_R1_2009_11_R1_2009_06_WAV.wav"
+    },
+    {
+      "id": "baseline/B06.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B06.wav",
+      "composer": "Ludwig van Beethoven",
+      "compositionId": "beethoven-op110",
+      "rotationIndex": 2,
+      "sourceSha256": "9f5e25e610b83508007891cf3ad2aed4e1492b3150d693c8e1e6c6e2a63caa0f",
+      "workMovement": "Sonata in A-flat, Op. 110",
+      "performanceId": "maestro-v3.0.0:2004/MIDI-Unprocessed_XP_01_R1_2004_01-02_ORIG_MID--AUDIO_01_R1_2004_02_Track02_wav.wav",
+      "sourceWavRelativePath": "2004/MIDI-Unprocessed_XP_01_R1_2004_01-02_ORIG_MID--AUDIO_01_R1_2004_02_Track02_wav.wav"
+    },
+    {
+      "id": "baseline/B07.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B07.wav",
+      "composer": "Ludwig van Beethoven",
+      "compositionId": "beethoven-op10-no1",
+      "rotationIndex": 3,
+      "sourceSha256": "15ee87b17e278addddbd82e6d9b3837bb6b9e728b61e3b8eeff3232c99b12c69",
+      "workMovement": "Sonata No. 5 in C Minor, Op. 10 No. 1, I. Allegro molto e con brio",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D2-13-20_mid--AUDIO-from_mp3_16_R1_2015_wav--2.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D2-13-20_mid--AUDIO-from_mp3_16_R1_2015_wav--2.wav"
+    },
+    {
+      "id": "baseline/B08.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B08.wav",
+      "composer": "Ludwig van Beethoven",
+      "compositionId": "beethoven-op2-no3",
+      "rotationIndex": 4,
+      "sourceSha256": "b741e36fa1c36614ffb6a4e806d580c55d18081c6ca5b492be4dbd36ef968fc0",
+      "workMovement": "Sonata No. 3, Op. 2 No. 3 in C major, I. Allegro con brio",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_065_PIANO065_MID--AUDIO-split_07-07-17_Piano-e_3-01_wav--2.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_065_PIANO065_MID--AUDIO-split_07-07-17_Piano-e_3-01_wav--2.wav"
+    },
+    {
+      "id": "baseline/B09.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B09.wav",
+      "composer": "Joseph Haydn",
+      "compositionId": "haydn-hob-xvi-20",
+      "rotationIndex": 5,
+      "sourceSha256": "b4c1826408f4a90196758f09c914fd9a6434240a71e9655fb2b31944708d10fd",
+      "workMovement": "Sonata in C Minor, First Movement",
+      "performanceId": "maestro-v3.0.0:2008/MIDI-Unprocessed_12_R1_2008_01-04_ORIG_MID--AUDIO_12_R1_2008_wav--1.wav",
+      "sourceWavRelativePath": "2008/MIDI-Unprocessed_12_R1_2008_01-04_ORIG_MID--AUDIO_12_R1_2008_wav--1.wav"
+    },
+    {
+      "id": "baseline/B10.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B10.wav",
+      "composer": "Frédéric Chopin",
+      "compositionId": "chopin-op25-no1",
+      "rotationIndex": 6,
+      "sourceSha256": "5d5c87a5680acca49b18f4fac7c7dcf1e8e573114f8f343a7550b6a3934b0b8c",
+      "workMovement": "Etude Op. 25 No. 1",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_07_R1_2015_wav--3.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_07_R1_2015_wav--3.wav"
+    },
+    {
+      "id": "baseline/B13.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B13.wav",
+      "composer": "Franz Liszt",
+      "compositionId": "liszt-transcendental-etude-no5",
+      "rotationIndex": 7,
+      "sourceSha256": "651f9533a95e228c4e09db982f92229aba171d6b6298fddcf108d9e6c1553164",
+      "workMovement": "Études d'exécution transcendante, No. 5, \"Feux follets\" S.139/5",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_047_PIANO047_MID--AUDIO-split_07-06-17_Piano-e_2-04_wav--2.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_047_PIANO047_MID--AUDIO-split_07-06-17_Piano-e_2-04_wav--2.wav"
+    },
+    {
+      "id": "baseline/B18.wav",
+      "musicClass": "baseline",
+      "relativeFilePath": "music/Baseline/B18.wav",
+      "composer": "Joseph Haydn",
+      "compositionId": "haydn-hob-xvi-52",
+      "rotationIndex": 8,
+      "sourceSha256": "c74f6420c73b82afb333053979784eca15c56b044c3ab5acfc6bcc45fb02e333",
+      "workMovement": "Sonata in E-flat Major, Hob. XVI:52, First Movement",
+      "performanceId": "maestro-v3.0.0:2008/MIDI-Unprocessed_16_R1_2008_01-04_ORIG_MID--AUDIO_16_R1_2008_wav--2.wav",
+      "sourceWavRelativePath": "2008/MIDI-Unprocessed_16_R1_2008_01-04_ORIG_MID--AUDIO_16_R1_2008_wav--2.wav"
+    },
+    {
+      "id": "reduced/R04.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R04.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv867",
+      "rotationIndex": 1,
+      "sourceSha256": "20e12f50f244cbad244173a9a70948506dc186c489bffc766d345e4481e5f78e",
+      "workMovement": "Prelude & Fugue in B flat minor, Book I, BWV 867",
+      "performanceId": "maestro-v3.0.0:2013/ORIG-MIDI_01_7_6_13_Group__MID--AUDIO_02_R1_2013_wav--1.wav",
+      "sourceWavRelativePath": "2013/ORIG-MIDI_01_7_6_13_Group__MID--AUDIO_02_R1_2013_wav--1.wav"
+    },
+    {
+      "id": "reduced/R12.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R12.wav",
+      "composer": "Frédéric Chopin",
+      "compositionId": "chopin-op57",
+      "rotationIndex": 2,
+      "sourceSha256": "777f8f438ac07165bbab0fb024e9ae1aaff3d709783dca48e573833806d41b87",
+      "workMovement": "Berceuse Op. 57 in D-flat Major",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_083_PIANO083_MID--AUDIO-split_07-09-17_Piano-e_2_-06_wav--5.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_083_PIANO083_MID--AUDIO-split_07-09-17_Piano-e_2_-06_wav--5.wav"
+    },
+    {
+      "id": "reduced/R15.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R15.wav",
+      "composer": "Johann Sebastian Bach / Egon Petri",
+      "compositionId": "bach-sheep-may-safely-graze",
+      "rotationIndex": 3,
+      "sourceSha256": "da1b57d2e6496d070d0876b7e768fc31c1cb33b3eda68e14918600300f30d2e3",
+      "workMovement": "\"Sheep May Safely Graze\"",
+      "performanceId": "maestro-v3.0.0:2013/ORIG-MIDI_02_7_7_13_Group__MID--AUDIO_18_R1_2013_wav--4.wav",
+      "sourceWavRelativePath": "2013/ORIG-MIDI_02_7_7_13_Group__MID--AUDIO_18_R1_2013_wav--4.wav"
+    },
+    {
+      "id": "reduced/R16.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R16.wav",
+      "composer": "Frédéric Chopin",
+      "compositionId": "chopin-op27-no2",
+      "rotationIndex": 4,
+      "sourceSha256": "f2c34a15298c21ce7fa2c9d24e698447a326319f80b4e9dcdedcfc2ada918db0",
+      "workMovement": "Nocturne Op. 27 No. 2 in D-flat Major",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_058_PIANO058_MID--AUDIO-split_07-07-17_Piano-e_2-02_wav--4.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_058_PIANO058_MID--AUDIO-split_07-07-17_Piano-e_2-02_wav--4.wav"
+    },
+    {
+      "id": "reduced/R17.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R17.wav",
+      "composer": "Frédéric Chopin",
+      "compositionId": "chopin-op62-no1",
+      "rotationIndex": 5,
+      "sourceSha256": "8c1f08eeb66d651e9f00b113110504986ef7906ce5c2cebb588d28a5a34a171a",
+      "workMovement": "Nocturne Op. 62 No. 1 in B Major",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_072_PIANO072_MID--AUDIO-split_07-08-17_Piano-e_1-06_wav--3.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_072_PIANO072_MID--AUDIO-split_07-08-17_Piano-e_1-06_wav--3.wav"
+    },
+    {
+      "id": "reduced/R21.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R21.wav",
+      "composer": "Claude Debussy",
+      "compositionId": "debussy-preludes-i-6-des-pas",
+      "rotationIndex": 6,
+      "sourceSha256": "f11bbc579d0110fbd38c9dd8a5c2889f226ffe502fe81866f30cefd6e8380651",
+      "workMovement": "Prelude No. 6, Book I, \"Des pas sur la neige\"",
+      "performanceId": "maestro-v3.0.0:2018/MIDI-Unprocessed_Recital16_MID--AUDIO_16_R1_2018_wav--3.wav",
+      "sourceWavRelativePath": "2018/MIDI-Unprocessed_Recital16_MID--AUDIO_16_R1_2018_wav--3.wav"
+    },
+    {
+      "id": "reduced/R22.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R22.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d780-no1",
+      "rotationIndex": 7,
+      "sourceSha256": "c91e56d2343415bc9b195a76b1e479abb8a2124632e84dd140cda9f446d5a345",
+      "workMovement": "Moment Musical Op. 94 No. 1 in C Major",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R2_D2-12-13-15_mid--AUDIO-from_mp3_12_R2_2015_wav--2.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R2_D2-12-13-15_mid--AUDIO-from_mp3_12_R2_2015_wav--2.wav"
+    },
+    {
+      "id": "reduced/R24.wav",
+      "musicClass": "reduced",
+      "relativeFilePath": "music/Reduced/R24.wav",
+      "composer": "Franz Schubert",
+      "compositionId": "schubert-d899-no3",
+      "rotationIndex": 8,
+      "sourceSha256": "e3d0e7cd3b5d3d07dcf837b8cbda085d34a5513d59e99de5584402802a7dda41",
+      "workMovement": "Impromptu Op. 90 No. 3 in G-flat Major, D. 899",
+      "performanceId": "maestro-v3.0.0:2017/MIDI-Unprocessed_073_PIANO073_MID--AUDIO-split_07-08-17_Piano-e_2-02_wav--2.wav",
+      "sourceWavRelativePath": "2017/MIDI-Unprocessed_073_PIANO073_MID--AUDIO-split_07-08-17_Piano-e_2-02_wav--2.wav"
+    },
+    {
+      "id": "elevated/E01.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E01.wav",
+      "composer": "Sergei Rachmaninoff",
+      "compositionId": "rachmaninoff-op32-no8",
+      "rotationIndex": 1,
+      "sourceSha256": "c2ca6e70a70a5944483eb0792b3c5ddb93c191a10fed19a9fe06a554e8604a9b",
+      "workMovement": "Prelude Op. 32 No. 8 in A Minor",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D1-9-12_mid--AUDIO-from_mp3_11_R1_2015_wav--5.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D1-9-12_mid--AUDIO-from_mp3_11_R1_2015_wav--5.wav"
+    },
+    {
+      "id": "elevated/E02.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E02.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv848",
+      "rotationIndex": 2,
+      "sourceSha256": "b0740c03a698e5cf6100bc15640a5d5a1c3ae9409259db127482a0cbece6c1a0",
+      "workMovement": "Prelude and Fugue in C-sharp Major, WTC I, BWV 848",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D1-9-12_mid--AUDIO-from_mp3_09_R1_2015_wav--1.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D1-9-12_mid--AUDIO-from_mp3_09_R1_2015_wav--1.wav"
+    },
+    {
+      "id": "elevated/E06.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E06.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv875",
+      "rotationIndex": 3,
+      "sourceSha256": "b0b7dc6c65017ade4cc233f8e93b24b80ab31cf80e3cc7ce45712f6e8252f10f",
+      "workMovement": "Prelude and Fugue in D Minor, Book II",
+      "performanceId": "maestro-v3.0.0:2004/MIDI-Unprocessed_XP_09_R1_2004_01-02_ORIG_MID--AUDIO_09_R1_2004_01_Track01_wav.wav",
+      "sourceWavRelativePath": "2004/MIDI-Unprocessed_XP_09_R1_2004_01-02_ORIG_MID--AUDIO_09_R1_2004_01_Track01_wav.wav"
+    },
+    {
+      "id": "elevated/E07.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E07.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv807",
+      "rotationIndex": 4,
+      "sourceSha256": "d642f6376916d752b164fb4c713e28b5a387ec1f843793d2f524e4a61eecc9b2",
+      "workMovement": "English Suite No. 2  in A Minor, BWV 807, I. Prelude",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_08_R1_2015_wav--1.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_08_R1_2015_wav--1.wav"
+    },
+    {
+      "id": "elevated/E08.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E08.wav",
+      "composer": "Johann Sebastian Bach",
+      "compositionId": "bach-bwv804",
+      "rotationIndex": 5,
+      "sourceSha256": "682010f65ad3c2cadca5a4379c30713a25dd5c1767e3fe4c52e85f9f8836ca4f",
+      "workMovement": "Duet in G, BWV 804",
+      "performanceId": "maestro-v3.0.0:2009/MIDI-Unprocessed_06_R1_2009_03-07_ORIG_MID--AUDIO_06_R1_2009_06_R1_2009_04_WAV.wav",
+      "sourceWavRelativePath": "2009/MIDI-Unprocessed_06_R1_2009_03-07_ORIG_MID--AUDIO_06_R1_2009_06_R1_2009_04_WAV.wav"
+    },
+    {
+      "id": "elevated/E09.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E09.wav",
+      "composer": "Franz Liszt",
+      "compositionId": "liszt-transcendental-etude-no2",
+      "rotationIndex": 6,
+      "sourceSha256": "14201210b0dc4b129bfc87008c073b982fb5f13617c1db75c018745ff15010a5",
+      "workMovement": "Transcendental Etude No. 2, “Molto vivace\"",
+      "performanceId": "maestro-v3.0.0:2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--4.wav",
+      "sourceWavRelativePath": "2015/MIDI-Unprocessed_R1_D1-1-8_mid--AUDIO-from_mp3_06_R1_2015_wav--4.wav"
+    },
+    {
+      "id": "elevated/E12.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E12.wav",
+      "composer": "Pyotr Ilyich Tchaikovsky / Mikhail Pletnev",
+      "compositionId": "tchaikovsky-nutcracker-pletnev-suite",
+      "rotationIndex": 7,
+      "sourceSha256": "7cb2a94da1ee9055fbd2a4a1eaba78cfd1e5ac082d34d4454da944cf874c7da3",
+      "workMovement": "March from \"Nutcracker Suite",
+      "performanceId": "maestro-v3.0.0:2008/MIDI-Unprocessed_02_R2_2008_01-05_ORIG_MID--AUDIO_02_R2_2008_wav--4.wav",
+      "sourceWavRelativePath": "2008/MIDI-Unprocessed_02_R2_2008_01-05_ORIG_MID--AUDIO_02_R2_2008_wav--4.wav"
+    },
+    {
+      "id": "elevated/E13.wav",
+      "musicClass": "elevated",
+      "relativeFilePath": "music/Elevated/E13.wav",
+      "composer": "Felix Mendelssohn / Sergei Rachmaninoff",
+      "compositionId": "mendelssohn-op61-rachmaninoff",
+      "rotationIndex": 8,
+      "sourceSha256": "44d4842f8d58f36ab019016901c210efcf34b1c9e4fdc4681a213a44ae2e8a7d",
+      "workMovement": "Scherzo from Mendelssohn's \"Midsummer Night's Dream\"",
+      "performanceId": "maestro-v3.0.0:2008/MIDI-Unprocessed_08_R2_2008_01-04_ORIG_MID--AUDIO_08_R2_2008_wav--4.wav",
+      "sourceWavRelativePath": "2008/MIDI-Unprocessed_08_R2_2008_01-04_ORIG_MID--AUDIO_08_R2_2008_wav--4.wav"
+    }
+  ],
+  "musicDecisions": [
+    {
+      "id": "decision-1",
+      "blockNumber": 3,
+      "windowStartMs": 7600610.700000018,
+      "windowEndMs": 7660610.700000018,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1097,
+      "medianFirstPassEntryDurationMs": 9922.899999976158,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "baseline",
+      "previousTrackId": "baseline/B18.wav",
+      "selectedTrackId": "baseline/B18.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    },
+    {
+      "id": "decision-2",
+      "blockNumber": 3,
+      "windowStartMs": 7630622.300000012,
+      "windowEndMs": 7690622.300000012,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1097,
+      "medianFirstPassEntryDurationMs": 10869.799999982119,
+      "firstPassRecordErrorRate": 0.2,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "reduced",
+      "previousTrackId": "baseline/B18.wav",
+      "selectedTrackId": "reduced/R12.wav",
+      "reason": "Recent performance met a reduced-state trigger."
+    },
+    {
+      "id": "decision-3",
+      "blockNumber": 3,
+      "windowStartMs": 7660613.300000012,
+      "windowEndMs": 7720613.300000012,
+      "recordCount": 4,
+      "medianInitiationLatencyMs": 1180.7999999821186,
+      "medianFirstPassEntryDurationMs": 12792.000000014901,
+      "firstPassRecordErrorRate": 0.25,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "reduced",
+      "selectedState": "reduced",
+      "previousTrackId": "reduced/R12.wav",
+      "selectedTrackId": "reduced/R12.wav",
+      "reason": "Recent performance met a reduced-state trigger."
+    },
+    {
+      "id": "decision-4",
+      "blockNumber": 3,
+      "windowStartMs": 7690615.100000024,
+      "windowEndMs": 7750615.100000024,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1142.0999999940395,
+      "medianFirstPassEntryDurationMs": 10290.600000023842,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "reduced",
+      "selectedState": "baseline",
+      "previousTrackId": "reduced/R12.wav",
+      "selectedTrackId": "baseline/B02.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    },
+    {
+      "id": "decision-5",
+      "blockNumber": 3,
+      "windowStartMs": 7720613.900000006,
+      "windowEndMs": 7780613.900000006,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1280.699999988079,
+      "medianFirstPassEntryDurationMs": 10259,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "baseline",
+      "previousTrackId": "baseline/B02.wav",
+      "selectedTrackId": "baseline/B02.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    },
+    {
+      "id": "decision-6",
+      "blockNumber": 3,
+      "windowStartMs": 7750623.300000012,
+      "windowEndMs": 7810623.300000012,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1271.5,
+      "medianFirstPassEntryDurationMs": 10518.200000017881,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "baseline",
+      "previousTrackId": "baseline/B02.wav",
+      "selectedTrackId": "baseline/B02.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    },
+    {
+      "id": "decision-7",
+      "blockNumber": 3,
+      "windowStartMs": 7780618.5,
+      "windowEndMs": 7840618.5,
+      "recordCount": 6,
+      "medianInitiationLatencyMs": 1122.5999999940395,
+      "medianFirstPassEntryDurationMs": 11068.54999999702,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "baseline",
+      "previousTrackId": "baseline/B02.wav",
+      "selectedTrackId": "baseline/B02.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    },
+    {
+      "id": "decision-8",
+      "blockNumber": 3,
+      "windowStartMs": 7810613.200000018,
+      "windowEndMs": 7870613.200000018,
+      "recordCount": 5,
+      "medianInitiationLatencyMs": 1128.9000000059605,
+      "medianFirstPassEntryDurationMs": 9240.300000011921,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "baseline",
+      "selectedState": "elevated",
+      "previousTrackId": "baseline/B02.wav",
+      "selectedTrackId": "elevated/E07.wav",
+      "reason": "Recent performance met every elevated-state trigger."
+    },
+    {
+      "id": "decision-9",
+      "blockNumber": 3,
+      "windowStartMs": 7840617.900000006,
+      "windowEndMs": 7900617.900000006,
+      "recordCount": 4,
+      "medianInitiationLatencyMs": 1119.4999999850988,
+      "medianFirstPassEntryDurationMs": 10133.10000000894,
+      "firstPassRecordErrorRate": 0,
+      "baselineInitiationLatencyMs": 1304.2999999970198,
+      "baselineFirstPassEntryDurationMs": 9933.95000000298,
+      "previousState": "elevated",
+      "selectedState": "baseline",
+      "previousTrackId": "elevated/E07.wav",
+      "selectedTrackId": "baseline/B06.wav",
+      "reason": "Neither reduced nor elevated trigger conditions were met."
+    }
+  ],
+  "musicTransitions": [
+    {
+      "id": "transition-1",
+      "decisionId": "decision-2",
+      "blockNumber": 3,
+      "previousTrackId": "baseline/B18.wav",
+      "selectedTrackId": "reduced/R12.wav",
+      "startedMs": 7690647.200000018,
+      "completedMs": 7695669.9,
+      "configuredCrossfadeMs": 5000,
+      "outcome": "playing",
+      "error": null
+    },
+    {
+      "id": "transition-2",
+      "decisionId": "decision-4",
+      "blockNumber": 3,
+      "previousTrackId": "reduced/R12.wav",
+      "selectedTrackId": "baseline/B02.wav",
+      "startedMs": 7750645.600000024,
+      "completedMs": 7755670.7,
+      "configuredCrossfadeMs": 5000,
+      "outcome": "playing",
+      "error": null
+    },
+    {
+      "id": "transition-3",
+      "decisionId": "decision-8",
+      "blockNumber": 3,
+      "previousTrackId": "baseline/B02.wav",
+      "selectedTrackId": "elevated/E07.wav",
+      "startedMs": 7870650.100000024,
+      "completedMs": 7875672.3,
+      "configuredCrossfadeMs": 5000,
+      "outcome": "playing",
+      "error": null
+    }
+  ],
+  "measures": [
+    {
+      "block": 0,
+      "condition": "No music",
+      "durationSeconds": 60,
+      "recordsPresented": 4,
+      "validatedRecords": 3,
+      "validatedRecordThroughput": 3,
+      "medianInitiationLatencyMs": 1633.3499999940395,
+      "medianFirstPassEntryDurationMs": 11595.65000000596,
+      "firstPassRecordErrorRate": 0.5,
+      "firstPassRecordAccuracy": 0.5,
+      "medianTimeToSuccessfulValidationMs": 15625.40000000596,
+      "correctionCycles": 1,
+      "correctionCyclesPerValidatedRecord": 0.3333333333333333
+    },
+    {
+      "block": 1,
+      "condition": "No music",
+      "durationSeconds": 268.46759999999404,
+      "recordsPresented": 20,
+      "validatedRecords": 20,
+      "validatedRecordThroughput": 4.469813117113673,
+      "medianInitiationLatencyMs": 1304.2999999970198,
+      "medianFirstPassEntryDurationMs": 9933.95000000298,
+      "firstPassRecordErrorRate": 0.2,
+      "firstPassRecordAccuracy": 0.8,
+      "medianTimeToSuccessfulValidationMs": 12247.999999985099,
+      "correctionCycles": 5,
+      "correctionCyclesPerValidatedRecord": 0.25
+    },
+    {
+      "block": 2,
+      "condition": "Static music",
+      "durationSeconds": 300,
+      "recordsPresented": 26,
+      "validatedRecords": 25,
+      "validatedRecordThroughput": 5,
+      "medianInitiationLatencyMs": 1112.5,
+      "medianFirstPassEntryDurationMs": 9885.600000023842,
+      "firstPassRecordErrorRate": 0.16,
+      "firstPassRecordAccuracy": 0.84,
+      "medianTimeToSuccessfulValidationMs": 11949,
+      "correctionCycles": 4,
+      "correctionCyclesPerValidatedRecord": 0.16
+    },
+    {
+      "block": 3,
+      "condition": "Adaptive music",
+      "durationSeconds": 300,
+      "recordsPresented": 25,
+      "validatedRecords": 24,
+      "validatedRecordThroughput": 4.8,
+      "medianInitiationLatencyMs": 1145.6499999910593,
+      "medianFirstPassEntryDurationMs": 10404.400000020862,
+      "firstPassRecordErrorRate": 0.041666666666666664,
+      "firstPassRecordAccuracy": 0.9583333333333334,
+      "medianTimeToSuccessfulValidationMs": 11941.45000000298,
+      "correctionCycles": 1,
+      "correctionCyclesPerValidatedRecord": 0.041666666666666664
+    },
+    {
+      "block": 4,
+      "condition": "No music",
+      "durationSeconds": 300,
+      "recordsPresented": 26,
+      "validatedRecords": 25,
+      "validatedRecordThroughput": 5,
+      "medianInitiationLatencyMs": 1044.4000000059605,
+      "medianFirstPassEntryDurationMs": 9480,
+      "firstPassRecordErrorRate": 0.16,
+      "firstPassRecordAccuracy": 0.84,
+      "medianTimeToSuccessfulValidationMs": 11420.09999999404,
+      "correctionCycles": 4,
+      "correctionCyclesPerValidatedRecord": 0.16
+    }
+  ]
+}
